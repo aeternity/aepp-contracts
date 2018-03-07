@@ -9,7 +9,7 @@ Editor to compile and deploy contracts.
 ```
 git clone https://github.com/aeternity/aepp-contracts
 cd aepp-contracts
-npm run install
+npm install
 ```
 
 ## Usage
@@ -29,6 +29,8 @@ npm run decrypt <PATH TO YOUR Epoch keys directory>
 ```
 npm run dev
 ```
+
+The current form should be self explainatory. 
 
 ## Build Setup
 
