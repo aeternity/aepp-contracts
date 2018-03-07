@@ -38,7 +38,7 @@ To be able to communicate with your node from the browser, you need to setup
 NGINX or Apache to set the CORS header.
 
 Checkout the standard [CORS configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-cors.conf)
-and [Proxy configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-default.conf)
+and [Proxy configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-default.conf). The proxy configuration is taken from the Docker configuration. Please make sure to change the hostnames to 127.0.0.1 or add `node1`, `node2`, `node3` to your `/etc/hosts`.
 
 *The configurations above expose all nodes of the 3-nodes localnet setup. 
 To be able to work with the editor you only need to configure one node 
