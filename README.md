@@ -1,6 +1,8 @@
 # aepp-contracts
 
-Editor to compile and deploy contracts.
+## Overview
+
+This is a simple utility to compile contracts and install them into the blockchain. It's a very early release, so bear with us if there are problems. In particular--
 
 *This repository still work in progress. Be aware that the wallet management will be made more secure in the near future*
 
@@ -16,18 +18,12 @@ npm install
 
 ### Preliminaries
 
-At the current state of development, you have to be in control of a mining node
-to be able to use the editor.
-
-1. You have to decrypt your private key as hex 
-from your node and copy it to your editor
-2. Setup a proxy configuration for your node to set CORS headers to * or 
-something appropriate
+At the current state of development, you have to be in control of a node to use the editor. You sign your transactions with the node's public key, and the node must have enough tokens. Additionally, you'll need to decrypt your private key as hex and enter it into the editor, and set up a proxy configuration in order to set [CORS headers](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 
 #### Decrypt your private key
 
-Before you can start using the editor, you have to decrypt your nodes key to sign the transactions. 
-Until tools become stable and have been made available as installable CLI tools, please use the npm script directly from the `aepp-sdk-js` repo.
+Before you can start using the editor, you have to decrypt your node's key, which you will use to sign the transactions. 
+Until the tools become stable and have been made available as installable CLI tools, please use the npm script directly from the `aepp-sdk-js` repo.
 
 ```
 git clone -b develop https://github.com/aeternity/aepp-sdk-js
