@@ -1,6 +1,36 @@
 # aepp-contracts
 
-> A Vue.js project
+Editor to compile and deploy contracts.
+
+*This repository still work in progress. Be aware that the wallet management will be made more secure in the near future*
+
+## Installation
+
+```
+git clone https://github.com/aeternity/aepp-contracts
+cd aepp-contracts
+npm install
+```
+
+## Usage
+
+### Preliminaries
+
+Before you can start using the editor, you have to decrypt your nodes key to sign the transactions. Until tools become stable and been made available as installable CLI tools, please use the npm script directly from the `aepp-sdk-js` repo.
+
+```
+git clone -b develop https://github.com/aeternity/aepp-sdk-js
+cd aepp-sdk-js
+npm install
+npm run decrypt <PATH TO YOUR Epoch keys directory>
+```
+### Start the application
+
+```
+npm run dev
+```
+
+The current form should be self explainatory. 
 
 ## Build Setup
 
