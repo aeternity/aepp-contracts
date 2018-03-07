@@ -45,15 +45,12 @@ export default {
       let data = await client.contracts.getCreateTx(this.byteCode)
       this.status = 'Sign and send transaction'
       client.tx.sendSigned(data.tx, this.privateKey)
-      console.log(await client.accounts.getPublicKey())
       this.status = 'Waiting for transaction to be mined'
       let interval = setInterval(async () => {
         let transaction = await client.tx.getTransaction(data['tx_hash'])
         if (transaction['block_height'] !== -1) {
-          this.status = 'Contract deployed successfully'
+          this.status = `Contract deployed successfully on block ${transaction['block_height']}`
           clearInterval(interval)
-        } else {
-          console.log(`Waiting for Block height. Current ${transaction['block_height']}`)
         }
       }, 2000)
     }
