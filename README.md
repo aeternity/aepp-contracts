@@ -41,8 +41,8 @@ npm run decrypt <PATH TO YOUR Epoch keys directory>
 To be able to communicate with your node from the browser, you need to setup 
 NGINX or Apache to set the CORS header.
 
-Here is the standard [CORS Configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-cors.conf)
-Here is the standard [Proxy Configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-default.conf)
+Checkout the standard [CORS configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-cors.conf)
+and [Proxy configuration](https://raw.githubusercontent.com/aeternity/epoch/master/docker/nginx-default.conf)
 
 *The configurations above expose all nodes of the 3-nodes localnet setup. 
 To be able to work with the editor you only need to configure one node 
