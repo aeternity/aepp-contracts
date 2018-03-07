@@ -1,6 +1,10 @@
 <template>
   <div class="contracts-editor">
     <h1>Ring Contract compile (Block height: {{height}})</h1>
+    <form class="server-form">
+      <input placeholder="External route" v-model="externalRoute" />
+      <input placeholder="Internal route" v-model="internalRoute" />
+    </form>
     <form class="compile-form" @submit.prevent="onCompile">
       <input placeholder="Paste your hex private key" type="text" v-model="privateKey" required/>
       <textarea placeholder="Paste your contract source code" v-model="contractCode" required/>
@@ -19,10 +23,6 @@
 <script>
 import AeternityClient from 'aepp-sdk'
 
-let provider = new AeternityClient.providers.HttpProvider('localhost', 3001)
-provider.setBaseUrl('http://localhost:3001/internal/v2/', true)
-let client = new AeternityClient(provider)
-
 export default {
   name: 'ContractsEditor',
   data () {
@@ -31,23 +31,26 @@ export default {
       contractCode: '',
       byteCode: '',
       height: 0,
-      status: ''
+      status: '',
+      externalRoute: 'http://localhost:3001',
+      internalRoute: 'http://localhost:3001/internal',
+      client: undefined
     }
   },
   methods: {
     async onCompile () {
       this.status = 'Compiling'
-      this.byteCode = await client.contracts.compile(this.contractCode, '')
+      this.byteCode = await this.client.contracts.compile(this.contractCode, '')
       this.status = 'Compiled successfully'
     },
     async onDeploy () {
       this.status = 'Create transaction object'
-      let data = await client.contracts.getCreateTx(this.byteCode)
+      let data = await this.client.contracts.getCreateTx(this.byteCode)
       this.status = 'Sign and send transaction'
-      client.tx.sendSigned(data.tx, this.privateKey)
+      this.client.tx.sendSigned(data.tx, this.privateKey)
       this.status = 'Waiting for transaction to be mined'
       let interval = setInterval(async () => {
-        let transaction = await client.tx.getTransaction(data['tx_hash'])
+        let transaction = await this.client.tx.getTransaction(data['tx_hash'])
         if (transaction['block_height'] !== -1) {
           this.status = `Contract deployed successfully on block ${transaction['block_height']}`
           clearInterval(interval)
@@ -56,6 +59,12 @@ export default {
     }
   },
   mounted () {
+    let provider = new AeternityClient.providers.HttpProvider('localhost', 3001)
+    // let provider = new AeternityClient.providers.HttpProvider('localhost', 3013, {internalPort: 3113})
+    provider.setBaseUrl(this.internalRoute + '/v2/', true)
+    provider.setBaseUrl(this.externalRoute + '/v2/')
+    let client = new AeternityClient(provider)
+    this.client = client
     let _this = this
     setInterval(
       () => {
@@ -79,9 +88,6 @@ export default {
       textarea {
         width: 100%;
       }
-      input {
-        margin: 16px;
-      }
     }
   }
   .deploy-form {
@@ -89,11 +95,22 @@ export default {
       height: 50px;
       width: 100%;
     }
+    input {
+      margin: 16px;
+    }
   }
   .compile-form {
     textarea {
       height: 200px;
       width: 100%;
+    }
+    input {
+      margin: 16px;
+    }
+  }
+  .server-form {
+    input {
+      margin: 2px;
     }
   }
 </style>
