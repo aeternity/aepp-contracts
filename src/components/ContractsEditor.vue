@@ -42,8 +42,8 @@ export default {
   name: 'ContractsEditor',
   data () {
     return {
-      privateKey: '3b12b6baed7aaa1a51a27b62e8cf8cecd6c41df094cb9528ec55e996cad72ad8',
-      publicKey: 'ak$3hJ3Jt4uCcgUsZ4dR6TjxAyCqZX2TL7aJudN4qBSwwDsgVq9g9RcKwZQdk22GzBx7n9pNJhbtssLj8apZjZNH8kfu7NQMd',
+      privateKey: '',
+      publicKey: '',
       contractCode: '',
       byteCode: '',
       height: 0,

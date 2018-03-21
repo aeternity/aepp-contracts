@@ -14,7 +14,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "aepp-sdk": "0.0.1-alpha.4",
+    "aepp-sdk": "aeternity/aepp-sdk-js#feature/call-contracts",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
