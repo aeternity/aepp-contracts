@@ -19,12 +19,12 @@
     </div>
     <div class="contracts-call-panel">
       <form class="call-data-form" @submit.prevent="onComputeCallData">
-        <input placeholder="Type function name" v-model="functionName" required>
-        <input placeholder="Type comma separated function arguments" v-model="functionArgs" required>
+        <input placeholder="Enter function name" v-model="functionName" required>
+        <input placeholder="Enter comma separated function arguments" v-model="functionArgs" required>
         <input type="submit" value="Generate call data" />
       </form>
       <form class="call-form" @submit.prevent="onCallFunction">
-        <input placeholder="Paste your contract id" v-model="contractAddress" required />
+        <input placeholder="Paste your contract address" v-model="contractAddress" required />
         <input placeholder="Paste your call data" v-model="callData" required />
         <input type="submit" value="Call function" />
       </form>
