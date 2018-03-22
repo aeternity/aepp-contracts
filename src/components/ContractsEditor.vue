@@ -12,15 +12,28 @@
         <textarea placeholder="Paste your contract source code" v-model="contractCode" required/>
         <input type="submit" value="Compile"/>
       </form>
-      <form class="deploy-form" @submit.prevent="onDeploy">
-        <textarea placeholder="Paste your contract byte code" v-model="byteCode" required />
-        <input type="submit" value="Deploy"/>
-      </form>
+      <div class="contracts-static-call-panel">
+        <form class="deploy-form" @submit.prevent="onDeploy">
+          <textarea placeholder="Paste your contract byte code" v-model="byteCode" required />
+          <input type="submit" value="Deploy"/>
+        </form>
+        <form class="contracts-static-call-form" @submit.prevent="onCallStatic">
+          <input placeholder="Paste your contract byte code" v-model="byteCode">
+          <div class="d-flex d-row w-100 function-args">
+            <input placeholder="Enter function name" v-model="staticFunction">
+            <input placeholder="Enter comma separated list of function arguments" v-model="staticArguments">
+          </div>
+          <input type="submit" value="Call static function">
+        </form>
+        <div class="result">Result: {{staticResult}}</div>
+      </div>
     </div>
     <div class="contracts-call-panel">
       <form class="call-data-form" @submit.prevent="onComputeCallData">
-        <input placeholder="Enter function name" v-model="functionName" required>
-        <input placeholder="Enter comma separated function arguments" v-model="functionArgs" required>
+        <div class="d-flex d-row w-100 function-args">
+          <input placeholder="Enter function name" v-model="functionName" required>
+          <input placeholder="Enter comma separated function arguments" v-model="functionArgs" required>
+        </div>
         <input type="submit" value="Generate call data" />
       </form>
       <form class="call-form" @submit.prevent="onCallFunction">
@@ -51,10 +64,13 @@ export default {
       callData: '',
       functionName: '',
       functionArgs: '',
+      staticFunction: '',
+      staticArguments: '',
       contractAddress: '',
       externalRoute: 'http://localhost:3001',
       internalRoute: 'http://localhost:3001/internal',
-      client: undefined
+      client: undefined,
+      staticResult: ''
     }
   },
   methods: {
@@ -104,11 +120,18 @@ export default {
           clearInterval(interval)
         }
       }, 2000)
+    },
+    async onCallStatic () {
+      this.staticResult = await this.client.contracts.callStatic(
+        'ring',
+        this.byteCode,
+        this.staticFunction,
+        this.staticArguments
+      )
     }
   },
   mounted () {
     let provider = new AeternityClient.providers.HttpProvider('localhost', 3001)
-    // let provider = new AeternityClient.providers.HttpProvider('localhost', 3013, {internalPort: 3113})
     provider.setBaseUrl(this.internalRoute + '/v2/', true)
     provider.setBaseUrl(this.externalRoute + '/v2/')
     let client = new AeternityClient(provider)
@@ -159,13 +182,20 @@ export default {
       display: flex;
       flex-direction: row;
       form {
-        width: 50%;
         padding: 8px;
-        margin: 8px;
+        margin: 4px;
         border: 1px solid black;
         input {
           margin: 8px;
         }
+      }
+    }
+    &-static-call {
+      &-panel {
+        width: 50%;
+      }
+      &-form {
+        margin: 2px;
       }
     }
   }
@@ -179,6 +209,7 @@ export default {
     }
   }
   .compile-form {
+    width: 50%;
     textarea {
       height: 200px;
       width: 50%;
@@ -191,5 +222,28 @@ export default {
     input {
       margin: 2px;
     }
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  .d-flex {
+    display: flex;
+  }
+  .flex-row {
+    flex-direction: row;
+  }
+  .w-100 {
+    width: 100%;
+  }
+  .function-args {
+    input {
+      width: 50%;
+    }
+  }
+  .result {
+    height: 50px;
+  }
+  .compile-form {
+    width: 50%;
   }
 </style>
