@@ -67,8 +67,8 @@ export default {
       staticFunction: '',
       staticArguments: '',
       contractAddress: '',
-      externalRoute: 'http://localhost:3001',
-      internalRoute: 'http://localhost:3001/internal',
+      externalRoute: 'https://sdk-testnet.aepps.com',
+      internalRoute: 'https://sdk-testnet.aepps.com/internal',
       client: undefined,
       staticResult: ''
     }
