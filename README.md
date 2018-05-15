@@ -2,36 +2,22 @@
 
 ## Overview
 
-This is a simple Web Application that will be used during [re:publica 2018](https://re-publica.com/en) using VueJS and [Aeternity's JS SDK](https://github.com/aeternity/aepp-sdk-js).
-
-It allows the bar tender to check whether participants are actually allowed to get their beers using Æ tokens coming from the [Beer App](https://github.com/aeternity/beer-aepp/).
-
-*This repository is a work in progress* and it has the precise scope of only being used during re:publica 2018 to gamify the process of ordering a beer offered by Aeternity.
-
-## Usage
-
-### Preliminaries
-
-This application is only intended to work with the [Beer App](https://github.com/aeternity/beer-aepp/), make sure to read that documentation first.
-
+This is a simple Web Application that demonstrates Aeternity Contracts.
 
 ### How it works
 
-1. Print this PDF to speed up the work:  https://github.com/aeternity/pos-aepp/pos-aepp-commands.pdf
-2. Access the app sending your secret via URL (eg. `http://URL_OF_APP/?secret=your-POS-secret-here`)
-3. Use a QR code scanner (or manually type in the input field) to switch POS functionalities of the POS application
-   * Possible commands:
-      1. `th$...` – Scan mode - Verifies a transaction
-      2. `number` - Refund mode - Refunds `number` AETs
-      3. `close` - Close POS
-      4. `out_of_beers` - Sets POS as "_out of beers_"
-      5. `open` - Open POS
+1. Select a node
+2. Add your private and public keys
+3. Write an [Aeternity contract](https://github.com/aeternity/protocol/tree/master/contracts) in [Sophia](https://github.com/aeternity/protocol/blob/master/contracts/sophia.md)
+4. Compile it by hitting "compile"
+5. Deploy it to the chain hitting "Deploy"
+6. Test other functionalities (call data, static function and function)
 
 ## Installation
 
 ```
-git clone https://github.com/aeternity/pos-aepp
-cd pos-aepp
+git clone https://github.com/aeternity/aepp-contracts/
+cd aepp-contracts
 yarn install
 ```
 
