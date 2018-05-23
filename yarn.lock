@@ -13,14 +13,15 @@
     string-loader "0.0.1"
     vue-clickaway "^2.1.0"
 
-"@aeternity/aepp-sdk@aeternity/aepp-sdk-js#develop":
+"@aeternity/aepp-sdk@aeternity/aepp-sdk-js#feature/working-web-builds":
   version "0.12.0-0.1.0-alpha.1"
-  resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/45760246f6b5f252d5d48454717304207f551b18"
+  resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/56250abf4cc0617e88cf8f0605b8d0a6c1215a95"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     aes-js "^3.1.0"
     axios "^0.18.0"
     bs58check "^2.1.1"
+    postinstall-build "^5.0.1"
     ramda "^0.25.0"
     rlp "^2.0.0"
     sha.js "^2.4.10"
@@ -3674,8 +3675,8 @@ flush-write-stream@^1.0.0:
     readable-stream "^2.0.4"
 
 follow-redirects@^1.3.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.4.1.tgz#d8120f4518190f55aac65bb6fc7b85fcd666d6aa"
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.0.tgz#234f49cf770b7f35b40e790f636ceba0c3a0ab77"
   dependencies:
     debug "^3.1.0"
 
@@ -6868,6 +6869,10 @@ postcss@^6, postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postc
     chalk "^2.4.1"
     source-map "^0.6.1"
     supports-color "^5.4.0"
+
+postinstall-build@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/postinstall-build/-/postinstall-build-5.0.1.tgz#b917a9079b26178d9a24af5a5cd8cb4a991d11b9"
 
 precss@^3.1.2:
   version "3.1.2"

@@ -15,11 +15,12 @@
   "license": "ISC",
   "dependencies": {
     "@aeternity/aepp-components": "^2.0.7",
-    "@aeternity/aepp-sdk": "aeternity/aepp-sdk-js#develop",
+    "@aeternity/aepp-sdk": "aeternity/aepp-sdk-js#feature/working-web-builds",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "fs": "^0.0.1-security",
     "html-webpack-plugin": "^3.1.0",
     "isomorphic-fetch": "^2.2.1",
+    "url": "^0.11.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vue-socket.io": "2.1.1-a",
