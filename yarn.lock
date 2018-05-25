@@ -13,6 +13,22 @@
     string-loader "0.0.1"
     vue-clickaway "^2.1.0"
 
+"@aeternity/aepp-sdk@aeternity/aepp-sdk-js#develop":
+  version "0.14.0-0.1.0-alpha.1"
+  resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/4ffc11226cdd8672838f19aa357967198b4c61e4"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.46"
+    aes-js "^3.1.0"
+    axios "^0.18.0"
+    bs58check "^2.1.1"
+    postinstall-build "^5.0.1"
+    ramda "^0.25.0"
+    rlp "^2.0.0"
+    sha.js "^2.4.10"
+    tweetnacl "^1.0.0"
+    url "^0.11.0"
+    websocket "^1.0.25"
+
 "@aeternity/aepp-sdk@aeternity/aepp-sdk-js#feature/working-web-builds":
   version "0.12.0-0.1.0-alpha.1"
   resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/56250abf4cc0617e88cf8f0605b8d0a6c1215a95"
@@ -21,7 +37,6 @@
     aes-js "^3.1.0"
     axios "^0.18.0"
     bs58check "^2.1.1"
-    postinstall-build "^5.0.1"
     ramda "^0.25.0"
     rlp "^2.0.0"
     sha.js "^2.4.10"

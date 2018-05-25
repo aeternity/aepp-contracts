@@ -73,23 +73,17 @@ function compile (client, contract) {
 function deploy (client, byteCode, account, options = {}) {
   console.log(`Deploying contract...`)
   return new Promise((resolve, reject) => {
-    client.contracts.deployContract(byteCode, account, '')
+    client.contracts.deployContract(byteCode, account, {amount: 10})
       .then(data => {
         console.log(`Deployed! Data:`)
         console.log(data)
         console.log(`\n`)
         // resolve(data)
-        let interval = setInterval(() => {
-          client.tx.getTransaction(data.tx_hash).then(transaction => {
-            // console.log(transaction)
-            console.log(`Checking contract deployment (block height: ${transaction.block_height}...)`)
-            if (transaction.block_height !== -1) {
-              console.log(`Contract deployed successfully on block ${transaction['block_height']}`)
-              resolve(data)
-              clearInterval(interval)
-            }
+        client.tx.waitForTransaction(data.tx_hash)
+          .then((blockHeight) => {
+            console.log(`Contract deployed successfully on block ${blockHeight}`)
+            resolve(data)
           })
-        }, 2000)
       })
       .catch((reject) => console.log(`NOT deployed, reason: ${reject}`))
   })
@@ -139,7 +133,7 @@ function callFunction (client, contractAddress, callData) {
       contractAddress,
       callData,
       { caller: wallet.pub,
-        amount: 3
+        amount: 10
       }
     )
       .then(data => {
@@ -152,7 +146,7 @@ function callFunction (client, contractAddress, callData) {
           .then(data => console.log(data))
           .catch((reject) => console.log(`Cannot Call Function, reason: ${reject}`, reject))
       })
-      .catch((reject) => console.log(`Cannot get TX of Call, reason: ${reject}`, reject.response.data.reason))
+      .catch((reject) => console.log(`Cannot get TX of Call, reason: ${reject} – Contract Address: ${contractAddress}`, reject.response.data.reason))
   })
 }
 
@@ -178,7 +172,7 @@ AeClient.then(client => {
             console.log(callData)
             console.log(`\n`)
             console.log(`Calling function with generated Call Data...`)
-            // console.log(deployedData.contract_address, callData)
+            // TODO: this won't work on 0.13.0 (it's been fixed on 0.14.0 on 25/05/2018 at ~17:00)
             callFunction(client, deployedData.contract_address, callData)
           })
         })
