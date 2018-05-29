@@ -39,115 +39,78 @@ const contract = `contract Identity =
 
 console.log(`Deploying contract: \n\n ${contract}\n`)
 
-function connect (host) {
+const aeClient = async (host) => {
   const node = url.parse(host)
   const secured = node.protocol === 'https:'
   const port = node.port || (secured ? 443 : 80)
 
   console.log(`Attempting to connect to ${host}...`)
-  const client = new AeternityClient.providers.HttpProvider(node.hostname, port, { secured })
+  const provider = new AeternityClient.providers.HttpProvider(node.hostname, port, { secured })
+  await provider.ready
+  const client = new AeternityClient(provider)
 
-  return new Promise((resolve, reject) => {
-    client.ready.then(status => {
-      // console.log('ready: ', status)
-      client.base.getHeight().then(height => {
-        console.log(`Connected. Current height reported as ${height}\n`)
-        resolve(client)
-      }).catch((reject) => console.log(reject))
-    }).catch((reject) => console.log(reject))
-  })
+  return client
 }
 
-function compile (client, contract) {
+const compile = async (client, contract) => {
   console.log(`Compiling contract...`)
-  return new Promise((resolve, reject) => {
-    client.contracts.compile(contract, 'options')
-      .then(byteCode => {
-        console.log(`Compiled!\n`)
-        resolve(byteCode)
-      })
-      .catch((reject) => console.log(`NOT compiled, reason: ${reject}`))
-  })
+  try {
+    return await client.contracts.compile(contract, 'options')
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-function deploy (client, byteCode, account, options = {}) {
+const deploy = async (client, byteCode, account, options = {}) => {
   console.log(`Deploying contract...`)
-  return new Promise((resolve, reject) => {
-    client.contracts.deployContract(byteCode, account, {amount: 10})
-      .then(data => {
-        console.log(`Deployed! Data:`)
-        console.log(data)
-        console.log(`\n`)
-        // resolve(data)
-        client.tx.waitForTransaction(data.tx_hash)
-          .then((blockHeight) => {
-            console.log(`Contract deployed successfully on block ${blockHeight}`)
-            resolve(data)
-          })
-      })
-      .catch((reject) => console.log(`NOT deployed, reason: ${reject}`))
-  })
+  try {
+    const deployedContract = await client.contracts.deployContract(byteCode, account, {amount: 10})
+    return await client.tx.waitForTransaction(deployedContract.txHash).then((blockHeight) => {
+      console.log(`Contract deployed successfully on block ${blockHeight}`)
+      return deployedContract
+    })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-function callStatic (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = '1') {
+const callStatic = async (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = '1') => {
   // console.log(`Calling static function "${staticFunction}" with ABI "${abi}", FUNCTION ${staticFunction}, ARGS ${staticArguments} ...`)
-  return new Promise((resolve, reject) => {
-    client.contracts.callStatic(
+  try {
+    return await client.contracts.callStatic(
       abi,
       byteCode,
       staticFunction,
       staticArguments
     )
-      .then(data => {
-        console.log(`Response from callStatic:`)
-        console.log(data)
-        console.log(`\n`)
-        resolve(data)
-      })
-      .catch((reject) => console.log(`Cannot call static, reason: ${reject}`, reject))
-  })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-function generateCallData (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = ['1']) {
+const generateCallData = async (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = ['1']) => {
   // console.log(`Generating callData ...`)
-  return new Promise((resolve, reject) => {
-    client.contracts.encodeCallData(
+  try {
+    return await client.contracts.encodeCallData(
       abi,
       byteCode,
       staticFunction,
       staticArguments.split(',')
     )
-      .then(data => {
-        // console.log(`Generated Call Data:`)
-        // console.log(data)
-        resolve(data)
-      })
-      .catch((reject) => console.log(`Cannot generate Call Data, reason: ${reject}`, reject))
-  })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-function callFunction (client, contractAddress, callData) {
+const callFunction = async (client, contractAddress, callData) => {
   // console.log(`Calling a function ...`)
-  return new Promise((resolve, reject) => {
-    client.contracts.getCallTx(
-      contractAddress,
-      callData,
-      { caller: wallet.pub,
-        amount: 10
-      }
-    )
-      .then(data => {
-        // console.log(`Generated Call Data:`)
-        // console.log(data)
-        resolve(data)
-        return new Promise((resolve, reject) => {
-          client.tx.sendSigned(data.tx, wallet.priv)
-        })
-          .then(data => console.log(data))
-          .catch((reject) => console.log(`Cannot Call Function, reason: ${reject}`, reject))
-      })
-      .catch((reject) => console.log(`Cannot get TX of Call, reason: ${reject} – Contract Address: ${contractAddress}`, reject.response.data.reason))
-  })
+  return await client.contracts.getCallTx(
+    contractAddress,
+    callData,
+    { caller: wallet.pub,
+      amount: 10
+    }
+  )
 }
 
 program
@@ -155,7 +118,7 @@ program
   .option('--node [node]', 'Node to connect to', 'http://localhost:3013')
   .parse(process.argv)
 
-const AeClient = connect(program.node)
+const AeClient = aeClient(program.node)
 
 AeClient.then(client => {
   // console.log(client)
@@ -166,16 +129,19 @@ AeClient.then(client => {
       callStatic(client, 'sophia', byteCode, 'main', '5999')
       deploy(client, byteCode, wallet, '')  // this won't be resolved until the TX is mined
         .then(deployedData => {
+          console.log('deployedData', deployedData)
           generateCallData(client, 'sophia', byteCode, 'main', '5999')
           .then(callData => {
             console.log(`Generated Call Data:`)
             console.log(callData)
             console.log(`\n`)
             console.log(`Calling function with generated Call Data...`)
-            // TODO: this won't work on 0.13.0 (it's been fixed on 0.14.0 on 25/05/2018 at ~17:00)
-            callFunction(client, deployedData.contract_address, callData)
-          })
-        })
-    })
+            callFunction(client, deployedData.contractAddress, callData)
+              .then(res => console.log(res))
+              .catch(err => console.log(err))
+            // console.log('res', res)
+          }).catch(err => console.log(err))
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
     .catch(err => console.log(err))
 }).catch(err => console.log(err))
