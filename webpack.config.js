@@ -28,7 +28,7 @@ module.exports = {
     }),
     new HtmlWebpackHarddiskPlugin(),
     new ExtractTextPlugin('style.css?[hash]'),
-    new CleanWebpackPlugin([distFolder]),
+    new CleanWebpackPlugin([distFolder])
     // debug bundle (for optimisation)
     // new BundleAnalyzerPlugin()
   ],
@@ -40,18 +40,23 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(s[ac]ss)$/,
+        test: /\.css$/,
         use: ExtractTextPlugin.extract({
-          fallback: 'vue-style-loader',
           use: [
             'css-loader',
-            'sass-loader',
-            'postcss-loader'
+            {
+              loader: 'postcss-loader',
+              options: {
+                config: {
+                  path: 'postcss.config.js'
+                }
+              }
+            }
           ]
-          // publicPath: '/dist'
+          // publicPath: '/web'
         })
       },
-      //allows vue compoents in '<template><html><script><style>' syntax
+      // allows vue compoents in '<template><html><script><style>' syntax
       {
         test: /\.vue$/,
         loader: 'vue-loader',

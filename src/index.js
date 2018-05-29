@@ -1,5 +1,5 @@
 // import socketio from 'socket.io'
-import './custom.scss'
+import './main.css'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import App from './App.vue'
