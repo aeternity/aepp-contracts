@@ -17,33 +17,35 @@
           <h2 class="py-2">
             Sophia Contract's Code:
           </h2>
-          <textarea v-model="contract" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+          <textarea v-model="contractCode" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
         </div>
 
         <div class="flex mt-8" v-if="byteCode">
           <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
-              Byte Code <span class="text-sm" v-bind:class="{ 'text-red' : !deployedData, 'text-green' : deployedData }">{{deployInfo}}</span>
+              Byte Code <span class="text-sm" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">{{deployInfo}}</span>
             </h2>
             <textarea v-model="byteCode" class="h-16 w-full border border-solid border-black font-mono bg-black text-white text-xs"></textarea>
 
+            <div class="mt-2 mb-2" v-if="deployError">Issues with Deploy: <br></div>
+            <div v-if="deployError" class="w-full text-white bg-black text-xs mb-4 font-mono">
+              {{deployError}}
+            </div>
+
             <div class="flex -mx-2 mt-4 mb-4">
-              <input class="mx-2 w-1/2 p-2" type="text" value="init" disabled>
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+              <input v-model="deployFunc" class="mx-2 w-1/2 p-2" type="text" value="init" disabled>
+              <input v-model="deployArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
-              <input class="mx-2 w-1/2 p-2" type="hidden" value="callData">
+              <input v-model="deployDeposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
+              <input v-model="deployGasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
+              <input v-model="deployAmount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
+              <input v-model="deployFee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
+              <input v-model="deployGas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
+              <input v-model="deployCallData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
             </div>
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
-
-            <button v-if="!minedData && deployedData" class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCheckMininStatus">Check Mining Status</button>
-            <span v-if="minedInfo" class="text-sm" v-bind:class="{ 'text-red' : !minedData, 'text-green' : minedData }">{{minedInfo}}</span>
           </div>
 
           <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
@@ -51,27 +53,35 @@
               ⬅ Call Static Function
             </h2>
             <div class="flex -mx-2 mt-4 mb-4">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="function">
-              <input class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+              <input v-model="staticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
+              <input v-model="staticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+            </div>
+            <div class="mt-2 mb-2" v-if="callStaticRes">Call Result: <br></div>
+            <div v-if="callStaticRes" class="w-full text-white bg-black text-xs mb-4 font-mono">
+              {{callStaticRes}}
             </div>
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
           </div>
         </div>
 
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow mt-8" v-if="minedData">
-          <h2 class="py-2">Function Call</h2>
+        <div v-if="deployedDataObj" class="w-full p-4 bg-grey-light rounded-sm shadow mt-8">
+          <h2 class="py-2">
+            Call Function
+          </h2>
           <div class="flex -mx-2 mt-4 mb-4">
-            <input class="mx-2 w-1/2 p-2" type="text" placeholder="function">
-            <input class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+            <input v-model="staticDeposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
+            <input v-model="staticGasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
+            <input v-model="staticAmount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
+            <input v-model="staticFee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
+            <input v-model="staticGas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
+            <input v-model="staticCallData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
           </div>
-          <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call!</button>
+          <div class="flex -mx-2 mt-4 mb-4">
+            <input v-model="nonStaticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
+              <input v-model="nonStaticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+          </div>
+          <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
         </div>
-
-         <div v-if="minedData">
-           <h2>
-              Call Function
-            </h2>
-         </div>
 
       </div>
     </div>
@@ -79,8 +89,7 @@
 </template>
 
 <script>
-import { AeternityClient } from '@aeternity/aepp-sdk'
-import url from 'url'
+import Ae, { Contract, Wallet } from '@aeternity/aepp-sdk/src'
 import account from '../account.js'
 
 export default {
@@ -89,17 +98,39 @@ export default {
   },
   data () {
     return {
-      contract: `contract Identity =
+      contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
       account: account,
       byteCode: '',
       client: false,
       host: 'https://sdk-testnet.aepps.com',
-      deployedData: false,
+      deployedDataObj: false,
       deployInfo: '',
       minedData: false,
-      minedInfo: ''
+      miningStatus: '',
+      wallet: false,
+      byteCodeObj: {},
+      deployFunc: 'init',
+      deployArgs: '()',
+      callStaticRes: '',
+      staticFunc: '',
+      staticArgs: '',
+      nonStaticFunc: '',
+      nonStaticArgs: '',
+      deployDeposit: 1,
+      deployGasPrice: 1,
+      deployAmount: 1,
+      deployFee: 1,
+      deployGas: 40000000,
+      deployCallData: '',
+      deployError: '',
+      callDeposit: '',
+      callGasPrice: '',
+      callFee: '',
+      callGas: '',
+      callAmount: '',
+      callCallData: ''
     }
   },
   props: {
@@ -108,92 +139,43 @@ export default {
     }
   },
   methods: {
-    async aeClient (host) {
-      const node = url.parse(host)
-      const secured = node.protocol === 'https:'
-      const port = node.port || (secured ? 443 : 80)
-
-      console.log(`Attempting to connect to ${host}...`)
-      const provider = new AeternityClient.providers.HttpProvider(node.hostname, port, { secured })
-      await provider.ready
-      const client = new AeternityClient(provider)
-
-      return client
-    },
-    async compile (client, contract) {
+    async compile (client, code) {
       console.log(`Compiling contract...`)
+      const wallet = Wallet.create(this.client, account)
+      const contract = Contract.create(this.client, { wallet })
       try {
         console.log(`Compiled!`)
-        return await client.contracts.compile(contract, 'options')
+        return contract.compile(code)
       } catch (err) {
         console.log(err)
       }
     },
-    async deployAndWait (client, byteCode, account, options = {}) {
+    async deploy (options = {}) {
       console.log(`Deploying contract...`, account)
       try {
-        const deployedContract = await client.contracts.deployContract(byteCode, account, {amount: 10})
-        return await client.tx.waitForTransaction(deployedContract.txHash).then((blockHeight) => {
-          console.log(`Contract deployed successfully on block ${blockHeight}`)
-          return deployedContract
-        })
+        return this.byteCodeObj.deploy(options) // TODO: send more options like: {amount: 10, abi: 'sophia'}
       } catch (err) {
         console.log(err)
       }
     },
-    async deploy (client, byteCode, account, options = {}) {
-      console.log(`Deploying contract...`, account)
+    async callStatic (func, arg = '1') {
+      console.log(`calling static func ${func} with args ${arg}`)
       try {
-        return await client.contracts.deployContract(byteCode, account, {amount: 10})
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async waitForMining (client, txHash) {
-      try {
-        return await client.tx.waitForTransaction(txHash).then((blockHeight) => {
-          console.log(`Contract deployed successfully on block ${blockHeight}`)
-          return blockHeight
-        })
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async callStatic (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = '1') {
-      // console.log(`Calling static function "${staticFunction}" with ABI "${abi}", FUNCTION ${staticFunction}, ARGS ${staticArguments} ...`)
-      try {
-        return await client.contracts.callStatic(
-          abi,
-          byteCode,
-          staticFunction,
-          staticArguments
+        return this.byteCodeObj.call(
+          func,
+          { args: arg }
         )
       } catch (err) {
         console.log(err)
       }
     },
-    async generateCallData (client, abi = 'sophia', byteCode, staticFunction = 'main', staticArguments = ['1']) {
-      // console.log(`Generating callData ...`)
-      try {
-        return await client.contracts.encodeCallData(
-          abi,
-          byteCode,
-          staticFunction,
-          staticArguments.split(',')
-        )
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async callFunction (client, contractAddress, callData) {
+    async callContract (contractAddress, func, arg) {
       // console.log(`Calling a function ...`)
       try {
-        return await client.contracts.getCallTx(
+        return this.deployedDataObj.call(
           contractAddress,
-          callData,
-          { caller: this.account.pub,
-            amount: 10
-          }
+          func,
+          { args: arg }
         )
       } catch (err) {
         console.log(err)
@@ -203,78 +185,76 @@ export default {
       this.deployedData = false
       this.deployInfo = ''
       this.minedData = false
-      this.minedInfo = ''
-      const byteCodeRes = this.compile(this.client, this.contract)
-      byteCodeRes
-        .then(code => {
-          this.byteCode = code
-        })
-        .catch(err => {
-          console.log(`Error: ${err}`)
+      this.miningStatus = false
+      this.compile(this.client, this.contractCode)
+        .then(byteCodeObj => {
+          this.byteCodeObj = byteCodeObj
+          this.byteCode = byteCodeObj.bytecode
         })
     },
     onDeploy () {
-      this.deployInfo = 'Deploying...'
-      this.deploy(this.client, this.byteCode, this.account, '') // this won't be resolved until the TX is mined
+      this.deployInfo = 'Deploying and checking for mining status...'
+      this.miningStatus = true
+
+      const opts = {
+        'owner': account.pub,
+        'code': this.contractCode,
+        'deposit': this.deployDeposit || 1,
+        'vmVersion': 1,
+        'gasPrice': this.deployGasPrice || 1,
+        'amount': this.deployAmount || 1,
+        'fee': this.deployFee || 1,
+        'gas': this.deployGas || 40000000,
+        // 'callData': this.deployCallData,
+        // 'nonce': 0,
+        'ttl': 9999999
+      }
+
+      this.deploy(opts) // this waits until the TX is mined
         .then(data => {
-          this.deployInfo = 'Deployed, but not mined'
-          this.deployedData = data
+          this.deployInfo = 'Deployed, and mined'
+          this.miningStatus = false
+          this.deployedDataObj = data
         })
         .catch(err => {
-          console.log(`Error: ${err}`)
-        })
-    },
-    onCheckMininStatus () {
-      this.minedInfo = 'Checking for mining status...'
-      this.waitForMining(this.client, this.deployedData.txHash)
-        .then(data => {
-          this.deployInfo = `Deployed and mined! #${data}`
-          this.minedInfo = false
-          this.minedData = data
-        })
-        .catch(err => {
-          console.log(`Error: ${err}`)
+          this.deployError = `${err}`
+          console.log(`Error during Deploy: ${err}`)
         })
     },
     onCallStatic () {
-
+      this.callStatic(this.staticFunc, this.staticArgs)
+        .then(data => {
+          this.callStaticRes = data
+        })
+        .catch(err => {
+          console.log(`Error: ${err}`)
+        })
+      // this.staticFuncField
+      // this.staticArgsField
     },
     onCallDataAndFunction () {
-
+      // const opts = {
+      //   'owner': account.pub,
+      //   'code': this.contractCode,
+      //   'deposit': this.callDeposit,
+      //   'vm_version': 153,
+      //   'gasPrice': this.callGasPrice,
+      //   'amount': this.callAmount,
+      //   'fee': this.callFee,
+      //   'gas': this.callGas,
+      //   // 'callData': this.callCallData,
+      //   // 'nonce': 0,
+      //   'ttl': 99999
+      // }
+      // this.nonStaticFuncField
+      // this.nonStaticArgsField
     }
   },
   mounted () {
-    const AeClient = this.aeClient(this.host)
-    AeClient.then(client => {
-      console.log('connected')
+    console.log(account)
+    Ae.create(this.host, {debug: true}).then(client => {
       this.client = client
     })
-    // AeClient.then(client => {
-    //   console.log(this.contract)
-    //   const byteCode = this.compile(client, this.contract)
-
-    //   byteCode
-    //     .then(byteCode => {
-    //       this.callStatic(client, 'sophia', byteCode, 'main', '5999')
-    //       this.deploy(client, byteCode, this.account, '') // this won't be resolved until the TX is mined
-    //         .then(deployedData => {
-    //           this.byteCode = byteCode
-    //           console.log('deployedData', deployedData)
-    //           this.generateCallData(client, 'sophia', byteCode, 'main', '5999')
-    //             .then(callData => {
-    //               console.log(`Generated Call Data:`)
-    //               console.log(callData)
-    //               console.log(`\n`)
-    //               console.log(`Calling function with generated Call Data...`)
-    //               this.callFunction(client, deployedData.contractAddress, callData)
-    //                 .then(res => console.log(res))
-    //                 .catch(err => console.log(err))
-    //             // console.log('res', res)
-    //             }).catch(err => console.log(err))
-    //         }).catch(err => console.log(err))
-    //     }).catch(err => console.log(err))
-    //     .catch(err => console.log(err))
-    // }).catch(err => console.log(err))
   }
 }
 </script>
