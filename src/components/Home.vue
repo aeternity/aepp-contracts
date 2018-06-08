@@ -38,12 +38,12 @@
               <input v-model="deployArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
-              <input v-model="deployDeposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
-              <input v-model="deployGasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
-              <input v-model="deployAmount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
-              <input v-model="deployFee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
-              <input v-model="deployGas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
-              <input v-model="deployCallData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
+              <input v-model="deployOpts.deposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
+              <input v-model="deployOpts.gasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
+              <input v-model="deployOpts.amount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
+              <input v-model="deployOpts.fee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
+              <input v-model="deployOpts.gas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
+              <input v-model="deployOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
             </div>
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
@@ -64,17 +64,17 @@
           </div>
         </div>
 
-        <div v-if="deployedDataObj" class="w-full p-4 bg-grey-light rounded-sm shadow mt-8">
+        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mt-8">
           <h2 class="py-2">
-            Call Function
+            ⬆ Call Function
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
-            <input v-model="staticDeposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
-            <input v-model="staticGasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
-            <input v-model="staticAmount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
-            <input v-model="staticFee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
-            <input v-model="staticGas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
-            <input v-model="staticCallData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
+            <input v-model="callOpts.deposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
+            <input v-model="callOpts.gasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
+            <input v-model="callOpts.amount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
+            <input v-model="callOpts.fee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
+            <input v-model="callOpts.gas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
+            <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
           </div>
           <div class="flex -mx-2 mt-4 mb-4">
             <input v-model="nonStaticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import Ae, { Contract, Wallet } from '@aeternity/aepp-sdk/src'
+import Ae, { Contract, Wallet } from '@aeternity/aepp-sdk'
 import account from '../account.js'
 
 export default {
@@ -114,23 +114,28 @@ export default {
       deployFunc: 'init',
       deployArgs: '()',
       callStaticRes: '',
+      callNonStaticRes: '',
       staticFunc: '',
       staticArgs: '',
       nonStaticFunc: '',
       nonStaticArgs: '',
-      deployDeposit: 1,
-      deployGasPrice: 1,
-      deployAmount: 1,
-      deployFee: 1,
-      deployGas: 40000000,
-      deployCallData: '',
-      deployError: '',
-      callDeposit: '',
-      callGasPrice: '',
-      callFee: '',
-      callGas: '',
-      callAmount: '',
-      callCallData: ''
+      deployOpts: {
+        deposit: 1,
+        gasPrice: 1,
+        amount: 1,
+        fee: 1,
+        gas: 40000000,
+        callData: ''
+      },
+      deployError: false,
+      callOpts: {
+        deposit: 1,
+        gasPrice: 1,
+        amount: 1,
+        fee: 1,
+        gas: 40000000,
+        callData: ''
+      }
     }
   },
   props: {
@@ -153,7 +158,7 @@ export default {
     async deploy (options = {}) {
       console.log(`Deploying contract...`, account)
       try {
-        return this.byteCodeObj.deploy(options) // TODO: send more options like: {amount: 10, abi: 'sophia'}
+        return this.byteCodeObj.deploy(options)
       } catch (err) {
         console.log(err)
       }
@@ -169,13 +174,17 @@ export default {
         console.log(err)
       }
     },
-    async callContract (contractAddress, func, arg) {
-      // console.log(`Calling a function ...`)
+    async callContract (func, args, opts) {
+      console.log(`Calling a function ...`)
+      // console.log(func, { args: args, opts: opts })
+
       try {
         return this.deployedDataObj.call(
-          contractAddress,
           func,
-          { args: arg }
+          {
+            args,
+            opts
+          }
         )
       } catch (err) {
         console.log(err)
@@ -186,6 +195,8 @@ export default {
       this.deployInfo = ''
       this.minedData = false
       this.miningStatus = false
+      this.byteCode = false
+
       this.compile(this.client, this.contractCode)
         .then(byteCodeObj => {
           this.byteCodeObj = byteCodeObj
@@ -195,24 +206,18 @@ export default {
     onDeploy () {
       this.deployInfo = 'Deploying and checking for mining status...'
       this.miningStatus = true
-
-      const opts = {
+      const extraOpts = {
         'owner': account.pub,
         'code': this.contractCode,
-        'deposit': this.deployDeposit || 1,
         'vmVersion': 1,
-        'gasPrice': this.deployGasPrice || 1,
-        'amount': this.deployAmount || 1,
-        'fee': this.deployFee || 1,
-        'gas': this.deployGas || 40000000,
-        // 'callData': this.deployCallData,
-        // 'nonce': 0,
+        'nonce': 0,
         'ttl': 9999999
       }
+      const opts = Object.assign(extraOpts, this.deployOpts)
 
       this.deploy(opts) // this waits until the TX is mined
         .then(data => {
-          this.deployInfo = 'Deployed, and mined'
+          this.deployInfo = `Deployed, and mined (Address: ${data.address})`
           this.miningStatus = false
           this.deployedDataObj = data
         })
@@ -229,32 +234,31 @@ export default {
         .catch(err => {
           console.log(`Error: ${err}`)
         })
-      // this.staticFuncField
-      // this.staticArgsField
     },
     onCallDataAndFunction () {
-      // const opts = {
-      //   'owner': account.pub,
-      //   'code': this.contractCode,
-      //   'deposit': this.callDeposit,
-      //   'vm_version': 153,
-      //   'gasPrice': this.callGasPrice,
-      //   'amount': this.callAmount,
-      //   'fee': this.callFee,
-      //   'gas': this.callGas,
-      //   // 'callData': this.callCallData,
-      //   // 'nonce': 0,
-      //   'ttl': 99999
-      // }
-      // this.nonStaticFuncField
-      // this.nonStaticArgsField
+      const extraOpts = {
+        'owner': account.pub,
+        'code': this.contractCode,
+        'vmVersion': 1,
+        'nonce': 0,
+        'ttl': 9999999
+      }
+      console.log(this.callOpts)
+      const opts = Object.assign(extraOpts, this.callOpts)
+
+      this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
+        .then(data => {
+          this.callNonStaticRes = data
+          console.log(this.callNonStaticRes)
+        })
+        .catch(err => {
+          console.log(`Error: ${err}`)
+        })
+      console.log(opts)
     }
   },
-  mounted () {
-    console.log(account)
-    Ae.create(this.host, {debug: true}).then(client => {
-      this.client = client
-    })
+  async mounted () {
+    this.client = await Ae.create(this.host, {debug: true})
   }
 }
 </script>
