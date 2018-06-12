@@ -15,12 +15,17 @@ This is a simple Web Application that demonstrates Aeternity Contracts.
 
 ## Installation
 
-```
+1. Clone this repo and install required dependencies
+```bash
 git clone https://github.com/aeternity/aepp-contracts/
 cd aepp-contracts
 yarn install
 ```
-
+2. Add a keypair to an env file, by renaming `.env.sample` to `.env` and adding your private and public key
+```
+export WALLET_PUB='YOUR_WALLET_PUB'
+export WALLET_PRIV=YOUR_WALLET_PRIV
+```
 
 ## Start the application
 

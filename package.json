@@ -1,13 +1,12 @@
 {
-  "name": "pos-aepp",
+  "name": "contracts-aepp",
   "version": "0.1.0",
-  "description": "Point of Sale aepp to use together with Beer Aepp",
+  "description": "Contracts Aepp - Test Aeternity Smart Contracts",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV='prod' webpack -p",
-    "start:dev": "NODE_ENV='dev' webpack-serve --mode=development ./webpack.config.js",
-    "pos-aepp": "src/bin/main.js --url https://republica.aepps.com"
+    "start:dev": "NODE_ENV='dev' webpack-serve --mode=development ./webpack.config.js"
   },
   "main": "src/index.js",
   "repository": "https://github.com/aeternity/web-aepp",
