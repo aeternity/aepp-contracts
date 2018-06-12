@@ -13,9 +13,9 @@
     string-loader "0.0.1"
     vue-clickaway "^2.1.0"
 
-"@aeternity/aepp-sdk@^0.14.0-0.1.0":
-  version "0.14.0-0.1.0"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.14.0-0.1.0.tgz#80c6a980987bcb8d560cb2f51c901afd15ed88cc"
+"@aeternity/aepp-sdk@^0.15.0-0.1.0":
+  version "0.15.0-0.1.0"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.15.0-0.1.0.tgz#9100f6cbd0378e5993d0e0f5ea0188f115a50b4b"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     aes-js "^3.1.1"

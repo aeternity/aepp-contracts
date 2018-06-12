@@ -25,7 +25,7 @@
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
         </div>
 
-        <div class="flex mt-8" v-if="byteCode">
+        <div class="flex mt-8 mb-8" v-if="byteCode">
           <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               Byte Code <span class="text-sm" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">{{deployInfo}}</span>
@@ -49,6 +49,7 @@
               <input v-model="deployOpts.gas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
               <input v-model="deployOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
             </div>
+
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
 
@@ -60,15 +61,21 @@
               <input v-model="staticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
               <input v-model="staticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
             </div>
-            <div class="mt-2 mb-2" v-if="callStaticRes">Call Result: <br></div>
-            <div v-if="callStaticRes" class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
-              {{callStaticRes}}
+
+            <div class="mt-2 mb-2" v-if="callStaticRes && !callStaticError">Call Result: <br>
+              <div class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
+                {{callStaticRes}}
+              </div>
             </div>
+            <div class="mt-2 mb-2" v-if="callStaticError">Errors: <br>
+              <textarea v-model="callStaticError" class="h-16 w-full border border-solid border-black font-mono bg-black text-white mb-2"></textarea>
+            </div>
+
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
           </div>
         </div>
 
-        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mt-8">
+        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
           <h2 class="py-2">
             ⬆ Call Function
           </h2>
@@ -84,7 +91,18 @@
             <input v-model="nonStaticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
               <input v-model="nonStaticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
           </div>
+
+          <div class="mt-2 mb-2" v-if="callRes && !callError">Call Result: <br>
+            <div class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
+              {{callRes}}
+            </div>
+          </div>
+          <div class="mt-2 mb-2" v-if="callError">Errors: <br>
+            <textarea v-model="callError" class="h-16 w-full border border-solid border-black font-mono bg-black text-white mb-2"></textarea>
+          </div>
+
           <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
+          <span v-if="waitingCall" class="text-sm text-red">Calling Function...</span>
         </div>
 
       </div>
@@ -117,13 +135,10 @@ export default {
       byteCodeObj: {},
       deployFunc: 'init',
       deployArgs: '()',
-      callStaticRes: '',
-      callNonStaticRes: '',
       staticFunc: '',
       staticArgs: '()',
       nonStaticFunc: '',
       nonStaticArgs: '',
-      compileError: '',
       deployOpts: {
         deposit: 1,
         gasPrice: 1,
@@ -132,7 +147,6 @@ export default {
         gas: 40000000,
         callData: ''
       },
-      deployError: false,
       callOpts: {
         deposit: 1,
         gasPrice: 1,
@@ -140,7 +154,14 @@ export default {
         fee: 1,
         gas: 40000000,
         callData: ''
-      }
+      },
+      callRes: '',
+      callError: '',
+      deployError: '',
+      compileError: '',
+      callStaticRes: '',
+      callStaticError: '',
+      waitingCall: false
     }
   },
   props: {
@@ -169,20 +190,19 @@ export default {
         console.log(err)
       }
     },
-    async callStatic (func, arg = '1') {
-      console.log(`calling static func ${func} with args ${arg}`)
+    async callStatic (func, args = '1') {
+      console.log(`calling static func ${func} with args ${args}`)
       try {
         return this.byteCodeObj.call(
           func,
-          { args: arg }
+          { args: args }
         )
       } catch (err) {
         console.log(err)
       }
     },
     async callContract (func, args, opts) {
-      console.log(`Calling a function ...`)
-      // console.log(func, { args: args, opts: opts })
+      console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, opts)
 
       try {
         return this.deployedDataObj.call(
@@ -198,6 +218,9 @@ export default {
     },
     onCompile () {
       this.compileError = ''
+      this.callError = ''
+      this.deployError = ''
+      this.callStaticError = ''
       this.deployedData = false
       this.deployInfo = ''
       this.minedData = false
@@ -230,17 +253,21 @@ export default {
         })
         .catch(err => {
           this.deployError = `${err}`
-          console.log(`Error during Deploy: ${err}`)
         })
     },
     onCallStatic () {
-      this.callStatic(this.staticFunc, this.staticArgs)
-        .then(data => {
-          this.callStaticRes = data
-        })
-        .catch(err => {
-          console.log(`Error: ${err}`)
-        })
+      if (this.staticFunc && this.staticArgs) {
+        this.callStatic(this.staticFunc, this.staticArgs)
+          .then(data => {
+            this.callStaticRes = data
+            this.callStaticError = ''
+          })
+          .catch(err => {
+            this.callStaticError = `${err}`
+          })
+      } else {
+        this.callStaticError = 'Please enter a Function and 1 or more Arguments.'
+      }
     },
     onCallDataAndFunction () {
       const extraOpts = {
@@ -250,22 +277,27 @@ export default {
         'nonce': 0,
         'ttl': 9999999
       }
-      console.log(this.callOpts)
       const opts = Object.assign(extraOpts, this.callOpts)
 
-      this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
-        .then(data => {
-          this.callNonStaticRes = data
-          console.log(this.callNonStaticRes)
-        })
-        .catch(err => {
-          console.log(`Error: ${err}`)
-        })
-      console.log(opts)
+      if (this.nonStaticFunc && this.nonStaticArgs) {
+        this.waitingCall = true
+        this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
+          .then(data => {
+            this.callRes = data
+            this.callError = ''
+            this.waitingCall = false
+          })
+          .catch(err => {
+            this.callError = `${err}`
+            this.waitingCall = false
+          })
+      } else {
+        this.callError = 'Please enter a Function and 1 or more Arguments.'
+      }
     }
   },
   async mounted () {
-    this.client = await Ae.create(this.host, {debug: false})
+    this.client = await Ae.create(this.host, {debug: true})
   }
 }
 </script>
