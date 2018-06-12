@@ -13,9 +13,9 @@
     string-loader "0.0.1"
     vue-clickaway "^2.1.0"
 
-"@aeternity/aepp-sdk@aeternity/aepp-sdk-js#feature/sweet-api":
-  version "0.14.0-0.1.0-alpha.1"
-  resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/b42ef4f69e10bca9abfe0ae975a29cf323eb1502"
+"@aeternity/aepp-sdk@^0.14.0-0.1.0":
+  version "0.14.0-0.1.0"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.14.0-0.1.0.tgz#80c6a980987bcb8d560cb2f51c901afd15ed88cc"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     aes-js "^3.1.1"

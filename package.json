@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@aeternity/aepp-components": "^2.0.7",
-    "@aeternity/aepp-sdk": "aeternity/aepp-sdk-js#feature/sweet-api",
+    "@aeternity/aepp-sdk": "^0.14.0-0.1.0",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "fs": "^0.0.1-security",
     "url": "^0.11.0",

@@ -258,7 +258,7 @@ export default {
     }
   },
   async mounted () {
-    this.client = await Ae.create(this.host, {debug: true})
+    this.client = await Ae.create(this.host, {debug: false})
   }
 }
 </script>
