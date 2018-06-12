@@ -18,6 +18,10 @@
             Sophia Contract's Code:
           </h2>
           <textarea v-model="contractCode" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+          <div v-if="compileError">
+            <textarea v-model="compileError" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+          </div>
+
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
         </div>
 
@@ -119,6 +123,7 @@ export default {
       staticArgs: '',
       nonStaticFunc: '',
       nonStaticArgs: '',
+      compileError: '',
       deployOpts: {
         deposit: 1,
         gasPrice: 1,
@@ -150,8 +155,9 @@ export default {
       const contract = Contract.create(this.client, { wallet })
       try {
         console.log(`Compiled!`)
-        return contract.compile(code)
+        return await contract.compile(code)
       } catch (err) {
+        this.compileError = err
         console.log(err)
       }
     },
@@ -191,6 +197,7 @@ export default {
       }
     },
     onCompile () {
+      this.compileError = ''
       this.deployedData = false
       this.deployInfo = ''
       this.minedData = false
