@@ -61,7 +61,7 @@
               <input v-model="staticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
             </div>
             <div class="mt-2 mb-2" v-if="callStaticRes">Call Result: <br></div>
-            <div v-if="callStaticRes" class="w-full text-white bg-black text-xs mb-4 font-mono">
+            <div v-if="callStaticRes" class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
               {{callStaticRes}}
             </div>
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
@@ -120,7 +120,7 @@ export default {
       callStaticRes: '',
       callNonStaticRes: '',
       staticFunc: '',
-      staticArgs: '',
+      staticArgs: '()',
       nonStaticFunc: '',
       nonStaticArgs: '',
       compileError: '',
