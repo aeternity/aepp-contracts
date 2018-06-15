@@ -7,14 +7,8 @@
 </template>
 
 <script>
-import { AeHeader, AeButton } from '@aeternity/aepp-components'
-
 export default {
   name: 'app',
-  components: {
-    AeHeader,
-    AeButton
-  },
   data () {
     return {
       goToRoute: '',
