@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <h2 v-if="!accessKey">MISSING ACCESS KEY!</h2>
-    <h4 v-if="!accessKey">Please access the app as https://URL/?secret=POS-secret-here</h4>
-    <div v-if="accessKey" class="content">
+    <div class="content">
       <router-view></router-view>
     </div>
   </div>

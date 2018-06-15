@@ -4,3 +4,4 @@
 .envrc
 .tern-port
 .vscode
+src/account.js
