@@ -1,11 +1,12 @@
 pipeline {
-  agent {
-    dockerfile {
-      filename 'Dockerfile.ci'
-      args '-v /etc/group:/etc/group:ro ' +
-           '-v /etc/passwd:/etc/passwd:ro ' +
-           '-v /var/lib/jenkins:/var/lib/jenkins'
-    }
+  dockerfile {
+    filename 'Dockerfile.ci'
+    args '-v /etc/group:/etc/group:ro ' +
+          '-v /etc/passwd:/etc/passwd:ro ' +
+          '-v /var/lib/jenkins:/var/lib/jenkins ' +
+          '-v /var/run/docker.sock:/var/run/docker.sock:rw ' +
+          '-v /usr/bin/docker:/usr/bin/docker:ro ' +
+          '--group-add docker'
   }
 
   environment {
