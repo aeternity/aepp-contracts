@@ -15,22 +15,7 @@ export default {
       amount: 0
     }
   },
-  computed: {
-    account () {
-      return this.$store.state.account
-    },
-    accessKey () {
-      return this.$store.getters.accessKey
-    },
-    accessKeyFromQuery () {
-      return this.$route.query.secret
-    }
-  },
-  mounted () {
-    if (this.accessKeyFromQuery) {
-      // console.info('Vue App mounted', this.accessKeyFromQuery)
-      this.$store.dispatch('setAccessKey', this.accessKeyFromQuery)
-    }
-  }
+  computed: { },
+  mounted () { }
 }
 </script>

@@ -21,7 +21,7 @@ git clone https://github.com/aeternity/aepp-contracts/
 cd aepp-contracts
 yarn install
 ```
-2. Add a keypair to an env file, by renaming `.env.sample` to `.env` and adding your private and public key
+1. Add a keypair to `src/account.js`
 ```
 export WALLET_PUB='YOUR_WALLET_PUB'
 export WALLET_PRIV=YOUR_WALLET_PRIV
