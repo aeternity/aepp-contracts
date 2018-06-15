@@ -10,10 +10,9 @@
   },
   "main": "src/index.js",
   "repository": "https://github.com/aeternity/web-aepp",
-  "author": "Alexander Kahl <ak@sodosopa.io>, Enrico Icardi <enrico.icardi@gmail.com>",
+  "author": "Enrico Icardi <enrico.icardi@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-components": "^2.0.7",
     "@aeternity/aepp-sdk": "^0.15.0-0.1.0",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "fs": "^0.0.1-security",
