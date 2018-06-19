@@ -64,7 +64,7 @@
                 <input v-model="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="text" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dAmout">Amout</label>
+                <label class="text-xs block mb-1" for="dAmount">Amount</label>
                 <input v-model="deployOpts.amount" class="w-full p-2" id="dAmout" type="text" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
@@ -127,7 +127,7 @@
               <input v-model="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="text" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cAmout">Amout</label>
+              <label class="text-xs block mb-1" for="cAmount">Amount</label>
               <input v-model="callOpts.amount" class="w-full p-2" id="cAmout" type="text" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
