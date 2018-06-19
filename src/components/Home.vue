@@ -18,8 +18,10 @@
             Sophia Contract's Code:
           </h2>
           <textarea v-model="contractCode" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+
           <div v-if="compileError">
-            <textarea v-model="compileError" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+            <label class="text-xs block mb-1 text-red">Errors</label>
+            <textarea v-model="compileError" class="h-64 w-full border border-solid border-black font-mono bg-black text-red"></textarea>
           </div>
 
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
@@ -28,26 +30,54 @@
         <div class="flex mt-8 mb-8" v-if="byteCode">
           <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
-              Byte Code <span class="text-sm" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">{{deployInfo}}</span>
+              Byte Code
+              <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">
+                {{deployInfo}}
+              </div>
             </h2>
             <textarea v-model="byteCode" class="h-16 w-full border border-solid border-black font-mono bg-black text-white text-xs"></textarea>
 
-            <div class="mt-2 mb-2" v-if="deployError">Issues with Deploy: <br></div>
-            <div v-if="deployError" class="w-full text-white bg-black text-xs mb-4 font-mono">
-              {{deployError}}
+            <div class="mt-2 mb-2" v-if="deployError">
+              <label class="text-xs block mb-1 text-red">Deploy Errors:</label>
+              <div class="w-full border border-solid border-black font-mono bg-black text-red text-sm">
+                {{deployError}}
+              </div>
             </div>
 
             <div class="flex -mx-2 mt-4 mb-4">
-              <input v-model="deployFunc" class="mx-2 w-1/2 p-2" type="text" value="init" disabled>
-              <input v-model="deployArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+              <div class="mx-2">
+                <label class="text-xs block mb-1" for="deployFunc">Function</label>
+                <input v-model="deployFunc" class="w-full p-2" id="deployFunc" type="text" value="init" disabled>
+              </div>
+              <div class="mx-2">
+                <label class="text-xs block mb-1" for="deployArgs">Arguments</label>
+                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="arguments">
+              </div>
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
-              <input v-model="deployOpts.deposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
-              <input v-model="deployOpts.gasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
-              <input v-model="deployOpts.amount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
-              <input v-model="deployOpts.fee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
-              <input v-model="deployOpts.gas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
-              <input v-model="deployOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
+              <div class="mx-2 w-1/5">
+                <label class="text-xs block mb-1" for="dDeposit">Deposit</label>
+                <input v-model="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="text" placeholder="deposit">
+              </div>
+              <div class="mx-2 w-1/5">
+                <label class="text-xs block mb-1" for="dGasPrice">Gas Price</label>
+                <input v-model="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="text" placeholder="gas price">
+              </div>
+              <div class="mx-2 w-1/5">
+                <label class="text-xs block mb-1" for="dAmout">Amout</label>
+                <input v-model="deployOpts.amount" class="w-full p-2" id="dAmout" type="text" placeholder="amount">
+              </div>
+              <div class="mx-2 w-1/5">
+                <label class="text-xs block mb-1" for="dFee">Fee</label>
+                <input v-model="deployOpts.fee" class="w-full p-2" id="dFee" type="text" placeholder="fee">
+              </div>
+              <div class="mx-2 w-1/5">
+                <label class="text-xs block mb-1" for="dGas">Gas</label>
+                <input v-model="deployOpts.gas" class="w-full p-2" id="dGas" type="text" placeholder="gas">
+              </div>
+
+              <input v-model="deployOpts.callData" class="w-full p-2" type="hidden" value="callData">
+
             </div>
 
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
@@ -58,17 +88,25 @@
               ⬅ Call Static Function
             </h2>
             <div class="flex -mx-2 mt-4 mb-4">
-              <input v-model="staticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
-              <input v-model="staticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+              <div class="mx-2 w-1/2">
+                <label class="text-xs block mb-1" for="staticFunc">Function</label>
+                <input v-model="staticFunc" class="w-full p-2" id="staticFunc" type="text" placeholder="function">
+              </div>
+              <div class="mx-2 w-1/2">
+                <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
+                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="arguments">
+              </div>
             </div>
 
-            <div class="mt-2 mb-2" v-if="callStaticRes && !callStaticError">Call Result: <br>
+            <div class="mt-2 mb-2" v-if="callStaticRes && !callStaticError">
+              <label class="text-xs block mb-1">Call Result</label>
               <div class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
                 {{callStaticRes}}
               </div>
             </div>
-            <div class="mt-2 mb-2" v-if="callStaticError">Errors: <br>
-              <textarea v-model="callStaticError" class="h-16 w-full border border-solid border-black font-mono bg-black text-white mb-2"></textarea>
+            <div class="mt-2 mb-2" v-if="callStaticError">
+              <label class="text-xs block mb-1 text-red">Errors</label>
+              <textarea v-model="callStaticError" class="h-48 w-full text-red bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono"></textarea>
             </div>
 
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
@@ -80,24 +118,49 @@
             ⬆ Call Function
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
-            <input v-model="callOpts.deposit" class="mx-2 w-1/2 p-2" type="text" placeholder="deposit">
-            <input v-model="callOpts.gasPrice" class="mx-2 w-1/2 p-2" type="text" placeholder="gas price">
-            <input v-model="callOpts.amount" class="mx-2 w-1/2 p-2" type="text" placeholder="amount">
-            <input v-model="callOpts.fee" class="mx-2 w-1/2 p-2" type="text" placeholder="fee">
-            <input v-model="callOpts.gas" class="mx-2 w-1/2 p-2" type="text" placeholder="gas">
+            <div class="mx-2 w-1/5">
+              <label class="text-xs block mb-1" for="cDeposit">Deposit</label>
+              <input v-model="callOpts.deposit" class="w-full p-2" id="cDeposit" type="text" placeholder="deposit">
+            </div>
+            <div class="mx-2 w-1/5">
+              <label class="text-xs block mb-1" for="cGasPrice">Gas Price</label>
+              <input v-model="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="text" placeholder="gas price">
+            </div>
+            <div class="mx-2 w-1/5">
+              <label class="text-xs block mb-1" for="cAmout">Amout</label>
+              <input v-model="callOpts.amount" class="w-full p-2" id="cAmout" type="text" placeholder="amount">
+            </div>
+            <div class="mx-2 w-1/5">
+              <label class="text-xs block mb-1" for="cFee">Fee</label>
+              <input v-model="callOpts.fee" class="w-full p-2" id="cFee" type="text" placeholder="fee">
+            </div>
+            <div class="mx-2 w-1/5">
+              <label class="text-xs block mb-1" for="cGas">Gas</label>
+              <input v-model="callOpts.gas" class="w-full p-2" id="cGas" type="text" placeholder="gas">
+            </div>
+
             <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
+
           </div>
           <div class="flex -mx-2 mt-4 mb-4">
-            <input v-model="nonStaticFunc" class="mx-2 w-1/2 p-2" type="text" placeholder="function">
-              <input v-model="nonStaticArgs" class="mx-2 w-1/2 p-2" type="text" placeholder="arguments">
+            <div class="mx-2 w-1/2">
+              <label class="text-xs block mb-1" for="func">Function</label>
+              <input v-model="nonStaticFunc" class="w-full p-2" id="func" type="text" placeholder="function">
+            </div>
+            <div class="mx-2 w-1/2">
+              <label class="text-xs block mb-1" for="args">Arguments</label>
+              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
+            </div>
           </div>
 
-          <div class="mt-2 mb-2" v-if="callRes && !callError">Call Result: <br>
+          <div class="mt-2 mb-2" v-if="callRes && !callError">
+            <label class="text-xs block mb-1">Call Result</label>
             <div class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
               {{callRes}}
             </div>
           </div>
-          <div class="mt-2 mb-2" v-if="callError">Errors: <br>
+          <div class="mt-2 mb-2" v-if="callError">
+            <label class="text-xs block mb-1 text-red">Errors</label>
             <textarea v-model="callError" class="h-16 w-full border border-solid border-black font-mono bg-black text-white mb-2"></textarea>
           </div>
 
@@ -135,8 +198,8 @@ export default {
       byteCodeObj: {},
       deployFunc: 'init',
       deployArgs: '()',
-      staticFunc: '',
-      staticArgs: '()',
+      staticFunc: 'main',
+      staticArgs: '(1)',
       nonStaticFunc: '',
       nonStaticArgs: '',
       deployOpts: {
