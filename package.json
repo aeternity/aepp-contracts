@@ -20,6 +20,7 @@
     "purgecss-webpack-plugin": "^1.2.0",
     "url": "^0.11.0",
     "vue": "^2.5.16",
+    "vue-codemirror": "^4.0.5",
     "vue-router": "^3.0.1",
     "vue-socket.io": "2.1.1-a",
     "vue-template-compiler": "^2.5.16",
