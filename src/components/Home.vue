@@ -18,9 +18,9 @@
             Sophia Contract's Code:
           </h2>
 
-          <div class="cm-wrapper">
+          <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
-            <div class='cm-keymap-toolbar'>
+            <div class='absolute pin-b pin-r'>
               <select v-model="cmOption.keyMap" >
                 <option :key="idx" v-for='(m, idx) in keymaps'>
                   {{m}}
@@ -412,12 +412,4 @@ export default {
 </script>
 
 <style scoped lang="css">
-.cm-wrapper {
-  position:relative;
-}
-.cm-keymap-toolbar {
-  position:absolute;
-  bottom:0;
-  right:0;
-}
 </style>
