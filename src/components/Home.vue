@@ -22,8 +22,9 @@
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
             <div class='cm-keymap-toolbar'>
               <select v-model="cmOption.keyMap" >
-                <option v-for='m in keymaps'>
-                {{m}}</option>
+                <option :key="idx" v-for='(m, idx) in keymaps'>
+                  {{m}}
+                </option>
               </select>
             </div>
             </div>
