@@ -346,7 +346,7 @@ export default {
         'nonce': 0,
         'ttl': 9999999,
         'options': {
-          'initState' : this.deployArgs
+          'initState': this.deployArgs
         }
       }
       const opts = Object.assign(extraOpts, this.deployOpts)
