@@ -17,7 +17,17 @@
           <h2 class="py-2">
             Sophia Contract's Code:
           </h2>
-          <textarea v-model="contractCode" class="h-64 w-full border border-solid border-black font-mono bg-black text-white"></textarea>
+
+          <div class="relative">
+            <codemirror v-model="contractCode" :options="cmOption"></codemirror>
+            <div class='absolute pin-b pin-r'>
+              <select v-model="cmOption.keyMap" >
+                <option :key="idx" v-for='(m, idx) in keymaps'>
+                  {{m}}
+                </option>
+              </select>
+            </div>
+            </div>
 
           <div v-if="compileError">
             <label class="text-xs block mb-1 text-red">Errors</label>
@@ -177,12 +187,28 @@
 import Ae, { Contract, Wallet } from '@aeternity/aepp-sdk'
 import account from '../account.js'
 
+import { codemirror } from 'vue-codemirror'
+
 export default {
   name: 'Home',
   components: {
+    codemirror
   },
   data () {
     return {
+      keymaps: [
+        'sublime',
+        'vim',
+        'emacs'
+      ],
+      cmOption: {
+        keyMap: 'sublime',
+        tabSize: 4,
+        styleActiveLine: true,
+        lineNumbers: true,
+        mode: 'text/javascript',
+        theme: 'base16-dark'
+      },
       contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
@@ -230,6 +256,20 @@ export default {
   props: {
     query: {
       type: Object
+    }
+  },
+  watch: {
+    keyMap (mapName) {
+      try {
+        window.localStorage.setItem('cmkeyMap', mapName)
+      } catch (e) {
+        /* handle error */
+      }
+    }
+  },
+  computed: {
+    keyMap () {
+      return this.cmOption.keyMap
     }
   },
   methods: {
@@ -363,6 +403,12 @@ export default {
     }
   },
   async mounted () {
+    try {
+      const mapName = window.localStorage.getItem('cmkeyMap')
+      if (mapName) this.cmOption.keyMap = mapName
+    } catch (e) {
+      /* handle error */
+    }
     this.client = await Ae.create(this.host, {debug: true})
   }
 }
