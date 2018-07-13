@@ -344,7 +344,10 @@ export default {
         'code': this.contractCode,
         'vmVersion': 1,
         'nonce': 0,
-        'ttl': 9999999
+        'ttl': 9999999,
+        'options': {
+          'initState' : this.deployArgs
+        }
       }
       const opts = Object.assign(extraOpts, this.deployOpts)
 
