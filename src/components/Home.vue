@@ -184,9 +184,10 @@
 </template>
 
 <script>
-import Ae, { Contract, Wallet } from '@aeternity/aepp-sdk'
-import account from '../account.js'
-
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+import Contract from '@aeternity/aepp-sdk/es/ae/contract'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+import accountData from '../account.js'
 import { codemirror } from 'vue-codemirror'
 
 export default {
@@ -212,7 +213,7 @@ export default {
       contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
-      account: account,
+      account: accountData,
       byteCode: '',
       client: false,
       host: 'https://sdk-testnet.aepps.com',
@@ -221,13 +222,13 @@ export default {
       minedData: false,
       miningStatus: '',
       wallet: false,
-      byteCodeObj: {},
       deployFunc: 'init',
       deployArgs: '()',
       staticFunc: 'main',
       staticArgs: '(1)',
       nonStaticFunc: '',
       nonStaticArgs: '',
+      contractAddress: '',
       deployOpts: {
         deposit: 1,
         gasPrice: 1,
@@ -273,22 +274,19 @@ export default {
     }
   },
   methods: {
-    async compile (client, code) {
+    async compile (code) {
       console.log(`Compiling contract...`)
-      const wallet = Wallet.create(this.client, account)
-      const contract = Contract.create(this.client, { wallet })
       try {
-        console.log(`Compiled!`)
-        return await contract.compile(code)
+        return this.client.contractCompile(code)
       } catch (err) {
         this.compileError = err
         console.log(err)
       }
     },
     async deploy (options = {}) {
-      console.log(`Deploying contract...`, account)
+      console.log(`Deploying contract...`, accountData)
       try {
-        return this.byteCodeObj.deploy(options)
+        return this.client.contractDeploy(this.byteCode, 'sophia', options)
       } catch (err) {
         console.log(err)
       }
@@ -296,25 +294,16 @@ export default {
     async callStatic (func, args = '1') {
       console.log(`calling static func ${func} with args ${args}`)
       try {
-        return this.byteCodeObj.call(
-          func,
-          { args: args }
-        )
+        return this.client.contractCallStatic(this.byteCode, 'sophia', func, args)
       } catch (err) {
         console.log(err)
       }
     },
-    async callContract (func, args, opts) {
+    async callContract (func, args, address, opts) {
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, opts)
 
       try {
-        return this.deployedDataObj.call(
-          func,
-          {
-            args,
-            opts
-          }
-        )
+        return this.client.contractCall(this.byteCode, 'sophia', address, func, args, opts)
       } catch (err) {
         console.log(err)
       }
@@ -330,9 +319,8 @@ export default {
       this.miningStatus = false
       this.byteCode = false
 
-      this.compile(this.client, this.contractCode)
+      this.compile(this.contractCode)
         .then(byteCodeObj => {
-          this.byteCodeObj = byteCodeObj
           this.byteCode = byteCodeObj.bytecode
         })
     },
@@ -340,7 +328,7 @@ export default {
       this.deployInfo = 'Deploying and checking for mining status...'
       this.miningStatus = true
       const extraOpts = {
-        'owner': account.pub,
+        'owner': accountData.pub,
         'code': this.contractCode,
         'vmVersion': 1,
         'nonce': 0,
@@ -353,6 +341,7 @@ export default {
 
       this.deploy(opts) // this waits until the TX is mined
         .then(data => {
+          this.contractAddress = data.address
           this.deployInfo = `Deployed, and mined (Address: ${data.address})`
           this.miningStatus = false
           this.deployedDataObj = data
@@ -377,7 +366,7 @@ export default {
     },
     onCallDataAndFunction () {
       const extraOpts = {
-        'owner': account.pub,
+        'owner': accountData.pub,
         'code': this.contractCode,
         'vmVersion': 1,
         'nonce': 0,
@@ -387,7 +376,7 @@ export default {
 
       if (this.nonStaticFunc && this.nonStaticArgs) {
         this.waitingCall = true
-        this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
+        this.callContract(this.nonStaticFunc, this.nonStaticArgs, this.contractAddress, opts)
           .then(data => {
             this.callRes = data
             this.callError = ''
@@ -409,7 +398,36 @@ export default {
     } catch (e) {
       /* handle error */
     }
-    this.client = await Ae.create(this.host, {debug: true})
+
+    // console.log(this.initTx({recipient: accountData.pub, amount: 10000000, fee: 1, ttl: 1}))
+
+    // Aepp({url: 'https://sdk-testnet.aepps.com', debug: true}).then(ae => {
+    //   this.client = ae
+    //   console.log('client', this.client)
+    //   return ae.contractCompile(this.contractCode)
+    // }).then(bytecode => {
+    //   console.log(`Obtained bytecode ${bytecode.bytecode}`)
+    //   // return bytecode.deploy({initState: program.init})
+    // }).then(deployed => {
+    //   console.log(`Contract deployed at ${deployed.address}`)
+    //   // return deployed.call(fn, {args: args.join(' ')})
+    // }).then(value => {
+    //   console.log(`Execution result: ${value}`)
+    // }).catch(e => console.log(e.message))
+
+    Wallet.compose(Contract)({
+      url: 'https://sdk-testnet.aepps.com',
+      accounts: [MemoryAccount({keypair: {priv: accountData.priv, pub: accountData.pub}})],
+      address: accountData.pub
+      // onTx: () => false,
+      // onChain: () => false,
+      // onAccount: () => false
+    }).then(ae => {
+      this.client = ae
+      // window.ae = ae
+      // console.log(this.client)
+    })
+    // this.client = await Ae.create(this.host, {debug: true})
   }
 }
 </script>
