@@ -3,9 +3,7 @@
     <div v-if="!this.account">
       <span>Error: Account not been set!</span>
     </div>
-    <div v-if="!this.client">
 
-    </div>
     <div v-if="this.account">
       <h1 class="py-2">
         Test contracts
@@ -21,11 +19,14 @@
           <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
             <div class='absolute pin-b pin-r'>
-              <select v-model="cmOption.keyMap" >
+              <select v-model="cmOption.keyMap" class="block appearance-none w-full py-2 px-4 rounded-none pr-8">
                 <option :key="idx" v-for='(m, idx) in keymaps'>
                   {{m}}
                 </option>
               </select>
+              <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+              </div>
             </div>
             </div>
 
@@ -67,23 +68,23 @@
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dDeposit">Deposit</label>
-                <input v-model="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="text" placeholder="deposit">
+                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGasPrice">Gas Price</label>
-                <input v-model="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="text" placeholder="gas price">
+                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dAmount">Amount</label>
-                <input v-model="deployOpts.amount" class="w-full p-2" id="dAmout" type="text" placeholder="amount">
+                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dFee">Fee</label>
-                <input v-model="deployOpts.fee" class="w-full p-2" id="dFee" type="text" placeholder="fee">
+                <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGas">Gas</label>
-                <input v-model="deployOpts.gas" class="w-full p-2" id="dGas" type="text" placeholder="gas">
+                <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
+                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
               </div>
 
               <input v-model="deployOpts.callData" class="w-full p-2" type="hidden" value="callData">
@@ -130,43 +131,56 @@
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cDeposit">Deposit</label>
-              <input v-model="callOpts.deposit" class="w-full p-2" id="cDeposit" type="text" placeholder="deposit">
+              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cGasPrice">Gas Price</label>
-              <input v-model="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="text" placeholder="gas price">
+              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cAmount">Amount</label>
-              <input v-model="callOpts.amount" class="w-full p-2" id="cAmout" type="text" placeholder="amount">
+              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cFee">Fee</label>
-              <input v-model="callOpts.fee" class="w-full p-2" id="cFee" type="text" placeholder="fee">
+              <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGas">Gas</label>
-              <input v-model="callOpts.gas" class="w-full p-2" id="cGas" type="text" placeholder="gas">
+              <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
+              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
             </div>
 
             <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
 
           </div>
           <div class="flex -mx-2 mt-4 mb-4">
-            <div class="mx-2 w-1/2">
+            <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="func">Function</label>
               <input v-model="nonStaticFunc" class="w-full p-2" id="func" type="text" placeholder="function">
             </div>
-            <div class="mx-2 w-1/2">
+            <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="args">Arguments</label>
               <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
+            </div>
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="args" id="sophiaType">Type</label>
+              <div class="relative">
+                <select v-model="sophiaType" class="block appearance-none w-full py-2 px-2 rounded-none">
+                  <option disabled>Select Sophia Type</option>
+                  <option :key="idx" v-for='(type, idx) in sophiaTypes' :value="type">
+                    {{type}}
+                  </option>
+                </select>
+                <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="mt-2 mb-2" v-if="callRes && !callError">
             <label class="text-xs block mb-1">Call Result</label>
-            <div class="w-full text-white bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono">
-              {{callRes}}
+            <div class="w-full text-white bg-black text-xs mb-4 p-4 font-mono" v-html="callRes">
             </div>
           </div>
           <div class="mt-2 mb-2" v-if="callError">
@@ -216,7 +230,7 @@ export default {
       account: accountData,
       byteCode: '',
       client: false,
-      host: 'https://sdk-testnet.aepps.com',
+      host: '//sdk-testnet.aepps.com',
       deployedDataObj: false,
       deployInfo: '',
       minedData: false,
@@ -251,7 +265,25 @@ export default {
       compileError: '',
       callStaticRes: '',
       callStaticError: '',
-      waitingCall: false
+      waitingCall: false,
+      sophiaType: 'int',
+      sophiaTypes: [
+        'uint',
+        'int',
+        'address',
+        'bool',
+        'string',
+        'list',
+        'tuple',
+        'record',
+        'map',
+        'option(\'a)',
+        'state',
+        'transactions',
+        'events',
+        'oracle(\'a, \'b)',
+        'oracle_query(\'a, \'b)'
+      ]
     }
   },
   props: {
@@ -277,16 +309,16 @@ export default {
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        return this.client.contractCompile(code)
+        return await this.client.contractCompile(code)
       } catch (err) {
         this.compileError = err
         console.log(err)
       }
     },
-    async deploy (options = {}) {
+    async deploy (initState, options = {}) {
       console.log(`Deploying contract...`, accountData)
       try {
-        return this.client.contractDeploy(this.byteCode, 'sophia', options)
+        return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
       } catch (err) {
         console.log(err)
       }
@@ -299,11 +331,10 @@ export default {
         console.log(err)
       }
     },
-    async callContract (func, args, address, opts) {
-      console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, opts)
-
+    async callContract (func, args, address, options) {
+      console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, args, opts)
+        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
       } catch (err) {
         console.log(err)
       }
@@ -329,20 +360,17 @@ export default {
       this.miningStatus = true
       const extraOpts = {
         'owner': accountData.pub,
-        'code': this.contractCode,
-        'vmVersion': 1,
-        'nonce': 0,
-        'ttl': 9999999,
-        'options': {
-          'initState': this.deployArgs
-        }
+        'code': this.contractCode
+        // 'vmVersion': 1
+        // 'nonce': 0,
+        // 'ttl': 9999999
       }
       const opts = Object.assign(extraOpts, this.deployOpts)
 
-      this.deploy(opts) // this waits until the TX is mined
+      this.deploy(this.deployArgs, opts) // this waits until the TX is mined
         .then(data => {
           this.contractAddress = data.address
-          this.deployInfo = `Deployed, and mined (Address: ${data.address})`
+          this.deployInfo = `Deployed, and mined at this address: ${data.address}`
           this.miningStatus = false
           this.deployedDataObj = data
         })
@@ -367,18 +395,25 @@ export default {
     onCallDataAndFunction () {
       const extraOpts = {
         'owner': accountData.pub,
-        'code': this.contractCode,
-        'vmVersion': 1,
-        'nonce': 0,
-        'ttl': 9999999
+        'code': this.contractCode
+        // 'vmVersion': 1
+        // 'nonce': 0,
+        // 'ttl': 9999999
       }
       const opts = Object.assign(extraOpts, this.callOpts)
 
       if (this.nonStaticFunc && this.nonStaticArgs) {
         this.waitingCall = true
         this.callContract(this.nonStaticFunc, this.nonStaticArgs, this.contractAddress, opts)
-          .then(data => {
-            this.callRes = data
+          .then(dataRes => {
+            this.callRes = dataRes.result
+            this.client.contractDecodeData(this.sophiaType, dataRes.result.returnValue).then(data => {
+              this.callRes = `Gas Used: ${dataRes.result.gasUsed} <br><br>---<br><br> Result: <br><br> ${data.value}`
+            }).catch(err => {
+              this.callError = `${err}`
+              this.waitingCall = false
+              this.callRes = ''
+            })
             this.callError = ''
             this.waitingCall = false
           })
@@ -399,38 +434,16 @@ export default {
       /* handle error */
     }
 
-    // console.log(this.initTx({recipient: accountData.pub, amount: 10000000, fee: 1, ttl: 1}))
-
-    // Aepp({url: 'https://sdk-testnet.aepps.com', debug: true}).then(ae => {
-    //   this.client = ae
-    //   console.log('client', this.client)
-    //   return ae.contractCompile(this.contractCode)
-    // }).then(bytecode => {
-    //   console.log(`Obtained bytecode ${bytecode.bytecode}`)
-    //   // return bytecode.deploy({initState: program.init})
-    // }).then(deployed => {
-    //   console.log(`Contract deployed at ${deployed.address}`)
-    //   // return deployed.call(fn, {args: args.join(' ')})
-    // }).then(value => {
-    //   console.log(`Execution result: ${value}`)
-    // }).catch(e => console.log(e.message))
-
     Wallet.compose(Contract)({
       url: 'https://sdk-testnet.aepps.com',
       accounts: [MemoryAccount({keypair: {priv: accountData.priv, pub: accountData.pub}})],
       address: accountData.pub
-      // onTx: () => false,
-      // onChain: () => false,
-      // onAccount: () => false
     }).then(ae => {
       this.client = ae
-      // window.ae = ae
-      // console.log(this.client)
     })
-    // this.client = await Ae.create(this.host, {debug: true})
   }
 }
 </script>
 
-<style scoped lang="css">
+<style lang="css">
 </style>
