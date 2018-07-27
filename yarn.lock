@@ -2,11 +2,13 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@^0.15.0-0.1.0":
-  version "0.15.0-0.1.0"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.15.0-0.1.0.tgz#9100f6cbd0378e5993d0e0f5ea0188f115a50b4b"
+"@aeternity/aepp-sdk@^0.18.0-0.1.0":
+  version "0.18.0-0.1.0"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.18.0-0.1.0.tgz#a7b0b0a1c25bf3bad7b7665add2def8629851ddc"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
+    "@stamp/it" "^1.0.3"
+    "@stamp/required" "^1.0.1"
     aes-js "^3.1.1"
     axios "^0.18.0"
     blakejs "^1.1.0"
@@ -14,8 +16,10 @@
     postinstall-build "^5.0.1"
     ramda "^0.25.0"
     rlp "^2.0.0"
+    sha.js "^2.4.11"
     tweetnacl "^1.0.0"
     url "^0.11.0"
+    uuid "^3.3.2"
     websocket "^1.0.25"
 
 "@babel/cli@^7.0.0-beta.49":
@@ -714,6 +718,46 @@
 "@sindresorhus/is@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
+
+"@stamp/compose@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@stamp/compose/-/compose-1.0.2.tgz#030ecf70e8f3dca042a2b34a15d6dc28fb07f9c6"
+  dependencies:
+    "@stamp/core" "^1.0.1"
+    "@stamp/is" "^1.0.0"
+
+"@stamp/core@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stamp/core/-/core-1.0.1.tgz#4573e425db48720db52f78590dfe88a3873ffd98"
+  dependencies:
+    "@stamp/is" "^1.0.0"
+
+"@stamp/is@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@stamp/is/-/is-1.0.0.tgz#edf031a3b43ee1f07e7b74bfbd837c82980eb25a"
+
+"@stamp/it@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@stamp/it/-/it-1.0.3.tgz#e9e43082df591e63bbc819848c09467dde1e575e"
+  dependencies:
+    "@stamp/compose" "^1.0.2"
+    "@stamp/core" "^1.0.1"
+    "@stamp/is" "^1.0.0"
+    "@stamp/shortcut" "^1.0.2"
+
+"@stamp/required@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stamp/required/-/required-1.0.1.tgz#8287dc44a48b7ec693be27685e67b99dc06d48bc"
+  dependencies:
+    "@stamp/compose" "^1.0.2"
+    "@stamp/core" "^1.0.1"
+    "@stamp/is" "^1.0.0"
+
+"@stamp/shortcut@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@stamp/shortcut/-/shortcut-1.0.2.tgz#31326726329a46ec3b9a0984651d7ddb141976b7"
+  dependencies:
+    "@stamp/compose" "^1.0.2"
 
 "@types/node@*":
   version "10.0.9"
@@ -7335,7 +7379,7 @@ setprototypeof@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.0.tgz#d0bd85536887b6fe7c0d818cb962d9d91c54e656"
 
-sha.js@^2.4.0, sha.js@^2.4.8:
+sha.js@^2.4.0, sha.js@^2.4.11, sha.js@^2.4.8:
   version "2.4.11"
   resolved "https://registry.yarnpkg.com/sha.js/-/sha.js-2.4.11.tgz#37a5cf0b81ecbc6943de109ba2960d1b26584ae7"
   dependencies:
@@ -8163,6 +8207,10 @@ utils-merge@1.0.1:
 uuid@^3.1.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
+
+uuid@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
 
 v8-compile-cache@^1.1.0, v8-compile-cache@^1.1.2:
   version "1.1.2"
