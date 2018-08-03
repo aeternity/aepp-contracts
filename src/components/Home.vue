@@ -476,7 +476,6 @@ export default {
     },
     async getClient () {
       if (this.account.priv && this.account.pub && this.host) {
-        console.log(this.account.priv)
         try {
           Wallet.compose(Contract)({
             url: this.host,
