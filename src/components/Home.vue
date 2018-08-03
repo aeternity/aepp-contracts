@@ -1,16 +1,51 @@
 <template>
   <div class="home container mx-auto">
-    <div v-if="!this.account">
-      <span>Error: Account not been set!</span>
+
+    <h6 class="mt-8 cursor-pointer hover:text-purple" v-if="!modifySettings" @click="modifySettings = true">
+      Modify Settings
+    </h6>
+
+    <div v-if="!this.account.priv || !this.account.pub || !this.host || this.modifySettings">
+      <div class="flex mt-8 mb-8">
+        <div class="w-full p-4 bg-grey-light rounded-sm shadow">
+          <h2 class="py-2">
+            Settings
+          </h2>
+          <div class="flex -mx-2 mt-4 mb-4">
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="host">Host</label>
+              <input v-model="host" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
+            </div>
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
+              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="https://sdk-testnet.aepps.com">
+            </div>
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="accountPub">Public Key</label>
+              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="https://sdk-testnet.aepps.com">
+            </div>
+          </div>
+          <button class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onSettings">Save</button>
+        </div>
+      </div>
     </div>
 
-    <div v-if="this.account">
+    <div v-if="this.account.priv && this.account.pub && this.host">
       <h1 class="py-2">
         Test contracts
-        <span v-if="!this.client" class="text-sm text-red">(connecting to client...)</span>
-        <span v-if="this.client" class="text-sm text-green">(client connected to {{this.host}})</span>
+        <span v-if="!this.client && !this.clientError" class="text-sm text-red">
+          (connecting to {{this.host}}...)
+        </span>
+        <span v-if="this.clientError" class="text-sm text-red">
+          Error connecting to {{this.host}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
+          <br>
+          {{this.clientError}}
+        </span>
+        <span v-if="this.client" class="text-sm text-green">
+          (client connected to {{this.host}})
+        </span>
       </h1>
-      <div class="mt-8 -mx-2">
+      <div class="mt-8 -mx-2" v-if="!this.clientError">
         <div class="w-full p-4 bg-grey-light rounded-sm shadow">
           <h2 class="py-2">
             Sophia Contract's Code:
@@ -163,7 +198,7 @@
               <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
             </div>
             <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="args" id="sophiaType">Type</label>
+              <label class="text-xs block mb-1" for="args" id="sophiaType">Return Type</label>
               <div class="relative">
                 <select v-model="sophiaType" class="block appearance-none w-full py-2 px-2 rounded-none">
                   <option disabled>Select Sophia Type</option>
@@ -201,7 +236,7 @@
 import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
 import Contract from '@aeternity/aepp-sdk/es/ae/contract'
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
-import accountData from '../account.js'
+import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
 
 export default {
@@ -211,6 +246,7 @@ export default {
   },
   data () {
     return {
+      modifySettings: false,
       keymaps: [
         'sublime',
         'vim',
@@ -227,10 +263,10 @@ export default {
       contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
-      account: accountData,
+      account: settingsData.account ? settingsData.account : {priv: null, pub: null},
       byteCode: '',
       client: false,
-      host: '//sdk-testnet.aepps.com',
+      host: settingsData.host ? settingsData.host : null,
       deployedDataObj: false,
       deployInfo: '',
       minedData: false,
@@ -259,6 +295,7 @@ export default {
         gas: 40000000,
         callData: ''
       },
+      clientError: false,
       callRes: '',
       callError: '',
       deployError: '',
@@ -316,7 +353,7 @@ export default {
       }
     },
     async deploy (initState, options = {}) {
-      console.log(`Deploying contract...`, accountData)
+      console.log(`Deploying contract...`, this.account)
       try {
         return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
       } catch (err) {
@@ -339,17 +376,29 @@ export default {
         console.log(err)
       }
     },
-    onCompile () {
+    resetData () {
       this.compileError = ''
       this.callError = ''
+      this.callRes = ''
       this.deployError = ''
       this.callStaticError = ''
       this.deployedData = false
+      this.deployedDataObj = false
       this.deployInfo = ''
       this.minedData = false
       this.miningStatus = false
       this.byteCode = false
 
+      this.modifySettings = false
+    },
+    onSettings () {
+      this.client = false
+      this.clientError = false
+      this.resetData()
+      this.getClient()
+    },
+    onCompile () {
+      this.resetData()
       this.compile(this.contractCode)
         .then(byteCodeObj => {
           this.byteCode = byteCodeObj.bytecode
@@ -359,7 +408,7 @@ export default {
       this.deployInfo = 'Deploying and checking for mining status...'
       this.miningStatus = true
       const extraOpts = {
-        'owner': accountData.pub,
+        'owner': this.account.pub,
         'code': this.contractCode
         // 'vmVersion': 1
         // 'nonce': 0,
@@ -394,7 +443,7 @@ export default {
     },
     onCallDataAndFunction () {
       const extraOpts = {
-        'owner': accountData.pub,
+        'owner': this.account.pub,
         'code': this.contractCode
         // 'vmVersion': 1
         // 'nonce': 0,
@@ -424,9 +473,28 @@ export default {
       } else {
         this.callError = 'Please enter a Function and 1 or more Arguments.'
       }
+    },
+    async getClient () {
+      if (this.account.priv && this.account.pub && this.host) {
+        console.log(this.account.priv)
+        try {
+          Wallet.compose(Contract)({
+            url: this.host,
+            accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})],
+            address: this.account.pub
+          }).then(ae => {
+            this.client = ae
+            this.clientError = false
+          }).catch(err => {
+            this.clientError = err
+          })
+        } catch (err) {
+          this.clientError = `${err} (wrong private/public key)`
+        }
+      }
     }
   },
-  async mounted () {
+  mounted () {
     try {
       const mapName = window.localStorage.getItem('cmkeyMap')
       if (mapName) this.cmOption.keyMap = mapName
@@ -434,13 +502,7 @@ export default {
       /* handle error */
     }
 
-    Wallet.compose(Contract)({
-      url: 'https://sdk-testnet.aepps.com',
-      accounts: [MemoryAccount({keypair: {priv: accountData.priv, pub: accountData.pub}})],
-      address: accountData.pub
-    }).then(ae => {
-      this.client = ae
-    })
+    this.getClient()
   }
 }
 </script>
