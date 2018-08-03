@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@^0.18.0-0.1.0":
-  version "0.18.0-0.1.0"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.18.0-0.1.0.tgz#a7b0b0a1c25bf3bad7b7665add2def8629851ddc"
+"@aeternity/aepp-sdk@0.18.0-0.1.1":
+  version "0.18.0-0.1.1"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.18.0-0.1.1.tgz#25889e8359b7490003cc2fb829ced06480a31241"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     "@stamp/it" "^1.0.3"
