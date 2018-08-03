@@ -475,17 +475,19 @@ export default {
       }
     },
     async getClient () {
+      console.log(this.host)
       if (this.account.priv && this.account.pub && this.host) {
         try {
           Wallet.compose(Contract)({
             url: this.host,
             accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})],
-            address: this.account.pub
+            address: this.account.pub,
+            onTx: true,
+            onChain: true,
+            onAccount: true
           }).then(ae => {
             this.client = ae
             this.clientError = false
-          }).catch(err => {
-            this.clientError = err
           })
         } catch (err) {
           this.clientError = `${err} (wrong private/public key)`

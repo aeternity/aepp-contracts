@@ -22,12 +22,12 @@ class TailwindExtractor {
 
 module.exports = {
   entry: './src/index.js',
-  mode: process.env.NODE_ENV == 'prod' ? 'production' : 'development',
+  mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   output: {
     filename: '[name].bundle.js?[hash]',
     path: distFolder
   },
-  devtool: process.env.NODE_ENV == 'prod' ? '' : 'eval-source-map',
+  devtool: process.env.NODE_ENV === 'prod' ? 'source-map' : 'eval-source-map',
   plugins: [
     new PurgecssPlugin({
 
