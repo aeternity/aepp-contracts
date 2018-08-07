@@ -233,9 +233,9 @@
 </template>
 
 <script>
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
-import Contract from '@aeternity/aepp-sdk/es/ae/contract'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
+import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
 

@@ -7,7 +7,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const PurgecssPlugin = require('purgecss-webpack-plugin')
 let glob = require('glob-all')
 
-const distFolder = path.resolve(__dirname, 'dist');
+const distFolder = path.resolve(__dirname, 'dist')
 const jsLoader = 'babel-loader!standard-loader?error=true'
 
 // Custom PurgeCSS extractor for Tailwind that allows special characters in
@@ -22,6 +22,7 @@ class TailwindExtractor {
 
 module.exports = {
   entry: './src/index.js',
+  resolve: { symlinks: false },
   mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   output: {
     filename: '[name].bundle.js?[hash]',
@@ -49,7 +50,7 @@ module.exports = {
       template: 'index.html',
       filename: 'index.html',
       inject: true,
-      title: 'Beer Æpp',
+      title: 'Contracts Æpp',
       baseUrl: '/',
       APIUrl: 'http://localhost:8080/',
       alwaysWriteToDisk: true
@@ -64,8 +65,28 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: jsLoader,
-        exclude: /node_modules/
+        // exclude: /node_modules\/(?!wallet.js|contract.js|memory.js)/,
+        exclude: /node_modules/,
+        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es/wallet.js'),
+        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es'),
+        loader: jsLoader
+      },
+      // NOTE/TODO: this is probably not something great,
+      // but most probably needed, to use the ES6 modules
+      // one annoying thing is that there is still one "const" in the final bundle
+      // due to the 'node_modules/rlp' lib, included in the SDK
+      {
+        test: /\.js$/,
+        include: path.resolve(__dirname, 'node_modules/@aeternity'),
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: [
+            '@babel/plugin-proposal-object-rest-spread',
+            '@babel/plugin-transform-runtime',
+            '@babel/plugin-proposal-export-default-from'
+          ]
+        }
       },
       {
         test: /\.css$/,
