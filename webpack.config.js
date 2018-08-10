@@ -28,7 +28,7 @@ module.exports = {
     filename: '[name].bundle.js?[hash]',
     path: distFolder
   },
-  devtool: process.env.NODE_ENV === 'prod' ? 'source-map' : 'eval-source-map',
+  devtool: process.env.NODE_ENV === 'prod' ? '' : 'eval-source-map',
   plugins: [
     new PurgecssPlugin({
 
@@ -77,7 +77,10 @@ module.exports = {
       // due to the 'node_modules/rlp' lib, included in the SDK
       {
         test: /\.js$/,
-        include: path.resolve(__dirname, 'node_modules/@aeternity'),
+        include: [
+          path.resolve(__dirname, 'node_modules/@aeternity'),
+          path.resolve(__dirname, 'node_modules/rlp')
+        ],
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env'],
