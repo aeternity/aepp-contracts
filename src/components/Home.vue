@@ -475,11 +475,11 @@ export default {
       }
     },
     async getClient () {
-      console.log(this.host)
       if (this.account.priv && this.account.pub && this.host) {
         try {
           Wallet.compose(Contract)({
             url: this.host,
+            internalUrl: this.host,
             accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})],
             address: this.account.pub,
             onTx: true,
@@ -487,6 +487,7 @@ export default {
             onAccount: true
           }).then(ae => {
             this.client = ae
+            this.client.contractCompile(this.contractCode)
             this.clientError = false
           })
         } catch (err) {

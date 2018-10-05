@@ -1,7 +1,7 @@
 export default {
   account: {
-    pub: 'ak$2nsbEHGpZDs2vhuJnbZDCKsFY1k4qyH18TongQqgWwHCwJa1oS',
-    priv: '1749dd02ba1238d801b58f353e5e5b338191ecd23f4169fa974552b863528901ebdac97f82931816f07828d9f2d8e275aa0232f1387925c40dd44824945f4336'
+    pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
+    priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61'
   },
-  host: 'https://sdk-testnet.aepps.com'
+  host: 'https://sdk-edgenet.aepps.com'
 }
