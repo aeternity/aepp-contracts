@@ -2,9 +2,10 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@aeternity/aepp-sdk-js#feature/epoch-0.24.0":
+"@aeternity/aepp-sdk@^0.24.0-0.1.0":
   version "0.24.0-0.1.0"
-  resolved "https://codeload.github.com/aeternity/aepp-sdk-js/tar.gz/5c0f80e3000dddb2e5de7a9ab0ad5f2dcd7ad580"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.24.0-0.1.0.tgz#d2f084c00eb9baa6b63d19b4212052fa93a08124"
+  integrity sha512-50OjDilnB3ceZVfYixYAT0fURjqV7Mbp603hp2l4AIu9m5x+ttboPMfKOxhTOu85GbDZF/ooLV7WVoSBEGH+Aw==
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     "@stamp/it" "^1.0.3"

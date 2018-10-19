@@ -1,8 +1,11 @@
 <template>
   <div class="home container mx-auto">
 
+    <h6 class="mt-8 font-mono text-sm text-purple" v-if="!modifySettings" @click="modifySettings = true">
+      <span class="text-black">Account: </span> {{ account.pub }} ({{balance >= 0 ? balance : '0'}} Ae Tokens)
+    </h6>
     <h6 class="mt-8 cursor-pointer hover:text-purple" v-if="!modifySettings" @click="modifySettings = true">
-      Modify Settings
+      Settings
     </h6>
 
     <div v-if="!this.account.priv || !this.account.pub || !this.host || this.modifySettings">
@@ -42,7 +45,7 @@
           {{this.clientError}}
         </span>
         <span v-if="this.client" class="text-sm text-green">
-          (client connected to {{this.host}})
+          ({{this.host}})
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
@@ -264,6 +267,7 @@ export default {
   type state = ()
   function main(x : int) = x`,
       account: settingsData.account ? settingsData.account : {priv: null, pub: null},
+      balance: 0,
       byteCode: '',
       client: false,
       host: settingsData.host ? settingsData.host : null,
@@ -284,7 +288,7 @@ export default {
         gasPrice: 1,
         amount: 1,
         fee: 1,
-        gas: 40000000,
+        gas: 1000,
         callData: ''
       },
       callOpts: {
@@ -292,7 +296,7 @@ export default {
         gasPrice: 1,
         amount: 1,
         fee: 1,
-        gas: 40000000,
+        gas: 1000,
         callData: ''
       },
       clientError: false,
@@ -390,6 +394,9 @@ export default {
       this.byteCode = false
 
       this.modifySettings = false
+
+      const self = this
+      this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
     },
     onSettings () {
       this.client = false
@@ -441,6 +448,15 @@ export default {
         this.callStaticError = 'Please enter a Function and 1 or more Arguments.'
       }
     },
+    async assignBalance (accountPub) {
+      return this.client.balance(accountPub).then(balance => {
+        // console.log('balance', balance)
+        return balance
+      }).catch(e => {
+        // console.log('ERROR CHECKING BALANCE')
+        return 0
+      })
+    },
     onCallDataAndFunction () {
       const extraOpts = {
         'owner': this.account.pub,
@@ -475,6 +491,8 @@ export default {
       }
     },
     async getClient () {
+      const self = this
+
       if (this.account.priv && this.account.pub && this.host) {
         try {
           Wallet.compose(Contract)({
@@ -487,7 +505,13 @@ export default {
             onAccount: true
           }).then(ae => {
             this.client = ae
-            this.client.contractCompile(this.contractCode)
+
+            this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
+            setInterval(function () {
+              self.assignBalance(self.account.pub).then(balance => { self.balance = balance })
+              console.log('stocazz')
+            }, 2000)
+
             this.clientError = false
           })
         } catch (err) {
