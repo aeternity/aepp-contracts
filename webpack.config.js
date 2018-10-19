@@ -21,7 +21,6 @@ class TailwindExtractor {
     return content.match(/[A-z0-9-:\/]+/g) || [];
   }
 }
-console.log('WIIIIIIII', process.env.EPOCH_URL)
 module.exports = {
   entry: './src/index.js',
   resolve: { symlinks: false },

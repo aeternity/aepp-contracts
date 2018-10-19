@@ -509,7 +509,6 @@ export default {
             this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
             setInterval(function () {
               self.assignBalance(self.account.pub).then(balance => { self.balance = balance })
-              console.log('stocazz')
             }, 2000)
 
             this.clientError = false
