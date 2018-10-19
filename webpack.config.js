@@ -7,6 +7,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const PurgecssPlugin = require('purgecss-webpack-plugin')
 let glob = require('glob-all')
 
+const webpack = require('webpack')
+
 const distFolder = path.resolve(__dirname, 'dist')
 const jsLoader = 'babel-loader!standard-loader?error=true'
 
@@ -19,7 +21,6 @@ class TailwindExtractor {
     return content.match(/[A-z0-9-:\/]+/g) || [];
   }
 }
-
 module.exports = {
   entry: './src/index.js',
   resolve: { symlinks: false },
@@ -57,9 +58,14 @@ module.exports = {
     }),
     new HtmlWebpackHarddiskPlugin(),
     new ExtractTextPlugin('style.css?[hash]'),
-    new CleanWebpackPlugin([distFolder])
+    new CleanWebpackPlugin([distFolder]),
     // debug bundle (for optimisation)
     // new BundleAnalyzerPlugin()
+    new webpack.DefinePlugin({
+      'process.env': {
+        EPOCH_URL: JSON.stringify(process.env.EPOCH_URL)
+      }
+    })
   ],
   module: {
     rules: [
