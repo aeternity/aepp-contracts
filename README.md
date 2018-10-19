@@ -21,10 +21,15 @@ git clone https://github.com/aeternity/aepp-contracts/
 cd aepp-contracts
 yarn install
 ```
-1. Add a keypair to `src/account.js`
+1. Add a keypair and a host to `src/settings.js`
 ```
-export WALLET_PUB='YOUR_WALLET_PUB'
-export WALLET_PRIV=YOUR_WALLET_PRIV
+export default {
+  account: {
+    pub: 'YOUR_WALLET_PUB',
+    priv: 'YOUR_WALLET_PRIV'
+  },
+  host: 'https://sdk-testnet.aepps.com'
+}
 ```
 
 ## Start the application

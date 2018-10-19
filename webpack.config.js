@@ -7,7 +7,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const PurgecssPlugin = require('purgecss-webpack-plugin')
 let glob = require('glob-all')
 
-const distFolder = path.resolve(__dirname, 'dist');
+const webpack = require('webpack')
+
+const distFolder = path.resolve(__dirname, 'dist')
 const jsLoader = 'babel-loader!standard-loader?error=true'
 
 // Custom PurgeCSS extractor for Tailwind that allows special characters in
@@ -19,15 +21,15 @@ class TailwindExtractor {
     return content.match(/[A-z0-9-:\/]+/g) || [];
   }
 }
-
 module.exports = {
   entry: './src/index.js',
-  mode: process.env.NODE_ENV == 'prod' ? 'production' : 'development',
+  resolve: { symlinks: false },
+  mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   output: {
     filename: '[name].bundle.js?[hash]',
     path: distFolder
   },
-  devtool: process.env.NODE_ENV == 'prod' ? '' : 'eval-source-map',
+  devtool: process.env.NODE_ENV === 'prod' ? '' : 'eval-source-map',
   plugins: [
     new PurgecssPlugin({
 
@@ -49,23 +51,51 @@ module.exports = {
       template: 'index.html',
       filename: 'index.html',
       inject: true,
-      title: 'Beer Æpp',
+      title: 'Contracts Æpp',
       baseUrl: '/',
       APIUrl: 'http://localhost:8080/',
       alwaysWriteToDisk: true
     }),
     new HtmlWebpackHarddiskPlugin(),
     new ExtractTextPlugin('style.css?[hash]'),
-    new CleanWebpackPlugin([distFolder])
+    new CleanWebpackPlugin([distFolder]),
     // debug bundle (for optimisation)
     // new BundleAnalyzerPlugin()
+    new webpack.DefinePlugin({
+      'process.env': {
+        EPOCH_URL: JSON.stringify(process.env.EPOCH_URL)
+      }
+    })
   ],
   module: {
     rules: [
       {
         test: /\.js$/,
-        loader: jsLoader,
-        exclude: /node_modules/
+        // exclude: /node_modules\/(?!wallet.js|contract.js|memory.js)/,
+        exclude: /node_modules/,
+        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es/wallet.js'),
+        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es'),
+        loader: jsLoader
+      },
+      // NOTE/TODO: this is probably not something great,
+      // but most probably needed, to use the ES6 modules
+      // one annoying thing is that there is still one "const" in the final bundle
+      // due to the 'node_modules/rlp' lib, included in the SDK
+      {
+        test: /\.js$/,
+        include: [
+          path.resolve(__dirname, 'node_modules/@aeternity'),
+          path.resolve(__dirname, 'node_modules/rlp')
+        ],
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: [
+            '@babel/plugin-proposal-object-rest-spread',
+            '@babel/plugin-transform-runtime',
+            '@babel/plugin-proposal-export-default-from'
+          ]
+        }
       },
       {
         test: /\.css$/,
