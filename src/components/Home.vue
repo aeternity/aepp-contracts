@@ -509,7 +509,7 @@ export default {
             this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
             setInterval(function () {
               self.assignBalance(self.account.pub).then(balance => { self.balance = balance })
-            }, 2000)
+            }, 10000)
 
             this.clientError = false
           })
