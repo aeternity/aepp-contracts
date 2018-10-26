@@ -71,31 +71,18 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        // exclude: /node_modules\/(?!wallet.js|contract.js|memory.js)/,
-        exclude: /node_modules/,
-        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es/wallet.js'),
-        // include: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es'),
+        exclude: [/node_modules/],
+        include: [/node_modules\/@aeternity/, /node_modules\/rlp/],
         loader: jsLoader
-      },
-      // NOTE/TODO: this is probably not something great,
-      // but most probably needed, to use the ES6 modules
-      // one annoying thing is that there is still one "const" in the final bundle
-      // due to the 'node_modules/rlp' lib, included in the SDK
-      {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, 'node_modules/@aeternity'),
-          path.resolve(__dirname, 'node_modules/rlp')
-        ],
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: [
-            '@babel/plugin-proposal-object-rest-spread',
-            '@babel/plugin-transform-runtime',
-            '@babel/plugin-proposal-export-default-from'
-          ]
-        }
+        // your babel options (or from .babelrc file)
+        // options: {
+        //   presets: ['@babel/preset-env'],
+        //   plugins: [
+        //     '@babel/plugin-proposal-object-rest-spread',
+        //     '@babel/plugin-transform-runtime',
+        //     '@babel/plugin-proposal-export-default-from'
+        //   ]
+        // }
       },
       {
         test: /\.css$/,
