@@ -498,7 +498,7 @@ export default {
           Wallet.compose(Contract)({
             url: this.host,
             internalUrl: this.host,
-            accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})],
+            accounts: [MemoryAccount({keypair: {secretKey: this.account.priv, publicKey: this.account.pub}})],
             address: this.account.pub,
             onTx: true,
             onChain: true,
