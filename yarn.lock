@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@^0.25.0-0.1.1":
-  version "0.25.0-0.1.1"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.25.0-0.1.1.tgz#0e339844046ba1f988ac293acd0366b355b2604c"
-  integrity sha512-8Rx3DspRFwJ7FJV+VPJ0Fw/KfNJe5qgY6N7TYh90DsQ4Yz8rm4VEiplzdoTSqdo/lXU8AmjxFLY8QOIIIstrBA==
+"@aeternity/aepp-sdk@^1.0.0-next":
+  version "1.0.0-next"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-1.0.0-next.tgz#906bd67947116bebc9459e3fb68278e6a43aa083"
+  integrity sha512-MwkkOmv8H4aychNtB29bhoLOcDwvjAYy8gz5f0yjF056k1tKHLvsy1hmbN2SnIlmcUmgJ0wYTYgqlvCEH+K7cw==
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     "@stamp/it" "^1.0.3"
@@ -13,20 +13,22 @@
     aes-js "^3.1.1"
     argon2 "^0.19.3"
     axios "^0.18.0"
+    bignumber.js "^8.0.1"
     blakejs "^1.1.0"
-    bn.js "^4.11.8"
     bs58check "^2.1.1"
     cacache "^11.2.0"
     commander "^2.14.1"
     esm "^3.0.77"
     fs "0.0.1-security"
     fs-extra "^7.0.0"
+    json-bigint "^0.3.0"
     path "^0.12.7"
     postinstall-build "^5.0.1"
     promisify-child-process "^2.1.2"
     ramda "^0.25.0"
     recursive-rename "^2.0.0"
     rlp "^2.0.0"
+    semver "^5.6.0"
     serialize-javascript "^1.5.0"
     sha.js "^2.4.11"
     tweetnacl "^1.0.0"
@@ -903,6 +905,16 @@ big.js@^3.1.3:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
   integrity sha512-+hN/Zh2D08Mx65pZ/4g5bsmNiZUuChDiQfTUQ7qJr4/kuopCr88xZsAXv6mBoZEsUI4OuGHlX59qE94K2mMW8Q==
 
+bignumber.js@^7.0.0:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
+  integrity sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
+
+bignumber.js@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-8.0.1.tgz#5d419191370fb558c64e3e5f70d68e5947138832"
+  integrity sha512-zAySveTJXkgLYCBi0b14xzfnOs+f3G6x36I8w2a1+PFQpWk/dp0mI0F+ZZK2bu+3ELewDcSyP+Cfq++NcHX7sg==
+
 binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
@@ -928,7 +940,7 @@ bluebird@^3.5.0:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.2.tgz#1be0908e054a751754549c270489c1505d4ab15a"
   integrity sha512-dhHTWMI7kMx5whMQntl7Vr9C6BvV10lFXDAasnqnrMYhXVCzzk6IO9Fo2L75jXHT07WrOngL1WDXOp+yYS91Yg==
 
-bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.8, bn.js@^4.4.0:
+bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
   integrity sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
@@ -3697,6 +3709,13 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+json-bigint@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/json-bigint/-/json-bigint-0.3.0.tgz#0ccd912c4b8270d05f056fbd13814b53d3825b1e"
+  integrity sha1-DM2RLEuCcNBfBW+9E4FLU9OCWx4=
+  dependencies:
+    bignumber.js "^7.0.0"
+
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
@@ -6251,6 +6270,11 @@ semver-diff@^2.0.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
   integrity sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
+
+semver@^5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
+  integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
 
 send@0.16.2:
   version "0.16.2"
