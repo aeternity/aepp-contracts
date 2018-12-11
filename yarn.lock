@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-1.0.1.tgz#62b3d80316215dbfd7bbfe601f589aceadb25eef"
-  integrity sha512-akYweUqUCjLnWibO8oL04HOckETrDrna/LAgDQYorXBSDXfija3mMlsal0DMcWPtCDERdxkeYQ1KtuSVwRfNDA==
+"@aeternity/aepp-sdk@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-1.1.1.tgz#e9289c9f2bc99765e12dfdc0a74041536b3b182b"
+  integrity sha512-e8Xb5kFbPRfVOg9HjxLXBFAYC3jpx0lkc8brwsBw5XtadqkpFuXfjK0yooNAj4w4LgziBpl6ug5SHvBJ1jn5uA==
   dependencies:
     "@babel/runtime" "^7.0.0-beta.46"
     "@stamp/it" "^1.0.3"
