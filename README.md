@@ -1,4 +1,4 @@
-# POS Æpp
+# Contracts Æpp
 
 ## Overview
 

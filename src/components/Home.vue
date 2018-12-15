@@ -268,6 +268,7 @@ export default {
   function main(x : int) = x`,
       account: settingsData.account ? settingsData.account : {priv: null, pub: null},
       balance: 0,
+      balanceInterval: null,
       byteCode: '',
       client: false,
       host: settingsData.host ? settingsData.host : null,
@@ -287,8 +288,8 @@ export default {
         deposit: 1,
         gasPrice: 1,
         amount: 1,
-        fee: 1,
-        gas: 1000,
+        fee: 500000,
+        gas: 1000000,
         callData: ''
       },
       callOpts: {
@@ -395,8 +396,8 @@ export default {
 
       this.modifySettings = false
 
-      const self = this
-      this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
+      // const self = this
+      // this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
     },
     onSettings () {
       this.client = false
@@ -452,9 +453,6 @@ export default {
       return this.client.balance(accountPub).then(balance => {
         // console.log('balance', balance)
         return balance
-      }).catch(e => {
-        // console.log('ERROR CHECKING BALANCE')
-        return 0
       })
     },
     onCallDataAndFunction () {
@@ -502,13 +500,15 @@ export default {
             address: this.account.pub,
             onTx: true,
             onChain: true,
-            onAccount: true
+            onAccount: true,
+            networkId: 'ae_uat'
           }).then(ae => {
             this.client = ae
 
             this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
-            setInterval(function () {
-              self.assignBalance(self.account.pub).then(balance => { self.balance = balance })
+            this.balanceInterval = setInterval(function () {
+              self.assignBalance(self.account.pub)
+                .then(balance => { self.balance = balance })
             }, 10000)
 
             this.clientError = false
