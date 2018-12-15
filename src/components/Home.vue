@@ -296,8 +296,8 @@ export default {
         deposit: 1,
         gasPrice: 1,
         amount: 1,
-        fee: 1,
-        gas: 1000,
+        fee: 500000,
+        gas: 1000000,
         callData: ''
       },
       clientError: false,
