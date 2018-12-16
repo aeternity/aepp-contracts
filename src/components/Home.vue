@@ -2,7 +2,7 @@
   <div class="home container mx-auto">
 
     <h6 class="mt-8 font-mono text-sm text-purple" v-if="!modifySettings" @click="modifySettings = true">
-      <span class="text-black">Account: </span> {{ account.pub }} ({{balance >= 0 ? balance : '0'}} Ae Tokens)
+      <span class="text-black">Account: </span> {{ account.pub }}
     </h6>
     <h6 class="mt-8 cursor-pointer hover:text-purple" v-if="!modifySettings" @click="modifySettings = true">
       Settings
