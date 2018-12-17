@@ -271,9 +271,9 @@ export default {
       miningStatus: '',
       wallet: false,
       deployFunc: 'init',
-      deployArgs: '()',
+      deployArgs: '',
       staticFunc: 'main',
-      staticArgs: '(1)',
+      staticArgs: '',
       staticSophiaType: 'int',
       nonStaticFunc: '',
       nonStaticArgs: '',
@@ -351,27 +351,27 @@ export default {
         console.log(err)
       }
     },
-    async deploy (initState, options = {}) {
+    async deploy (initState = '()', options = {}) {
       console.log(`Deploying contract...`, this.account)
       try {
-        return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
+        return this.client.contractDeploy(this.byteCode, 'sophia', {initState: `(${initState})`, options})
       } catch (err) {
         console.log(err)
       }
     },
-    async callStatic (func, args = '1') {
+    async callStatic (func, args = '()') {
       console.log(`calling static func ${func} with args ${args}`)
       try {
-        const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args })
+        const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args: `(${args})` })
         return { decoded: await res.decode('int'), result: res.result }
       } catch (err) {
         console.log(err)
       }
     },
-    async callContract (func, args, address, options) {
+    async callContract (func, args = '()', address, options) {
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
+        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args: `(${args})`, options})
       } catch (err) {
         console.log(err)
       }
