@@ -436,7 +436,7 @@ export default {
       if (this.staticFunc) {
         this.callStatic(this.staticFunc, this.staticArgs)
           .then(data => {
-            this.callStaticRes = `Result: ` + data.decoded.value
+            this.callStaticRes = `Result: ` + JSON.stringify(data.decoded.value)
             this.callStaticError = ''
           })
           .catch(err => {
