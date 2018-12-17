@@ -404,6 +404,7 @@ export default {
       this.resetData()
       this.compile(this.contractCode)
         .then(byteCodeObj => {
+          this.contractAddress = undefined
           this.byteCode = byteCodeObj.bytecode
         })
     },
