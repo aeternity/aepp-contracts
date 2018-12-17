@@ -105,23 +105,23 @@
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dGas">Gas Limit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
               </div>
 
@@ -171,23 +171,23 @@
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cGas">Gas Limit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
             </div>
 
