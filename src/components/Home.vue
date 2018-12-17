@@ -105,23 +105,23 @@
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dDeposit">Deposit</label>
+                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGasPrice">Gas Price</label>
+                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dAmount">Amount</label>
+                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dFee">Fee</label>
+                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
+                <label class="text-xs block mb-1" for="dGas">Gas Limit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
               </div>
 
@@ -131,8 +131,7 @@
 
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
-
-          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
+          <div v-if="contractAddress" class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               ⬅ Call Static Function
             </h2>
@@ -144,6 +143,10 @@
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
                 <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="arguments">
+              </div>
+              <div class="mx-2 w-1/2">
+                <label class="text-xs block mb-1" for="staticSophiaTypeInput">Return Type</label>
+                <input v-model="staticSophiaType" class="w-full p-2" id="staticSophiaTypeInput" type="text" placeholder="Sophia Type" value="int">
               </div>
             </div>
 
@@ -158,7 +161,7 @@
               <textarea v-model="callStaticError" class="h-48 w-full text-red bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono"></textarea>
             </div>
 
-            <button disabled class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static (disabled)</button>
+            <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
           </div>
         </div>
 
@@ -168,23 +171,23 @@
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cDeposit">Deposit</label>
+              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGasPrice">Gas Price</label>
+              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cAmount">Amount</label>
+              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cFee">Fee</label>
+              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
+              <label class="text-xs block mb-1" for="cGas">Gas Limit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
             </div>
 
@@ -201,18 +204,8 @@
               <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
             </div>
             <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="args" id="sophiaType">Return Type</label>
-              <div class="relative">
-                <select v-model="sophiaType" class="block appearance-none w-full py-2 px-2 rounded-none">
-                  <option disabled>Select Sophia Type</option>
-                  <option :key="idx" v-for='(type, idx) in sophiaTypes' :value="type">
-                    {{type}}
-                  </option>
-                </select>
-                <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker">
-                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-              </div>
+              <label class="text-xs block mb-1" for="sophiaTypeInput">Return Type</label>
+              <input v-model="sophiaType" class="w-full p-2" id="sophiaTypeInput" type="text" placeholder="Sophia Type">
             </div>
           </div>
 
@@ -278,9 +271,10 @@ export default {
       miningStatus: '',
       wallet: false,
       deployFunc: 'init',
-      deployArgs: '()',
+      deployArgs: '',
       staticFunc: 'main',
-      staticArgs: '(1)',
+      staticArgs: '',
+      staticSophiaType: 'int',
       nonStaticFunc: '',
       nonStaticArgs: '',
       contractAddress: '',
@@ -357,26 +351,27 @@ export default {
         console.log(err)
       }
     },
-    async deploy (initState, options = {}) {
+    async deploy (initState = '()', options = {}) {
       console.log(`Deploying contract...`, this.account)
       try {
-        return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
+        return this.client.contractDeploy(this.byteCode, 'sophia', {initState: `(${initState})`, options})
       } catch (err) {
         console.log(err)
       }
     },
-    async callStatic (func, args = '1') {
+    async callStatic (func, args = '()') {
       console.log(`calling static func ${func} with args ${args}`)
       try {
-        return this.client.contractCallStatic(this.byteCode, 'sophia', func, args)
+        const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args: `(${args})` })
+        return { decoded: await res.decode('int'), result: res.result }
       } catch (err) {
         console.log(err)
       }
     },
-    async callContract (func, args, address, options) {
+    async callContract (func, args = '()', address, options) {
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
+        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args: `(${args})`, options})
       } catch (err) {
         console.log(err)
       }
@@ -409,6 +404,7 @@ export default {
       this.resetData()
       this.compile(this.contractCode)
         .then(byteCodeObj => {
+          this.contractAddress = undefined
           this.byteCode = byteCodeObj.bytecode
         })
     },
@@ -439,7 +435,7 @@ export default {
       if (this.staticFunc && this.staticArgs) {
         this.callStatic(this.staticFunc, this.staticArgs)
           .then(data => {
-            this.callStaticRes = data
+            this.callStaticRes = `Result: ` + data.decoded.value
             this.callStaticError = ''
           })
           .catch(err => {
@@ -533,4 +529,7 @@ export default {
 </script>
 
 <style lang="css">
+  .no-underline {
+    text-decoration: none;
+  }
 </style>
