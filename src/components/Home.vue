@@ -532,4 +532,11 @@ export default {
   .no-underline {
     text-decoration: none;
   }
+  .CodeMirror {
+    height: auto;
+    min-height: 300px;
+  }
+  .CodeMirror-scroll {
+	min-height: 300px;
+  }
 </style>
