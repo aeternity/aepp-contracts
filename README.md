@@ -28,7 +28,8 @@ export default {
     pub: 'YOUR_WALLET_PUB',
     priv: 'YOUR_WALLET_PRIV'
   },
-  host: 'https://sdk-testnet.aepps.com'
+  host: 'https://sdk-testnet.aepps.com',
+  internalHost: 'https://sdk-testnet.aepps.com'
 }
 ```
 

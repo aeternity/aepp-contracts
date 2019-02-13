@@ -1,7 +1,8 @@
 export default {
   account: {
-    pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
-    priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61'
+    pub: 'ak_2EdPu7gJTMZSdFntHK5864CnsRykW1GUwLGC2KeC8tjNnFBjBx',
+    priv: '195675e7ef31c689f92eb86fc67e31124b3b124889906607f63ee9d323834039a2a39512ab47c05b764883c04466533e0661007061a4787dc34e95de96b7b8e7'
   },
-  host: process.env.EPOCH_URL ? process.env.EPOCH_URL : 'https://sdk-testnet.aepps.com'
+  host: 'https://sdk-testnet.aepps.com',
+  internalHost: 'https://sdk-testnet.aepps.com'
 }

@@ -491,13 +491,12 @@ export default {
         try {
           Wallet.compose(Contract)({
             url: this.host,
-            internalUrl: this.host,
+            internalUrl: settingsData.internalHost,
             accounts: [MemoryAccount({keypair: {secretKey: this.account.priv, publicKey: this.account.pub}})],
             address: this.account.pub,
             onTx: true,
             onChain: true,
-            onAccount: true,
-            networkId: 'ae_uat'
+            onAccount: true
           }).then(ae => {
             this.client = ae
 
