@@ -21,11 +21,11 @@
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
-              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="Private Key">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPub">Public Key</label>
-              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="Public Key">
             </div>
           </div>
           <button class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onSettings">Save</button>
@@ -100,28 +100,28 @@
               </div>
               <div class="mx-2">
                 <label class="text-xs block mb-1" for="deployArgs">Arguments</label>
-                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="arguments">
+                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="()">
               </div>
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
                 <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
               </div>
 
@@ -142,7 +142,7 @@
               </div>
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
-                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="arguments">
+                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="()">
               </div>
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticSophiaTypeInput">Return Type</label>
@@ -171,23 +171,23 @@
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
               <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
             </div>
 
@@ -201,7 +201,7 @@
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="args">Arguments</label>
-              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
+              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="()">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="sophiaTypeInput">Return Type</label>
@@ -271,9 +271,9 @@ export default {
       miningStatus: '',
       wallet: false,
       deployFunc: 'init',
-      deployArgs: '()',
+      deployArgs: '',
       staticFunc: 'main',
-      staticArgs: '(1)',
+      staticArgs: '',
       staticSophiaType: 'int',
       nonStaticFunc: '',
       nonStaticArgs: '',
@@ -352,28 +352,29 @@ export default {
       }
     },
     async deploy (initState, options = {}) {
+      initState = initState ? `(${initState})` : '()'
       console.log(`Deploying contract...`, this.account)
       try {
         return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
       } catch (err) {
         console.log(err)
+        throw err
       }
     },
-    async callStatic (func, args = '1') {
+    async callStatic (func, args) {
       console.log(`calling static func ${func} with args ${args}`)
-      try {
-        const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args })
-        return { decoded: await res.decode('int'), result: res.result }
-      } catch (err) {
-        console.log(err)
-      }
+      args = args ? `(${args})` : '()'
+      const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args })
+      return { decoded: await res.decode(this.staticSophiaType), result: res.result }
     },
     async callContract (func, args, address, options) {
+      args = args ? `(${args})` : '()'
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
         return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
       } catch (err) {
         console.log(err)
+        throw err
       }
     },
     resetData () {
@@ -432,13 +433,14 @@ export default {
         })
     },
     onCallStatic () {
-      if (this.staticFunc && this.staticArgs) {
+      if (this.staticFunc) {
         this.callStatic(this.staticFunc, this.staticArgs)
           .then(data => {
-            this.callStaticRes = `Result: ` + data.decoded.value
+            this.callStaticRes = `Result: ` + JSON.stringify(data.decoded.value)
             this.callStaticError = ''
           })
           .catch(err => {
+            err = err.response ? err.response.data.reason : 'Unknown error'
             this.callStaticError = `${err}`
           })
       } else {
@@ -461,7 +463,7 @@ export default {
       }
       const opts = Object.assign(extraOpts, this.callOpts)
 
-      if (this.nonStaticFunc && this.nonStaticArgs) {
+      if (this.nonStaticFunc) {
         this.waitingCall = true
         this.callContract(this.nonStaticFunc, this.nonStaticArgs, this.contractAddress, opts)
           .then(dataRes => {
