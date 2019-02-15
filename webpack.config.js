@@ -63,7 +63,8 @@ module.exports = {
     // new BundleAnalyzerPlugin()
     new webpack.DefinePlugin({
       'process.env': {
-        EPOCH_URL: JSON.stringify(process.env.EPOCH_URL)
+        VUE_APP_NODE_URL: JSON.stringify(process.env.VUE_APP_NODE_URL),
+        VUE_APP_NODE_INTERNAL_URL: JSON.stringify(process.env.VUE_APP_NODE_INTERNAL_URL)
       }
     })
   ],
