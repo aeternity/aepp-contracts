@@ -8,7 +8,7 @@
       Settings
     </h6>
 
-    <div v-if="!this.account.priv || !this.account.pub || !this.host || this.modifySettings">
+    <div v-if="!this.account.priv || !this.account.pub || !this.url || this.modifySettings">
       <div class="flex mt-8 mb-8">
         <div class="w-full p-4 bg-grey-light rounded-sm shadow">
           <h2 class="py-2">
@@ -17,7 +17,7 @@
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="host">Host</label>
-              <input v-model="host" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="url" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
@@ -33,19 +33,19 @@
       </div>
     </div>
 
-    <div v-if="this.account.priv && this.account.pub && this.host">
+    <div v-if="this.account.priv && this.account.pub && this.url">
       <h1 class="py-2">
         Test contracts
         <span v-if="!this.client && !this.clientError" class="text-sm text-red">
-          (connecting to {{this.host}}...)
+          (connecting to {{this.url}}...)
         </span>
         <span v-if="this.clientError" class="text-sm text-red">
-          Error connecting to {{this.host}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
+          Error connecting to {{this.url}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
           <br>
           {{this.clientError}}
         </span>
         <span v-if="this.client" class="text-sm text-green">
-          ({{this.host}})
+          ({{this.url}})
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
@@ -114,7 +114,7 @@
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
+                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmount" type="number" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
@@ -180,7 +180,7 @@
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
+              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmount" type="number" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
@@ -264,7 +264,7 @@ export default {
       balanceInterval: null,
       byteCode: '',
       client: false,
-      host: settingsData.host ? settingsData.host : null,
+      url: settingsData.url ? settingsData.url : null,
       deployedDataObj: false,
       deployInfo: '',
       minedData: false,
@@ -489,11 +489,11 @@ export default {
     async getClient () {
       const self = this
 
-      if (this.account.priv && this.account.pub && this.host) {
+      if (this.account.priv && this.account.pub && this.url) {
         try {
           Wallet.compose(Contract)({
-            url: this.host,
-            internalUrl: settingsData.internalHost,
+            url: this.url,
+            internalUrl: settingsData.internalUrl,
             accounts: [MemoryAccount({keypair: {secretKey: this.account.priv, publicKey: this.account.pub}})],
             address: this.account.pub,
             onTx: true,
