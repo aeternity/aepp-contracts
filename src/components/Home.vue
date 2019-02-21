@@ -250,11 +250,12 @@ export default {
       ],
       cmOption: {
         keyMap: 'sublime',
-        tabSize: 4,
+        indentUnit: 2,
         styleActiveLine: true,
         lineNumbers: true,
         mode: 'text/javascript',
-        theme: 'base16-dark'
+        theme: 'base16-dark',
+        extraKeys: { Tab: this.usingSpacesInsteadTab }
       },
       contractCode: `contract Identity =
   type state = ()
@@ -342,6 +343,10 @@ export default {
     }
   },
   methods: {
+    usingSpacesInsteadTab (cm) {
+      const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
+      cm.replaceSelection(spaces)
+    },
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
