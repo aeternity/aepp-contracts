@@ -106,23 +106,23 @@
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
+                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" min="0" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
+                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" min="1000000" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmount" type="number" placeholder="amount">
+                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmount" type="number" min="0" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
+                <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="auto">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
-                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
+                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" min="0" placeholder="gas">
               </div>
 
               <input v-model="deployOpts.callData" class="w-full p-2" type="hidden" value="callData">
@@ -172,23 +172,23 @@
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
+              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" min="0" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
+              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" min="1000000" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmount" type="number" placeholder="amount">
+              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmount" type="number" min="0" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
+              <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="auto">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
-              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
+              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" min="0" placeholder="gas">
             </div>
 
             <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
@@ -280,18 +280,18 @@ export default {
       nonStaticArgs: '',
       contractAddress: '',
       deployOpts: {
-        deposit: 1,
-        gasPrice: 1,
-        amount: 1,
-        fee: 500000,
+        deposit: 0,
+        gasPrice: 1000000,
+        amount: 0,
+        fee: null, // sdk will automatically select this
         gas: 1000000,
         callData: ''
       },
       callOpts: {
-        deposit: 1,
-        gasPrice: 1,
-        amount: 1,
-        fee: 500000,
+        deposit: 0,
+        gasPrice: 1000000,
+        amount: 0,
+        fee: null, // sdk will automatically select this
         gas: 1000000,
         callData: ''
       },
