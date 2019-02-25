@@ -371,7 +371,7 @@ export default {
       args = args ? `(${args})` : '()'
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
+        return this.client.contractCall(address, 'sophia-address', address, func, {args, options})
       } catch (err) {
         console.log(err)
         throw err
