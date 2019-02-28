@@ -110,7 +110,7 @@
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" min="1000000" placeholder="gas price">
+                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" min="1000000000" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
@@ -176,7 +176,7 @@
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" min="1000000" placeholder="gas price">
+              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" min="1000000000" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
               <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
@@ -280,7 +280,7 @@ export default {
       contractAddress: '',
       deployOpts: {
         deposit: 0,
-        gasPrice: 1000000,
+        gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
         gas: 1000000,
@@ -288,7 +288,7 @@ export default {
       },
       callOpts: {
         deposit: 0,
-        gasPrice: 1000000,
+        gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
         gas: 1000000,
