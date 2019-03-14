@@ -49,10 +49,12 @@
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow">
-          <h2 class="py-2">
+        <div class="w-full p-4 bg-grey-light rounded-sm shadow" v-if="!usingPreDeployedContract">
+          <h2 class="py-2 inline-block">
             Sophia Contract's Code:
           </h2>
+
+          <button v-if="this.client" class="inline-block float-right rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onUsePreDeployedContract()">Use pre-deployed contract's address</button>
 
           <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
@@ -76,8 +78,25 @@
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
         </div>
 
-        <div class="flex mt-8 mb-8" v-if="byteCode">
-          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
+        <div class="w-full p-4 bg-grey-light rounded-sm shadow" v-if="usingPreDeployedContract">
+          <h2 class="py-2 inline-block">
+            Deployed Sophia Contract's address:
+          </h2>
+
+          <button v-if="this.client" class="inline-block float-right rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onUseContractCode()">Back to Sophia Contract's Code</button>
+
+          <div class="flex -mx-2 mt-4 mb-4">
+            <div class="w-1/2 mx-2 min-w-510">
+              <label class="text-xs block mb-1" for="preDeployedContract">Pre-deployed contract's address</label>
+              <input v-model="contractAddress" class="w-full p-2" id="preDeployedContract" @change="filledInPreDeployedContractAddress = false" type="text" placeholder="Sophia Contract's address">
+            </div>
+          </div>
+
+          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onFilledInAddress()">Continue</button>
+        </div>
+
+        <div class="flex mt-8 mb-8" v-if="byteCode || filledInPreDeployedContractAddress">
+          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow" v-if="!filledInPreDeployedContractAddress">
             <h2 class="py-2">
               Byte Code
               <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">
@@ -131,7 +150,7 @@
 
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
-          <div v-if="contractAddress" class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
+          <div v-if="contractAddress" v-bind:class="{ 'w-full': filledInPreDeployedContractAddress, 'w-1/2': ! filledInPreDeployedContractAddress}" class="p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               ⬅ Call Static Function
             </h2>
@@ -165,7 +184,7 @@
           </div>
         </div>
 
-        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
+        <div v-if="(deployedDataObj && byteCode) || filledInPreDeployedContractAddress" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
           <h2 class="py-2">
             ⬆ Call Function
           </h2>
@@ -319,7 +338,9 @@ export default {
         'events',
         'oracle(\'a, \'b)',
         'oracle_query(\'a, \'b)'
-      ]
+      ],
+      usingPreDeployedContract: false,
+      filledInPreDeployedContractAddress: false
     }
   },
   props: {
@@ -371,7 +392,7 @@ export default {
       args = args ? `(${args})` : '()'
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
+        return this.client.contractCall(address, 'sophia-address', address, func, {args, options})
       } catch (err) {
         console.log(err)
         throw err
@@ -471,7 +492,7 @@ export default {
             this.client.contractDecodeData(this.sophiaType, dataRes.result.returnValue).then(data => {
               this.callRes = `Gas Used: ${dataRes.result.gasUsed} <br><br>---<br><br> Result: <br><br> ${data.value}`
             }).catch(err => {
-              this.callError = `${err}`
+              this.callError = `${JSON.stringify(err)}`
               this.waitingCall = false
               this.callRes = ''
             })
@@ -479,7 +500,7 @@ export default {
             this.waitingCall = false
           })
           .catch(err => {
-            this.callError = `${err}`
+            this.callError = `${JSON.stringify(err)}`
             this.waitingCall = false
           })
       } else {
@@ -514,6 +535,28 @@ export default {
           this.clientError = `${err} (wrong private/public key)`
         }
       }
+    },
+    onUsePreDeployedContract () {
+      this.usingPreDeployedContract = true
+      this.contractAddress = ''
+      this.resetData()
+    },
+    onFilledInAddress () {
+      if (!this.contractAddress) {
+        return
+      }
+
+      this.filledInPreDeployedContractAddress = true
+    },
+    onUseContractCode () {
+      this.usingPreDeployedContract = false
+      this.filledInPreDeployedContractAddress = false
+      this.staticFunc = 'main'
+      this.callStaticRes = ''
+      this.staticArgs = ''
+      this.nonStaticFunc = ''
+      this.nonStaticArgs = ''
+      this.resetData()
     }
   },
   mounted () {
@@ -532,6 +575,13 @@ export default {
 <style lang="css">
   .no-underline {
     text-decoration: none;
+  }
+  button,
+  button:hover,
+  button:focus,
+  button:active {
+	  outline: none;
+	  outline: 0;
   }
   .CodeMirror {
     height: auto;
