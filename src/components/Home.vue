@@ -49,12 +49,10 @@
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow" v-if="!usingPreDeployedContract">
+        <div class="w-full p-4 bg-grey-light rounded-sm shadow">
           <h2 class="py-2 inline-block">
             Sophia Contract's Code:
           </h2>
-
-          <button v-if="this.client" class="inline-block float-right rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onUsePreDeployedContract()">Use pre-deployed contract's address</button>
 
           <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
@@ -78,25 +76,8 @@
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
         </div>
 
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow" v-if="usingPreDeployedContract">
-          <h2 class="py-2 inline-block">
-            Deployed Sophia Contract's address:
-          </h2>
-
-          <button v-if="this.client" class="inline-block float-right rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onUseContractCode()">Back to Sophia Contract's Code</button>
-
-          <div class="flex -mx-2 mt-4 mb-4">
-            <div class="w-1/2 mx-2 min-w-510">
-              <label class="text-xs block mb-1" for="preDeployedContract">Pre-deployed contract's address</label>
-              <input v-model="contractAddress" class="w-full p-2" id="preDeployedContract" @change="filledInPreDeployedContractAddress = false" type="text" placeholder="Sophia Contract's address">
-            </div>
-          </div>
-
-          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onFilledInAddress()">Continue</button>
-        </div>
-
-        <div class="flex mt-8 mb-8" v-if="byteCode || filledInPreDeployedContractAddress">
-          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow" v-if="!filledInPreDeployedContractAddress">
+        <div class="flex mt-8 mb-8" v-if="byteCode">
+          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               Byte Code
               <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">
@@ -150,7 +131,7 @@
 
             <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
-          <div v-if="contractAddress" v-bind:class="{ 'w-full': filledInPreDeployedContractAddress, 'w-1/2': ! filledInPreDeployedContractAddress}" class="p-4 bg-grey-light rounded-sm shadow">
+          <div v-if="contractAddress" class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               ⬅ Call Static Function
             </h2>
@@ -184,7 +165,7 @@
           </div>
         </div>
 
-        <div v-if="(deployedDataObj && byteCode) || filledInPreDeployedContractAddress" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
+        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
           <h2 class="py-2">
             ⬆ Call Function
           </h2>
@@ -248,11 +229,13 @@
 </template>
 
 <script>
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
-import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
+// import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
+import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+// import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
+// import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
+const compilerUrl = 'https://compiler.aepps.com'
 
 export default {
   name: 'Home',
@@ -339,9 +322,7 @@ export default {
         'events',
         'oracle(\'a, \'b)',
         'oracle_query(\'a, \'b)'
-      ],
-      usingPreDeployedContract: false,
-      filledInPreDeployedContractAddress: false
+      ]
     }
   },
   props: {
@@ -371,17 +352,18 @@ export default {
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        return await this.client.contractCompile(code)
+        return await this.client.compileContractAPI(code)
       } catch (err) {
         this.compileError = err
         console.log(err)
       }
     },
     async deploy (initState, options = {}) {
-      initState = initState ? `(${initState})` : '()'
+      initState = initState ? [initState] : []
       console.log(`Deploying contract...`, this.account)
       try {
-        return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
+        const contractInstance = await this.client.getContractInstance(this.contractCode)
+        return await contractInstance.deploy(initState, options)
       } catch (err) {
         console.log(err)
         throw err
@@ -389,15 +371,16 @@ export default {
     },
     async callStatic (func, args) {
       console.log(`calling static func ${func} with args ${args}`)
-      args = args ? `(${args})` : '()'
-      const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args })
+      args = args ? [args] : []
+      const options = { callStatic: true }
+      const res = await this.deployedDataObj.call(func, args, options)
       return { decoded: await res.decode(this.staticSophiaType), result: res.result }
     },
-    async callContract (func, args, address, options) {
-      args = args ? `(${args})` : '()'
+    async callContract (func, args, options) {
+      args = args ? [args] : []
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(address, 'sophia-address', address, func, {args, options})
+        return this.deployedDataObj.call(func, args, options)
       } catch (err) {
         console.log(err)
         throw err
@@ -432,7 +415,7 @@ export default {
       this.compile(this.contractCode)
         .then(byteCodeObj => {
           this.contractAddress = undefined
-          this.byteCode = byteCodeObj.bytecode
+          this.byteCode = byteCodeObj
         })
     },
     onDeploy () {
@@ -449,10 +432,11 @@ export default {
 
       this.deploy(this.deployArgs, opts) // this waits until the TX is mined
         .then(data => {
-          this.contractAddress = data.address
-          this.deployInfo = `Deployed, and mined at this address: ${data.address}`
+          this.contractAddress = data.deployInfo.address
+          this.deployInfo = `Deployed, and mined at this address: ${data.deployInfo.address}`
           this.miningStatus = false
           this.deployedDataObj = data
+          this.deployError = ''
         })
         .catch(err => {
           this.deployError = `${err}`
@@ -462,7 +446,7 @@ export default {
       if (this.staticFunc) {
         this.callStatic(this.staticFunc, this.staticArgs)
           .then(data => {
-            this.callStaticRes = `Result: ` + JSON.stringify(data.decoded.value)
+            this.callStaticRes = `Result: ` + JSON.stringify(data.decoded)
             this.callStaticError = ''
           })
           .catch(err => {
@@ -491,7 +475,7 @@ export default {
 
       if (this.nonStaticFunc) {
         this.waitingCall = true
-        this.callContract(this.nonStaticFunc, this.nonStaticArgs, this.contractAddress, opts)
+        this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
           .then(dataRes => {
             this.callRes = dataRes.result
             this.client.contractDecodeData(this.sophiaType, dataRes.result.returnValue).then(data => {
@@ -513,55 +497,27 @@ export default {
       }
     },
     async getClient () {
-      const self = this
-
       if (this.account.priv && this.account.pub && this.url) {
         try {
-          Wallet.compose(Contract)({
-            url: this.url,
-            internalUrl: settingsData.internalUrl,
-            accounts: [MemoryAccount({keypair: {secretKey: this.account.priv, publicKey: this.account.pub}})],
-            address: this.account.pub,
-            onTx: true,
-            onChain: true,
-            onAccount: true
-          }).then(ae => {
-            this.client = ae
+          const networkId = settingsData.networkId
 
-            this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
-            this.balanceInterval = setInterval(function () {
-              self.assignBalance(self.account.pub)
-                .then(balance => { self.balance = balance })
-            }, 10000)
+          const clientNative = await Ae.compose({
+            props: {
+              url: this.url,
+              internalUrl: settingsData.internalUrl,
+              compilerUrl: compilerUrl
+            }
+          })({nativeMode: true, networkId})
 
-            this.clientError = false
-          })
+          const account = { secretKey: this.account.priv, publicKey: this.account.pub }
+
+          await clientNative.setKeypair(account)
+
+          this.client = clientNative
         } catch (err) {
           this.clientError = `${err} (wrong private/public key)`
         }
       }
-    },
-    onUsePreDeployedContract () {
-      this.usingPreDeployedContract = true
-      this.contractAddress = ''
-      this.resetData()
-    },
-    onFilledInAddress () {
-      if (!this.contractAddress) {
-        return
-      }
-
-      this.filledInPreDeployedContractAddress = true
-    },
-    onUseContractCode () {
-      this.usingPreDeployedContract = false
-      this.filledInPreDeployedContractAddress = false
-      this.staticFunc = 'main'
-      this.callStaticRes = ''
-      this.staticArgs = ''
-      this.nonStaticFunc = ''
-      this.nonStaticArgs = ''
-      this.resetData()
     }
   },
   mounted () {
