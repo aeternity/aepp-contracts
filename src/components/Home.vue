@@ -8,7 +8,7 @@
       Settings
     </h6>
 
-    <div v-if="!this.account.priv || !this.account.pub || !this.host || this.modifySettings">
+    <div v-if="!this.account.priv || !this.account.pub || !this.url || this.modifySettings">
       <div class="flex mt-8 mb-8">
         <div class="w-full p-4 bg-grey-light rounded-sm shadow">
           <h2 class="py-2">
@@ -17,15 +17,15 @@
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="host">Host</label>
-              <input v-model="host" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="url" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
-              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="Private Key">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPub">Public Key</label>
-              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="https://sdk-testnet.aepps.com">
+              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="Public Key">
             </div>
           </div>
           <button class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onSettings">Save</button>
@@ -33,24 +33,24 @@
       </div>
     </div>
 
-    <div v-if="this.account.priv && this.account.pub && this.host">
+    <div v-if="this.account.priv && this.account.pub && this.url">
       <h1 class="py-2">
         Test contracts
         <span v-if="!this.client && !this.clientError" class="text-sm text-red">
-          (connecting to {{this.host}}...)
+          (connecting to {{this.url}}...)
         </span>
         <span v-if="this.clientError" class="text-sm text-red">
-          Error connecting to {{this.host}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
+          Error connecting to {{this.url}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
           <br>
           {{this.clientError}}
         </span>
         <span v-if="this.client" class="text-sm text-green">
-          ({{this.host}})
+          ({{this.url}})
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
         <div class="w-full p-4 bg-grey-light rounded-sm shadow">
-          <h2 class="py-2">
+          <h2 class="py-2 inline-block">
             Sophia Contract's Code:
           </h2>
 
@@ -100,29 +100,29 @@
               </div>
               <div class="mx-2">
                 <label class="text-xs block mb-1" for="deployArgs">Arguments</label>
-                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="arguments">
+                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="()">
               </div>
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" placeholder="deposit">
+                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" min="0" placeholder="deposit">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" placeholder="gas price">
+                <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" min="1000000000" placeholder="gas price">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmout" type="number" placeholder="amount">
+                <label class="text-xs block mb-1" for="dAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <input v-model.number="deployOpts.amount" class="w-full p-2" id="dAmount" type="number" min="0" placeholder="amount">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="fee">
+                <label class="text-xs block mb-1" for="dFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+                <input v-model.number="deployOpts.fee" class="w-full p-2" id="dFee" type="number" placeholder="auto">
               </div>
               <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" placeholder="gas">
+                <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
+                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" min="0" placeholder="gas">
               </div>
 
               <input v-model="deployOpts.callData" class="w-full p-2" type="hidden" value="callData">
@@ -142,7 +142,7 @@
               </div>
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
-                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="arguments">
+                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="()">
               </div>
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticSophiaTypeInput">Return Type</label>
@@ -171,24 +171,24 @@
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" placeholder="deposit">
+              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" min="0" placeholder="deposit">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" placeholder="gas price">
+              <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" min="1000000000" placeholder="gas price">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmout" type="number" placeholder="amount">
+              <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmount" type="number" min="0" placeholder="amount">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="fee">
+              <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
+              <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="auto">
             </div>
             <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cGas">Gas Limit <a class="text-black no-underline" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" placeholder="gas">
+              <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
+              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" min="0" placeholder="gas">
             </div>
 
             <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
@@ -201,7 +201,7 @@
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="args">Arguments</label>
-              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="arguments">
+              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="()">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="sophiaTypeInput">Return Type</label>
@@ -229,11 +229,13 @@
 </template>
 
 <script>
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
-import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
+// import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
+import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+// import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
+// import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
+const compilerUrl = 'https://compiler.aepps.com'
 
 export default {
   name: 'Home',
@@ -250,11 +252,12 @@ export default {
       ],
       cmOption: {
         keyMap: 'sublime',
-        tabSize: 4,
+        indentUnit: 2,
         styleActiveLine: true,
         lineNumbers: true,
         mode: 'text/javascript',
-        theme: 'base16-dark'
+        theme: 'base16-dark',
+        extraKeys: { Tab: this.usingSpacesInsteadTab }
       },
       contractCode: `contract Identity =
   type state = ()
@@ -264,33 +267,33 @@ export default {
       balanceInterval: null,
       byteCode: '',
       client: false,
-      host: settingsData.host ? settingsData.host : null,
+      url: settingsData.url ? settingsData.url : null,
       deployedDataObj: false,
       deployInfo: '',
       minedData: false,
       miningStatus: '',
       wallet: false,
       deployFunc: 'init',
-      deployArgs: '()',
+      deployArgs: '',
       staticFunc: 'main',
-      staticArgs: '(1)',
+      staticArgs: '',
       staticSophiaType: 'int',
       nonStaticFunc: '',
       nonStaticArgs: '',
       contractAddress: '',
       deployOpts: {
-        deposit: 1,
-        gasPrice: 1,
-        amount: 1,
-        fee: 500000,
+        deposit: 0,
+        gasPrice: 1000000000,
+        amount: 0,
+        fee: null, // sdk will automatically select this
         gas: 1000000,
         callData: ''
       },
       callOpts: {
-        deposit: 1,
-        gasPrice: 1,
-        amount: 1,
-        fee: 500000,
+        deposit: 0,
+        gasPrice: 1000000000,
+        amount: 0,
+        fee: null, // sdk will automatically select this
         gas: 1000000,
         callData: ''
       },
@@ -342,38 +345,46 @@ export default {
     }
   },
   methods: {
+    usingSpacesInsteadTab (cm) {
+      const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
+      cm.replaceSelection(spaces)
+    },
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        return await this.client.contractCompile(code)
+        return await this.client.compileContractAPI(code)
       } catch (err) {
         this.compileError = err
         console.log(err)
       }
     },
-    async deploy (initState, options = {}) {
+    async deploy (initArgs, options = {}) {
+      initArgs = initArgs ? initArgs.split(',').map((arg) => { return arg.trim() }) : []
+
       console.log(`Deploying contract...`, this.account)
       try {
-        return this.client.contractDeploy(this.byteCode, 'sophia', {initState, options})
+        const contractInstance = await this.client.getContractInstance(this.contractCode)
+        return await contractInstance.deploy(initArgs, options)
       } catch (err) {
         console.log(err)
+        throw err
       }
     },
-    async callStatic (func, args = '1') {
+    async callStatic (func, args) {
       console.log(`calling static func ${func} with args ${args}`)
-      try {
-        const res = await this.client.contractCallStatic(this.contractAddress, 'sophia-address', func, { args })
-        return { decoded: await res.decode('int'), result: res.result }
-      } catch (err) {
-        console.log(err)
-      }
+      args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
+      const options = { callStatic: true }
+      const res = await this.deployedDataObj.call(func, args, options)
+      return { decoded: await res.decode(this.staticSophiaType), result: res.result }
     },
-    async callContract (func, args, address, options) {
+    async callContract (func, args, options) {
+      args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.client.contractCall(this.byteCode, 'sophia', address, func, {args, options})
+        return this.deployedDataObj.call(func, args, options)
       } catch (err) {
         console.log(err)
+        throw err
       }
     },
     resetData () {
@@ -405,7 +416,7 @@ export default {
       this.compile(this.contractCode)
         .then(byteCodeObj => {
           this.contractAddress = undefined
-          this.byteCode = byteCodeObj.bytecode
+          this.byteCode = byteCodeObj
         })
     },
     onDeploy () {
@@ -422,23 +433,25 @@ export default {
 
       this.deploy(this.deployArgs, opts) // this waits until the TX is mined
         .then(data => {
-          this.contractAddress = data.address
-          this.deployInfo = `Deployed, and mined at this address: ${data.address}`
+          this.contractAddress = data.deployInfo.address
+          this.deployInfo = `Deployed, and mined at this address: ${data.deployInfo.address}`
           this.miningStatus = false
           this.deployedDataObj = data
+          this.deployError = ''
         })
         .catch(err => {
           this.deployError = `${err}`
         })
     },
     onCallStatic () {
-      if (this.staticFunc && this.staticArgs) {
+      if (this.staticFunc) {
         this.callStatic(this.staticFunc, this.staticArgs)
           .then(data => {
-            this.callStaticRes = `Result: ` + data.decoded.value
+            this.callStaticRes = `Result: ` + JSON.stringify(data.decoded)
             this.callStaticError = ''
           })
           .catch(err => {
+            err = err.response ? err.response.data.reason : 'Unknown error'
             this.callStaticError = `${err}`
           })
       } else {
@@ -461,15 +474,15 @@ export default {
       }
       const opts = Object.assign(extraOpts, this.callOpts)
 
-      if (this.nonStaticFunc && this.nonStaticArgs) {
+      if (this.nonStaticFunc) {
         this.waitingCall = true
-        this.callContract(this.nonStaticFunc, this.nonStaticArgs, this.contractAddress, opts)
+        this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
           .then(dataRes => {
             this.callRes = dataRes.result
             this.client.contractDecodeData(this.sophiaType, dataRes.result.returnValue).then(data => {
               this.callRes = `Gas Used: ${dataRes.result.gasUsed} <br><br>---<br><br> Result: <br><br> ${data.value}`
             }).catch(err => {
-              this.callError = `${err}`
+              this.callError = `${JSON.stringify(err)}`
               this.waitingCall = false
               this.callRes = ''
             })
@@ -477,7 +490,7 @@ export default {
             this.waitingCall = false
           })
           .catch(err => {
-            this.callError = `${err}`
+            this.callError = `${JSON.stringify(err)}`
             this.waitingCall = false
           })
       } else {
@@ -485,30 +498,23 @@ export default {
       }
     },
     async getClient () {
-      const self = this
-
-      if (this.account.priv && this.account.pub && this.host) {
+      if (this.account.priv && this.account.pub && this.url) {
         try {
-          Wallet.compose(Contract)({
-            url: this.host,
-            internalUrl: this.host,
-            accounts: [MemoryAccount({keypair: {secretKey: this.account.priv, publicKey: this.account.pub}})],
-            address: this.account.pub,
-            onTx: true,
-            onChain: true,
-            onAccount: true,
-            networkId: 'ae_uat'
-          }).then(ae => {
-            this.client = ae
+          const networkId = settingsData.networkId
 
-            this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
-            this.balanceInterval = setInterval(function () {
-              self.assignBalance(self.account.pub)
-                .then(balance => { self.balance = balance })
-            }, 10000)
+          const clientNative = await Ae.compose({
+            props: {
+              url: this.url,
+              internalUrl: settingsData.internalUrl,
+              compilerUrl: compilerUrl
+            }
+          })({nativeMode: true, networkId})
 
-            this.clientError = false
-          })
+          const account = { secretKey: this.account.priv, publicKey: this.account.pub }
+
+          await clientNative.setKeypair(account)
+
+          this.client = clientNative
         } catch (err) {
           this.clientError = `${err} (wrong private/public key)`
         }
@@ -531,5 +537,19 @@ export default {
 <style lang="css">
   .no-underline {
     text-decoration: none;
+  }
+  button,
+  button:hover,
+  button:focus,
+  button:active {
+	  outline: none;
+	  outline: 0;
+  }
+  .CodeMirror {
+    height: auto;
+    min-height: 300px;
+  }
+  .CodeMirror-scroll {
+    min-height: 300px;
   }
 </style>
