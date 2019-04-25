@@ -358,12 +358,13 @@ export default {
         console.log(err)
       }
     },
-    async deploy (initState, options = {}) {
-      initState = initState ? [initState] : []
+    async deploy (initArgs, options = {}) {
+      initArgs = initArgs ? initArgs.split(',').map((arg) => { return arg.trim() }) : []
+
       console.log(`Deploying contract...`, this.account)
       try {
         const contractInstance = await this.client.getContractInstance(this.contractCode)
-        return await contractInstance.deploy(initState, options)
+        return await contractInstance.deploy(initArgs, options)
       } catch (err) {
         console.log(err)
         throw err
@@ -371,13 +372,13 @@ export default {
     },
     async callStatic (func, args) {
       console.log(`calling static func ${func} with args ${args}`)
-      args = args ? [args] : []
+      args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       const options = { callStatic: true }
       const res = await this.deployedDataObj.call(func, args, options)
       return { decoded: await res.decode(this.staticSophiaType), result: res.result }
     },
     async callContract (func, args, options) {
-      args = args ? [args] : []
+      args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
         return this.deployedDataObj.call(func, args, options)
