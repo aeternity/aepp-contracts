@@ -21,7 +21,7 @@
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
-              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="text" placeholder="Private Key">
+              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="password" placeholder="Private Key">
             </div>
             <div class="mx-2 w-1/3">
               <label class="text-xs block mb-1" for="accountPub">Public Key</label>
