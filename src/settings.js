@@ -1,7 +1,7 @@
 export default {
   account: {
-    pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
-    priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61'
+    pub: 'ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG',
+    priv: '0eb8cefe04593f2960ddb7d731321b709cec5ce10625334542e410630f0b02d4d1a124ce191ef08e8d2d8fbf424504013c9b8aaecec6f71785f2ee20ddf3a688'
   },
   url: process.env.VUE_APP_NODE_URL ? process.env.VUE_APP_NODE_URL : 'https://sdk-testnet.aepps.com',
   internalUrl: process.env.VUE_APP_NODE_INTERNAL_URL ? process.env.VUE_APP_NODE_INTERNAL_URL : 'https://sdk-testnet.aepps.com'
