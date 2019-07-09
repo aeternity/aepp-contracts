@@ -322,7 +322,8 @@ export default {
         'events',
         'oracle(\'a, \'b)',
         'oracle_query(\'a, \'b)'
-      ]
+      ],
+      deployedInfo: ''
     }
   },
   props: {
@@ -364,7 +365,8 @@ export default {
       console.log(`Deploying contract...`, this.account)
       try {
         const contractInstance = await this.client.getContractInstance(this.contractCode)
-        return await contractInstance.deploy(initArgs, options)
+        this.deployedInfo = await contractInstance.deploy(initArgs, options)
+        return contractInstance
       } catch (err) {
         console.log(err)
         throw err
@@ -381,7 +383,7 @@ export default {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return this.deployedDataObj.call(func, args, options)
+        return await this.deployedDataObj.call(func, args, options)
       } catch (err) {
         console.log(err)
         throw err
@@ -401,7 +403,7 @@ export default {
       this.byteCode = false
 
       this.modifySettings = false
-
+      this.deployedInfo = ''
       // const self = this
       // this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
     },
@@ -433,8 +435,8 @@ export default {
 
       this.deploy(this.deployArgs, opts) // this waits until the TX is mined
         .then(data => {
-          this.contractAddress = data.deployInfo.address
-          this.deployInfo = `Deployed, and mined at this address: ${data.deployInfo.address}`
+          this.contractAddress = this.deployedInfo.address
+          this.deployInfo = `Deployed, and mined at this address: ${this.deployedInfo.address}`
           this.miningStatus = false
           this.deployedDataObj = data
           this.deployError = ''
@@ -460,7 +462,6 @@ export default {
     },
     async assignBalance (accountPub) {
       return this.client.balance(accountPub).then(balance => {
-        // console.log('balance', balance)
         return balance
       })
     },
@@ -478,14 +479,7 @@ export default {
         this.waitingCall = true
         this.callContract(this.nonStaticFunc, this.nonStaticArgs, opts)
           .then(dataRes => {
-            this.callRes = dataRes.result
-            this.client.contractDecodeData(this.sophiaType, dataRes.result.returnValue).then(data => {
-              this.callRes = `Gas Used: ${dataRes.result.gasUsed} <br><br>---<br><br> Result: <br><br> ${data.value}`
-            }).catch(err => {
-              this.callError = `${JSON.stringify(err)}`
-              this.waitingCall = false
-              this.callRes = ''
-            })
+            this.callRes = `Gas Used: ${dataRes.result.gasUsed} <br><br>---<br><br> Result: <br><br> ${dataRes.decodedResult}`
             this.callError = ''
             this.waitingCall = false
           })
