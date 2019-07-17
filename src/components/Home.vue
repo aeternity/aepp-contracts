@@ -261,7 +261,7 @@ export default {
       },
       contractCode: `contract Identity =
   type state = ()
-  function main(x : int) = x`,
+  entrypoint main(x : int) = x`,
       account: settingsData.account ? settingsData.account : {priv: null, pub: null},
       balance: 0,
       balanceInterval: null,
