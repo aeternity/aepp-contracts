@@ -235,7 +235,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 // import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
-const compilerUrl = 'https://compiler.aepps.com'
+const compilerUrl = 'https://latest.compiler.aepps.com'
 
 export default {
   name: 'Home',
