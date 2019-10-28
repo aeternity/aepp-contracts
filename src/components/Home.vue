@@ -235,6 +235,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 // import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
 import { codemirror } from 'vue-codemirror'
+import { contractSource } from './contractSrc'
 const compilerUrl = 'https://latest.compiler.aepps.com'
 
 export default {
@@ -259,8 +260,7 @@ export default {
         theme: 'base16-dark',
         extraKeys: { Tab: this.usingSpacesInsteadTab }
       },
-      contractCode: `contract Identity =
-  entrypoint main(x : int) = x`,
+      contractCode: contractSource,
       account: settingsData.account ? settingsData.account : {priv: null, pub: null},
       balance: 0,
       balanceInterval: null,
