@@ -43,7 +43,4 @@ export const contractSource = `contract CryptoHamster =
    function get_block_hash_bytes_as_int() : int =
       switch(Chain.block_hash(Chain.block_height - 1))
          None => abort("blockhash not found")
-         Some(bytes) => Bytes.to_int(bytes)
-
-   // entrypoint test(name: string) : hash =
-   //    String.sha3(name)`
+         Some(bytes) => Bytes.to_int(bytes)`
