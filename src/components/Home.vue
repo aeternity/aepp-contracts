@@ -483,7 +483,8 @@ export default {
             this.waitingCall = false
           })
           .catch(err => {
-            this.callError = `${JSON.stringify(err)}`
+            console.log('in the error')
+            this.callError = `${JSON.stringify(err.message)}`
             this.waitingCall = false
           })
       } else {
