@@ -56,16 +56,6 @@
 
           <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
-            <div class='absolute pin-b pin-r'>
-              <select v-model="cmOption.keyMap" class="block appearance-none w-full py-2 px-4 rounded-none pr-8">
-                <option :key="idx" v-for='(m, idx) in keymaps'>
-                  {{m}}
-                </option>
-              </select>
-              <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-              </div>
-            </div>
             </div>
 
           <div v-if="compileError">
@@ -100,14 +90,11 @@
               </div>
               <div class="mx-2">
                 <label class="text-xs block mb-1" for="deployArgs">Arguments</label>
-                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="()">
+                <input v-model="deployArgs" class="w-full p-2" id="deployArgs" type="text" placeholder="comma separated args">
               </div>
             </div>
             <div class="flex -mx-2 mt-4 mb-4">
-              <div class="mx-2 w-1/5">
-                <label class="text-xs block mb-1" for="dDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-                <input v-model.number="deployOpts.deposit" class="w-full p-2" id="dDeposit" type="number" min="0" placeholder="deposit">
-              </div>
+
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
                 <input v-model.number="deployOpts.gasPrice" class="w-full p-2" id="dGasPrice" type="number" min="1000000000" placeholder="gas price">
@@ -142,11 +129,7 @@
               </div>
               <div class="mx-2 w-1/2">
                 <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
-                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="()">
-              </div>
-              <div class="mx-2 w-1/2">
-                <label class="text-xs block mb-1" for="staticSophiaTypeInput">Return Type</label>
-                <input v-model="staticSophiaType" class="w-full p-2" id="staticSophiaTypeInput" type="text" placeholder="Sophia Type" value="int">
+                <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="comma separated args">
               </div>
             </div>
 
@@ -170,23 +153,19 @@
             ⬆ Call Function
           </h2>
           <div class="flex -mx-2 mt-4 mb-4">
-            <div class="mx-2 w-1/5">
-              <label class="text-xs block mb-1" for="cDeposit">Deposit <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
-              <input v-model.number="callOpts.deposit" class="w-full p-2" id="cDeposit" type="number" min="0" placeholder="deposit">
-            </div>
-            <div class="mx-2 w-1/5">
+            <div class="mx-2 w-1/4">
               <label class="text-xs block mb-1" for="cGasPrice">Gas Price <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.gasPrice" class="w-full p-2" id="cGasPrice" type="number" min="1000000000" placeholder="gas price">
             </div>
-            <div class="mx-2 w-1/5">
+            <div class="mx-2 w-1/4">
               <label class="text-xs block mb-1" for="cAmount">Amount <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.amount" class="w-full p-2" id="cAmount" type="number" min="0" placeholder="amount">
             </div>
-            <div class="mx-2 w-1/5">
+            <div class="mx-2 w-1/4">
               <label class="text-xs block mb-1" for="cFee">Fee <a class="text-black no-underline" target="_blank" href="https://en.wikipedia.org/wiki/Atto-"> (a)</a></label>
               <input v-model.number="callOpts.fee" class="w-full p-2" id="cFee" type="number" placeholder="auto">
             </div>
-            <div class="mx-2 w-1/5">
+            <div class="mx-2 w-1/4">
               <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
               <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" min="0" placeholder="gas">
             </div>
@@ -195,17 +174,13 @@
 
           </div>
           <div class="flex -mx-2 mt-4 mb-4">
-            <div class="mx-2 w-1/3">
+            <div class="mx-2 w-1/2">
               <label class="text-xs block mb-1" for="func">Function</label>
               <input v-model="nonStaticFunc" class="w-full p-2" id="func" type="text" placeholder="function">
             </div>
-            <div class="mx-2 w-1/3">
+            <div class="mx-2 w-1/2">
               <label class="text-xs block mb-1" for="args">Arguments</label>
-              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="()">
-            </div>
-            <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="sophiaTypeInput">Return Type</label>
-              <input v-model="sophiaType" class="w-full p-2" id="sophiaTypeInput" type="text" placeholder="Sophia Type">
+              <input v-model="nonStaticArgs" class="w-full p-2" id="args" type="text" placeholder="comma separated args">
             </div>
           </div>
 
@@ -222,7 +197,6 @@
           <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
           <span v-if="waitingCall" class="text-sm text-red">Calling Function...</span>
         </div>
-
       </div>
     </div>
   </div>
@@ -243,11 +217,6 @@ export default {
   data () {
     return {
       modifySettings: false,
-      keymaps: [
-        'sublime',
-        'vim',
-        'emacs'
-      ],
       cmOption: {
         keyMap: 'sublime',
         indentUnit: 2,
@@ -274,12 +243,10 @@ export default {
       deployArgs: '',
       staticFunc: 'main',
       staticArgs: '',
-      staticSophiaType: 'int',
       nonStaticFunc: '',
       nonStaticArgs: '',
       contractAddress: '',
       deployOpts: {
-        deposit: 0,
         gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
@@ -287,7 +254,6 @@ export default {
         callData: ''
       },
       callOpts: {
-        deposit: 0,
         gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
@@ -302,24 +268,6 @@ export default {
       callStaticRes: '',
       callStaticError: '',
       waitingCall: false,
-      sophiaType: 'int',
-      sophiaTypes: [
-        'uint',
-        'int',
-        'address',
-        'bool',
-        'string',
-        'list',
-        'tuple',
-        'record',
-        'map',
-        'option(\'a)',
-        'state',
-        'transactions',
-        'events',
-        'oracle(\'a, \'b)',
-        'oracle_query(\'a, \'b)'
-      ],
       deployedInfo: ''
     }
   },
@@ -457,18 +405,10 @@ export default {
         this.callStaticError = 'Please enter a Function and 1 or more Arguments.'
       }
     },
-    async assignBalance (accountPub) {
-      return this.client.balance(accountPub).then(balance => {
-        return balance
-      })
-    },
     onCallDataAndFunction () {
       const extraOpts = {
         'owner': this.account.pub,
         'code': this.contractCode
-        // 'vmVersion': 1
-        // 'nonce': 0,
-        // 'ttl': 9999999
       }
       const opts = Object.assign(extraOpts, this.callOpts)
 
