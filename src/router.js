@@ -1,7 +1,7 @@
 import Router from 'vue-router'
 import Home from './components/Home.vue'
 
-export default (store) => {
+export default () => {
   const routes = [
     {
       path: '/',
