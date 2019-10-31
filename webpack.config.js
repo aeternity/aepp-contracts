@@ -85,23 +85,7 @@ module.exports = {
         //   ]
         // }
       },
-      {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          use: [
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                config: {
-                  path: 'postcss.config.js'
-                }
-              }
-            }
-          ]
-          // publicPath: '/web'
-        })
-      },
+      { test: /\.css$/, loader: 'style-loader!css-loader' },
       // allows vue compoents in '<template><html><script><style>' syntax
       {
         test: /\.vue$/,

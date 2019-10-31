@@ -229,19 +229,17 @@
 </template>
 
 <script>
-// import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
 import Ae from '@aeternity/aepp-sdk/es/ae/universal'
-// import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
-// import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 import settingsData from '../settings.js'
-import { codemirror } from 'vue-codemirror'
+
+import 'codemirror/keymap/sublime'
+import 'codemirror/mode/haskell/haskell'
+import 'codemirror/addon/merge/merge'
+
 const compilerUrl = 'https://latest.compiler.aepps.com'
 
 export default {
   name: 'Home',
-  components: {
-    codemirror
-  },
   data () {
     return {
       modifySettings: false,
@@ -255,8 +253,8 @@ export default {
         indentUnit: 2,
         styleActiveLine: true,
         lineNumbers: true,
-        mode: 'text/javascript',
-        theme: 'base16-dark',
+        mode: 'haskell',
+        theme: 'monokai',
         extraKeys: { Tab: this.usingSpacesInsteadTab }
       },
       contractCode: `contract Identity =

@@ -13,10 +13,10 @@
   "author": "Enrico Icardi <enrico.icardi@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "5.0.0",
+    "@aeternity/aepp-sdk": "6.0.1",
     "purgecss-webpack-plugin": "^1.2.0",
     "vue": "^2.5.16",
-    "vue-codemirror": "^4.0.5",
+    "vue-codemirror": "^4.0.6",
     "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.5.16",
     "vuex": "^3.0.1"
