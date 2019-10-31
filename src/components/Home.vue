@@ -322,7 +322,7 @@ export default {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       const options = { callStatic: true }
       const res = await this.deployedDataObj.call(func, args, options)
-      return { decoded: await res.decode(this.staticSophiaType), result: res.result }
+      return { decoded: res.decodedResult, result: res.result }
     },
     async callContract (func, args, options) {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
@@ -340,7 +340,6 @@ export default {
       this.callRes = ''
       this.deployError = ''
       this.callStaticError = ''
-      this.deployedData = false
       this.deployedDataObj = false
       this.deployInfo = ''
       this.minedData = false
@@ -398,8 +397,7 @@ export default {
             this.callStaticError = ''
           })
           .catch(err => {
-            err = err.response ? err.response.data.reason : 'Unknown error'
-            this.callStaticError = `${err}`
+            this.callStaticError = err
           })
       } else {
         this.callStaticError = 'Please enter a Function and 1 or more Arguments.'
