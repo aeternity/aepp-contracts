@@ -1,51 +1,18 @@
 <template>
   <div class="home container mx-auto">
 
-    <h6 class="mt-8 font-mono text-sm text-purple" v-if="!modifySettings" @click="modifySettings = true">
-      <span class="text-black">Account: </span> {{ account.pub }}
-    </h6>
-    <h6 class="mt-8 cursor-pointer hover:text-purple" v-if="!modifySettings" @click="modifySettings = true">
-      Settings
-    </h6>
-
-    <div v-if="!this.account.priv || !this.account.pub || !this.url || this.modifySettings">
-      <div class="flex mt-8 mb-8">
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow">
-          <h2 class="py-2">
-            Settings
-          </h2>
-          <div class="flex -mx-2 mt-4 mb-4">
-            <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="host">Host</label>
-              <input v-model="url" class="w-full p-2" id="host" type="text" placeholder="https://sdk-testnet.aepps.com">
-            </div>
-            <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
-              <input v-model="account.priv" class="w-full p-2" id="accountPriv" type="password" placeholder="Private Key">
-            </div>
-            <div class="mx-2 w-1/3">
-              <label class="text-xs block mb-1" for="accountPub">Public Key</label>
-              <input v-model="account.pub" class="w-full p-2" id="accountPub" type="text" placeholder="Public Key">
-            </div>
-          </div>
-          <button class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onSettings">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="this.account.priv && this.account.pub && this.url">
-      <h1 class="py-2">
+     <h1 class="py-2">
         Test contracts
         <span v-if="!this.client && !this.clientError" class="text-sm text-red">
-          (connecting to {{this.url}}...)
+          (connecting to {{this.nodeUrl}} ...)
         </span>
         <span v-if="this.clientError" class="text-sm text-red">
-          Error connecting to {{this.url}} – <span class="cursor-pointer underline" @click="modifySettings = true">Modify Settings</span>
+          Error connecting to {{this.nodeUrl}}
           <br>
           {{this.clientError}}
         </span>
         <span v-if="this.client" class="text-sm text-green">
-          ({{this.url}})
+          ({{this.nodeUrl}})
         </span>
       </h1>
       <div class="mt-8 -mx-2" v-if="!this.clientError">
@@ -56,7 +23,7 @@
 
           <div class="relative">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
-            </div>
+          </div>
 
           <div v-if="compileError">
             <label class="text-xs block mb-1 text-red">Errors</label>
@@ -64,6 +31,7 @@
           </div>
 
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
+          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="resetContract">Reset</button>
         </div>
 
         <div class="flex mt-8 mb-8" v-if="byteCode">
@@ -197,20 +165,19 @@
           <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
           <span v-if="waitingCall" class="text-sm text-red">Calling Function...</span>
         </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Ae from '@aeternity/aepp-sdk/es/ae/universal'
-import settingsData from '../settings.js'
+import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 
 import 'codemirror/keymap/sublime'
 import 'codemirror/mode/haskell/haskell'
 import 'codemirror/addon/merge/merge'
 
-const compilerUrl = 'https://latest.compiler.aepps.com'
+const compilerUrl = 'https://compiler.aeternity.art'
 
 export default {
   name: 'Home',
@@ -226,14 +193,17 @@ export default {
         theme: 'monokai',
         extraKeys: { Tab: this.usingSpacesInsteadTab }
       },
-      contractCode: `contract Identity =
-  entrypoint main(x : int) = x`,
-      account: settingsData.account ? settingsData.account : {priv: null, pub: null},
+      example: `@compiler >= 4
+
+contract Example =
+  entrypoint example(x : int) = x`,
+      contractCode: '',
+      keypair: null,
       balance: 0,
       balanceInterval: null,
       byteCode: '',
       client: false,
-      url: settingsData.url ? settingsData.url : null,
+      nodeUrl: 'https://testnet.aeternity.art',
       deployedDataObj: false,
       deployInfo: '',
       minedData: false,
@@ -241,7 +211,7 @@ export default {
       wallet: false,
       deployFunc: 'init',
       deployArgs: '',
-      staticFunc: 'main',
+      staticFunc: 'example',
       staticArgs: '',
       nonStaticFunc: '',
       nonStaticArgs: '',
@@ -276,20 +246,6 @@ export default {
       type: Object
     }
   },
-  watch: {
-    keyMap (mapName) {
-      try {
-        window.localStorage.setItem('cmkeyMap', mapName)
-      } catch (e) {
-        /* handle error */
-      }
-    }
-  },
-  computed: {
-    keyMap () {
-      return this.cmOption.keyMap
-    }
-  },
   methods: {
     usingSpacesInsteadTab (cm) {
       const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
@@ -307,7 +263,7 @@ export default {
     async deploy (initArgs, options = {}) {
       initArgs = initArgs ? initArgs.split(',').map((arg) => { return arg.trim() }) : []
 
-      console.log(`Deploying contract...`, this.account)
+      console.log(`Deploying contract...`)
       try {
         const contractInstance = await this.client.getContractInstance(this.contractCode)
         this.deployedInfo = await contractInstance.deploy(initArgs, options)
@@ -348,16 +304,9 @@ export default {
 
       this.modifySettings = false
       this.deployedInfo = ''
-      // const self = this
-      // this.assignBalance(this.account.pub).then(balance => { self.balance = balance })
-    },
-    onSettings () {
-      this.client = false
-      this.clientError = false
-      this.resetData()
-      this.getClient()
     },
     onCompile () {
+      this.saveContract()
       this.resetData()
       this.compile(this.contractCode)
         .then(byteCodeObj => {
@@ -369,11 +318,8 @@ export default {
       this.deployInfo = 'Deploying and checking for mining status...'
       this.miningStatus = true
       const extraOpts = {
-        'owner': this.account.pub,
+        'owner': this.keypair.publicKey,
         'code': this.contractCode
-        // 'vmVersion': 1
-        // 'nonce': 0,
-        // 'ttl': 9999999
       }
       const opts = Object.assign(extraOpts, this.deployOpts)
 
@@ -405,7 +351,7 @@ export default {
     },
     onCallDataAndFunction () {
       const extraOpts = {
-        'owner': this.account.pub,
+        'owner': this.keypair.publicKey,
         'code': this.contractCode
       }
       const opts = Object.assign(extraOpts, this.callOpts)
@@ -427,38 +373,51 @@ export default {
       }
     },
     async getClient () {
-      if (this.account.priv && this.account.pub && this.url) {
-        try {
-          const networkId = settingsData.networkId
-
-          const clientNative = await Ae.compose({
-            props: {
-              url: this.url,
-              internalUrl: settingsData.internalUrl,
-              compilerUrl: compilerUrl
-            }
-          })({nativeMode: true, networkId})
-
-          const account = { secretKey: this.account.priv, publicKey: this.account.pub }
-
-          await clientNative.setKeypair(account)
-
-          this.client = clientNative
-        } catch (err) {
-          this.clientError = `${err} (wrong private/public key)`
-        }
-      }
+      this.client = await Universal({
+        url: this.nodeUrl,
+        internalUrl: this.nodeUrl,
+        compilerUrl: compilerUrl,
+        keypair: this.keypair
+      })
+    },
+    getKeypair () {
+      let keypairString = window.localStorage.getItem('testnet-keypair')
+      let keypair = keypairString ? JSON.parse(keypairString) : Crypto.generateKeyPair()
+      window.localStorage.setItem('testnet-keypair', JSON.stringify(keypair))
+      return keypair
+    },
+    async fundAccount (publicKey) {
+      const fundingClient = await Universal({
+        url: this.nodeUrl,
+        internalUrl: this.nodeUrl,
+        keypair: {
+          publicKey: 'ak_2qb5NUA8Dt41moZU7X2Tc2462Vb2nwRBrdWTuT2nUyAvdk8dHU',
+          secretKey: '0f34e79602f94c9300509b71c1fed42a9f47eafeef1e25b6922e9044eb3d8e14f2051cda7937da54a4a568c60b60a69293469059bafd927a7a0d160a2ac208aa'
+        },
+        compilerUrl: compilerUrl
+      })
+      await fundingClient.spend(100000000000000000, publicKey)
+    },
+    saveContract () {
+      window.localStorage.setItem('contract-code', this.contractCode)
+    },
+    getContract () {
+      return window.localStorage.getItem('contract-code') ? window.localStorage.getItem('contract-code') : this.example
+    },
+    resetContract () {
+      this.contractCode = this.example
+      this.saveContract()
     }
   },
-  mounted () {
+  async mounted () {
     try {
-      const mapName = window.localStorage.getItem('cmkeyMap')
-      if (mapName) this.cmOption.keyMap = mapName
+      this.keypair = this.getKeypair()
+      this.contractCode = this.getContract()
+      await this.getClient()
+      if ((await this.client.balance(this.keypair.publicKey).catch(() => 0)) < 50000000000000000) await this.fundAccount(this.keypair.publicKey)
     } catch (e) {
-      /* handle error */
+      console.error(e)
     }
-
-    this.getClient()
   }
 }
 </script>
