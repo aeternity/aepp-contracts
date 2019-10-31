@@ -31,6 +31,8 @@
           </div>
 
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
+          <input v-if="this.client" v-model="contractAddress" class="mt-2 rounded-l-full bg-black hover:bg-purple text-white p-2 px-4" />
+          <button v-if="this.client" class="mt-2 rounded-r-full bg-black hover:bg-purple text-white p-2 px-4" @click="atAddress">at Address</button>
           <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="resetContract">Reset</button>
         </div>
 
@@ -38,7 +40,7 @@
           <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
             <h2 class="py-2">
               Byte Code
-              <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedDataObj, 'text-green' : deployedDataObj }">
+              <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedContractInstance, 'text-green' : deployedContractInstance }">
                 {{deployInfo}}
               </div>
             </h2>
@@ -116,7 +118,7 @@
           </div>
         </div>
 
-        <div v-if="deployedDataObj && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
+        <div v-if="deployedContractInstance && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
           <h2 class="py-2">
             ⬆ Call Function
           </h2>
@@ -204,7 +206,7 @@ contract Example =
       byteCode: '',
       client: false,
       nodeUrl: 'https://testnet.aeternity.art',
-      deployedDataObj: false,
+      deployedContractInstance: null,
       deployInfo: '',
       minedData: false,
       miningStatus: '',
@@ -237,8 +239,7 @@ contract Example =
       compileError: '',
       callStaticRes: '',
       callStaticError: '',
-      waitingCall: false,
-      deployedInfo: ''
+      waitingCall: false
     }
   },
   props: {
@@ -266,7 +267,7 @@ contract Example =
       console.log(`Deploying contract...`)
       try {
         const contractInstance = await this.client.getContractInstance(this.contractCode)
-        this.deployedInfo = await contractInstance.deploy(initArgs, options)
+        this.deployedContractInstance = await contractInstance.deploy(initArgs, options)
         return contractInstance
       } catch (err) {
         console.log(err)
@@ -277,14 +278,14 @@ contract Example =
       console.log(`calling static func ${func} with args ${args}`)
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       const options = { callStatic: true }
-      const res = await this.deployedDataObj.call(func, args, options)
+      const res = await this.deployedContractInstance.call(func, args, options)
       return { decoded: res.decodedResult, result: res.result }
     },
     async callContract (func, args, options) {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return await this.deployedDataObj.call(func, args, options)
+        return await this.deployedContractInstance.call(func, args, options)
       } catch (err) {
         console.log(err)
         throw err
@@ -296,14 +297,14 @@ contract Example =
       this.callRes = ''
       this.deployError = ''
       this.callStaticError = ''
-      this.deployedDataObj = false
+      this.deployedContractInstance = false
       this.deployInfo = ''
       this.minedData = false
       this.miningStatus = false
       this.byteCode = false
 
       this.modifySettings = false
-      this.deployedInfo = ''
+      this.deployedContractInstance = ''
     },
     onCompile () {
       this.saveContract()
@@ -325,10 +326,10 @@ contract Example =
 
       this.deploy(this.deployArgs, opts) // this waits until the TX is mined
         .then(data => {
-          this.contractAddress = this.deployedInfo.address
-          this.deployInfo = `Deployed, and mined at this address: ${this.deployedInfo.address}`
+          this.contractAddress = this.deployedContractInstance.address
+          this.deployInfo = `Deployed, and mined at this address: ${this.contractAddress}`
           this.miningStatus = false
-          this.deployedDataObj = data
+          this.deployedContractInstance = data
           this.deployError = ''
         })
         .catch(err => {
@@ -403,6 +404,29 @@ contract Example =
     },
     getContract () {
       return window.localStorage.getItem('contract-code') ? window.localStorage.getItem('contract-code') : this.example
+    },
+    atAddress () {
+      this.saveContract()
+      this.resetData()
+      this.compile(this.contractCode)
+        .then(byteCodeObj => {
+          this.byteCode = byteCodeObj
+        })
+
+      this.deployInfo = 'Instantiating Contract at address ...'
+      this.miningStatus = true
+
+      this.client.getContractInstance(this.contractCode, {contractAddress: this.contractAddress})
+        .then(data => {
+          console.log(data)
+          this.deployInfo = `Instantiated Contract at address: ${this.contractAddress}`
+          this.miningStatus = false
+          this.deployedContractInstance = data
+          this.deployError = ''
+        })
+        .catch(err => {
+          this.deployError = `${err}`
+        })
     },
     resetContract () {
       this.contractCode = this.example
