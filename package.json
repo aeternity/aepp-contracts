@@ -40,7 +40,7 @@
     "vue-loader": "^14.2.2",
     "vue-style-loader": "^4.1.0",
     "webpack": "^4.20.1",
-    "webpack-bundle-analyzer": "^2.11.1",
+    "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.1.1",
     "webpack-serve": "^0.2.0"
   }
