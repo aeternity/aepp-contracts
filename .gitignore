@@ -1,6 +1,0 @@
-/node_modules
-/dist
-*.log
-.envrc
-.tern-port
-.vscode
