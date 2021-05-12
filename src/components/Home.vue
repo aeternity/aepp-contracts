@@ -97,7 +97,13 @@
                 <label class="text-xs block mb-1" for="staticFunc">Function</label>
                 <input v-model="staticFunc" class="w-full p-2" id="staticFunc" type="text" placeholder="function">
               </div>
-              <div class="mx-2 w-1/2">
+              <div class="mx-2 w-1/4">
+                <label class="text-xs block mb-1" for="staticGas">Gas Limit</label>
+                <input v-model.number="staticGas" class="w-full p-2" id="staticGas" type="number" min="0" placeholder="gas">
+              </div>
+            </div>
+            <div class="flex -mx-2 mt-4 mb-4">
+              <div class="mx-2 w-full">
                 <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
                 <input v-model="staticArgs" class="w-full p-2" id="staticArgs" type="text" placeholder="comma separated args">
               </div>
@@ -172,14 +178,14 @@
 </template>
 
 <script>
-import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+import { Universal, Node, MemoryAccount } from '@aeternity/aepp-sdk/es'
 import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 
 import 'codemirror/keymap/sublime'
 import 'codemirror/mode/haskell/haskell'
 import 'codemirror/addon/merge/merge'
 
-const compilerUrl = 'https://compiler.aeternity.art'
+const compilerUrl = 'https://latest.compiler.aeternity.art'
 
 export default {
   name: 'Home',
@@ -214,6 +220,7 @@ contract Example =
       deployFunc: 'init',
       deployArgs: '',
       staticFunc: 'example',
+      staticGas: 1000000,
       staticArgs: '',
       nonStaticFunc: '',
       nonStaticArgs: '',
@@ -274,10 +281,10 @@ contract Example =
         throw err
       }
     },
-    async callStatic (func, args) {
+    async callStatic (func, args, gas) {
       console.log(`calling static func ${func} with args ${args}`)
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
-      const options = { callStatic: true }
+      const options = { callStatic: true, gas }
       const res = await this.deployedContractInstance.call(func, args, options)
       return { decoded: res.decodedResult, result: res.result }
     },
@@ -338,7 +345,7 @@ contract Example =
     },
     onCallStatic () {
       if (this.staticFunc) {
-        this.callStatic(this.staticFunc, this.staticArgs)
+        this.callStatic(this.staticFunc, this.staticArgs, this.staticGas)
           .then(data => {
             this.callStaticRes = `Result: ` + JSON.stringify(data.decoded)
             this.callStaticError = ''
@@ -375,10 +382,15 @@ contract Example =
     },
     async getClient () {
       this.client = await Universal({
-        url: this.nodeUrl,
-        internalUrl: this.nodeUrl,
         compilerUrl: compilerUrl,
-        keypair: this.keypair
+        nodes: [
+          {
+            name: 'node',
+            instance: await Node({ url: this.nodeUrl })
+          }],
+        accounts: [
+          MemoryAccount({ keypair: this.keypair })
+        ]
       })
     },
     getKeypair () {
@@ -389,14 +401,22 @@ contract Example =
     },
     async fundAccount (publicKey) {
       const fundingClient = await Universal({
-        url: this.nodeUrl,
-        internalUrl: this.nodeUrl,
-        keypair: {
-          publicKey: 'ak_2qb5NUA8Dt41moZU7X2Tc2462Vb2nwRBrdWTuT2nUyAvdk8dHU',
-          secretKey: '0f34e79602f94c9300509b71c1fed42a9f47eafeef1e25b6922e9044eb3d8e14f2051cda7937da54a4a568c60b60a69293469059bafd927a7a0d160a2ac208aa'
-        },
-        compilerUrl: compilerUrl
+        compilerUrl: compilerUrl,
+        nodes: [
+          {
+            name: 'node',
+            instance: await Node({ url: this.nodeUrl })
+          }],
+        accounts: [
+          MemoryAccount({
+            keypair: {
+              publicKey: 'ak_2qb5NUA8Dt41moZU7X2Tc2462Vb2nwRBrdWTuT2nUyAvdk8dHU',
+              secretKey: '0f34e79602f94c9300509b71c1fed42a9f47eafeef1e25b6922e9044eb3d8e14f2051cda7937da54a4a568c60b60a69293469059bafd927a7a0d160a2ac208aa'
+            }
+          })
+        ]
       })
+
       await fundingClient.spend(100000000000000000, publicKey)
     },
     saveContract () {
@@ -408,10 +428,8 @@ contract Example =
     atAddress () {
       this.saveContract()
       this.resetData()
-      this.compile(this.contractCode)
-        .then(byteCodeObj => {
-          this.byteCode = byteCodeObj
-        })
+
+      this.byteCode = 'calling at address doesn\'t need bytecode'
 
       this.deployInfo = 'Instantiating Contract at address ...'
       this.miningStatus = true
