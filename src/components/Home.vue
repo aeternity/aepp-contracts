@@ -33,15 +33,18 @@
 
      <h1 class="py-2">
         Test contracts
-        <span v-if="!client && !clientError" class="text-sm text-red">
+        <span v-if="!client && !clientError" class="text-sm text-red-500">
           (connecting to {{nodeUrl}} ...)
         </span>
-        <span v-if="clientError" class="text-sm text-red">
-          Error connecting to {{nodeUrl}}
-          <br>
-          {{clientError}}
+        <span v-if="!client && clientError" class="text-sm text-red-500">
+          {{ clientError }}
         </span>
-        <span v-if="client" class="text-sm text-green">
+       <span v-if="client && clientError" class="text-sm text-red-500">
+           Error connecting to {{nodeUrl}} <br/>
+           {{ clientError }}
+        </span>
+
+        <span v-if="client && !clientError" class="text-sm text-green-500">
           ({{nodeUrl}})
         </span>
       </h1>
@@ -420,17 +423,25 @@ contract Example =
       }
     },
     async getClient () {
-      this.client = await Universal({
-        compilerUrl: compilerUrl,
-        nodes: [
-          {
-            name: 'node',
-            instance: await Node({ url: this.nodeUrl })
-          }],
-        accounts: [
-          MemoryAccount({ keypair: this.keypair })
-        ]
-      })
+      this.clientError = null
+      try {
+        this.client = await Universal({
+          compilerUrl: compilerUrl,
+          nodes: [
+            {
+              name: 'node',
+              instance: await Node({ url: this.nodeUrl })
+            }],
+          accounts: [
+            MemoryAccount({ keypair: this.keypair })
+          ]
+        })
+        if ((await this.client.getBalance(this.keypair.publicKey)) < 10000000000000000) await this.fundAccount(this.keypair.publicKey)
+        await this.client.balance(this.keypair.publicKey)
+      } catch(err) {
+        this.clientError = err.toString().includes('404') ? 'Account not found' : err
+        console.log(this.clientError)
+      }
     },
     getKeypair () {
       let keypairString = window.localStorage.getItem('testnet-keypair')
@@ -494,7 +505,6 @@ contract Example =
       this.keypair = this.getKeypair()
       this.contractCode = this.getContract()
       await this.getClient()
-      if ((await this.client.balance(this.keypair.publicKey).catch(() => 0)) < 50000000000000000) await this.fundAccount(this.keypair.publicKey)
     } catch (e) {
       console.error(e)
     }
