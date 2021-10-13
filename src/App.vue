@@ -1,21 +1,16 @@
 <template>
   <div id="app">
-    <div class="content">
-      <router-view></router-view>
-    </div>
+    <Home/>
   </div>
 </template>
 
 <script>
+import Home from './components/Home.vue'
+
 export default {
   name: 'app',
-  data () {
-    return {
-      goToRoute: '',
-      amount: 0
-    }
-  },
-  computed: { },
-  mounted () { }
+  components: {
+    Home
+  }
 }
 </script>

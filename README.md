@@ -19,24 +19,13 @@ This is a simple Web Application that demonstrates Aeternity Contracts.
 ```bash
 git clone https://github.com/aeternity/aepp-contracts/
 cd aepp-contracts
-yarn install
-```
-1. Add a keypair and a url to `src/settings.js`
-```
-export default {
-  account: {
-    pub: 'YOUR_WALLET_PUB',
-    priv: 'YOUR_WALLET_PRIV'
-  },
-  url: 'https://sdk-testnet.aepps.com',
-  internalUrl: 'https://sdk-testnet.aepps.com'
-}
+npm install
 ```
 
 ## Start the application
 
 ```
-yarn run start:dev
+npm run serve
 ```
 
 The current form should be self explainatory.
@@ -45,17 +34,10 @@ The current form should be self explainatory.
 
 ``` bash
 # install dependencies
-yarn install
-
-# serve with hot reload at localhost:8080
-yarn run start:dev
+npm install
 
 # build for production with minification
-yarn run build
-
-# TODO: runs tests
-yarn run test
-
+npm run build
 ```
 
 ## License

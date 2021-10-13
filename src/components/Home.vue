@@ -1,22 +1,53 @@
 <template>
   <div class="home container mx-auto">
 
+    <h6 class="mt-4 text-sm text-purple" v-if="!modifySettings && keypair && keypair.publicKey" @click="modifySettings = true">
+      <span class="font-mono text-black">Account: </span> {{ keypair.publicKey }}
+    </h6>
+
+    <div v-if="!keypair || !keypair.secretKey || !keypair.publicKey || !nodeUrl || this.modifySettings">
+      <div class="flex mt-8 mb-8">
+        <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
+          <h2 class="py-2">
+            Settings
+          </h2>
+          <div class="flex -mx-2 mt-4 mb-4">
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="host">Host</label>
+              <input v-model="nodeUrl" class="w-full p-2" id="host" type="text" placeholder="https://testnet.aeternity.io">
+            </div>
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="accountPub">Public Key</label>
+              <input v-model="keypair.publicKey" class="w-full p-2" id="accountPub" type="text" placeholder="Public Key">
+            </div>
+            <div class="mx-2 w-1/3">
+              <label class="text-xs block mb-1" for="accountPriv">Private Key</label>
+              <input v-model="keypair.secretKey" class="w-full p-2" id="accountPriv" type="text" placeholder="Private Key">
+            </div>
+          </div>
+          <button class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="saveSettings">Save</button>
+          <button class="mt-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="createKeypair">Create Keypair</button>
+        </div>
+      </div>
+    </div>
+
      <h1 class="py-2">
         Test contracts
-        <span v-if="!this.client && !this.clientError" class="text-sm text-red">
-          (connecting to {{this.nodeUrl}} ...)
+        <span v-if="!client && !clientError" class="text-sm text-red">
+          (connecting to {{nodeUrl}} ...)
         </span>
-        <span v-if="this.clientError" class="text-sm text-red">
-          Error connecting to {{this.nodeUrl}}
+        <span v-if="clientError" class="text-sm text-red">
+          Error connecting to {{nodeUrl}}
           <br>
-          {{this.clientError}}
+          {{clientError}}
         </span>
-        <span v-if="this.client" class="text-sm text-green">
-          ({{this.nodeUrl}})
+        <span v-if="client" class="text-sm text-green">
+          ({{nodeUrl}})
         </span>
       </h1>
-      <div class="mt-8 -mx-2" v-if="!this.clientError">
-        <div class="w-full p-4 bg-grey-light rounded-sm shadow">
+
+      <div class="mt-2 -mx-2" v-if="!clientError">
+        <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
           <h2 class="py-2 inline-block">
             Sophia Contract's Code:
           </h2>
@@ -27,30 +58,28 @@
 
           <div v-if="compileError">
             <label class="text-xs block mb-1 text-red">Errors</label>
-            <textarea v-model="compileError" class="h-64 w-full border border-solid border-black font-mono bg-black text-red"></textarea>
+            <textarea v-model="compileError" class="h-16 w-full border border-solid border-black font-mono bg-black text-xs text-red-500"></textarea>
           </div>
 
-          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCompile">Compile</button>
-          <input v-if="this.client" v-model="contractAddress" class="mt-2 rounded-l-full bg-black hover:bg-purple text-white p-2 px-4" />
-          <button v-if="this.client" class="mt-2 rounded-r-full bg-black hover:bg-purple text-white p-2 px-4" @click="atAddress">at Address</button>
-          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="resetContract">Reset</button>
+          <button v-if="this.client" class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="onCompile">Compile</button>
+          <input v-if="this.client" v-model="contractAddress" class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4" />
+          <button v-if="this.client" class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="atAddress">at Address</button>
+          <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="resetContract">Reset</button>
         </div>
 
         <div class="flex mt-8 mb-8" v-if="byteCode">
-          <div class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
+          <div class="w-1/2 p-4 bg-gray-200 rounded-sm shadow">
             <h2 class="py-2">
               Byte Code
-              <div class="w-full text-xs" v-bind:class="{ 'text-red' : !deployedContractInstance, 'text-green' : deployedContractInstance }">
+              <span class="block w-full text-xs" v-bind:class="{ 'text-red' : !deployedContractInstance, 'text-green' : deployedContractInstance }">
                 {{deployInfo}}
-              </div>
+              </span>
             </h2>
-            <textarea v-model="byteCode" class="h-16 w-full border border-solid border-black font-mono bg-black text-white text-xs"></textarea>
+            <textarea v-model="byteCode" class="h-16 w-full font-mono bg-black text-white text-xs mb-4 p-4"></textarea>
 
             <div class="mt-2 mb-2" v-if="deployError">
               <label class="text-xs block mb-1 text-red">Deploy Errors:</label>
-              <div class="w-full border border-solid border-black font-mono bg-black text-red text-sm">
-                {{deployError}}
-              </div>
+              <textarea v-model="deployError" class="h-16 w-full text-red-500 bg-black text-xs mb-4 p-4 font-mono"></textarea>
             </div>
 
             <div class="flex -mx-2 mt-4 mb-4">
@@ -79,16 +108,16 @@
               </div>
               <div class="mx-2 w-1/5">
                 <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
-                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" min="0" placeholder="gas">
+                <input v-model.number="deployOpts.gas" class="w-full p-2" id="dGas" type="number" min="0" placeholder="auto">
               </div>
 
               <input v-model="deployOpts.callData" class="w-full p-2" type="hidden" value="callData">
 
             </div>
 
-            <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onDeploy">Deploy</button>
+            <button class="py-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="onDeploy">Deploy</button>
           </div>
-          <div v-if="contractAddress" class="w-1/2 p-4 bg-grey-light rounded-sm shadow">
+          <div v-if="contractAddress" class="w-1/2 p-4 bg-gray-200 rounded-sm shadow">
             <h2 class="py-2">
               ⬅ Call Static Function
             </h2>
@@ -117,14 +146,14 @@
             </div>
             <div class="mt-2 mb-2" v-if="callStaticError">
               <label class="text-xs block mb-1 text-red">Errors</label>
-              <textarea v-model="callStaticError" class="h-48 w-full text-red bg-black text-xs mb-4 p-4 overflow-x-scroll font-mono"></textarea>
+              <textarea v-model="callStaticError" class="h-16 w-full text-red-500 bg-black text-xs mb-4 p-4 font-mono"></textarea>
             </div>
 
-            <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallStatic">Call Static</button>
+            <button class="py-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="onCallStatic">Call Static</button>
           </div>
         </div>
 
-        <div v-if="deployedContractInstance && byteCode" class="w-full p-4 bg-grey-light rounded-sm shadow mb-8">
+        <div v-if="deployedContractInstance && byteCode" class="w-full p-4 bg-gray-200 rounded-sm shadow mb-8">
           <h2 class="py-2">
             ⬆ Call Function
           </h2>
@@ -143,7 +172,7 @@
             </div>
             <div class="mx-2 w-1/4">
               <label class="text-xs block mb-1" for="cGas">Gas Limit</label>
-              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" min="0" placeholder="gas">
+              <input v-model.number="callOpts.gas" class="w-full p-2" id="cGas" type="number" min="0" placeholder="auto">
             </div>
 
             <input v-model="callOpts.callData" class="mx-2 w-1/2 p-2" type="hidden" value="callData">
@@ -167,11 +196,11 @@
           </div>
           <div class="mt-2 mb-2" v-if="callError">
             <label class="text-xs block mb-1 text-red">Errors</label>
-            <textarea v-model="callError" class="h-16 w-full border border-solid border-black font-mono bg-black text-white mb-2"></textarea>
+            <textarea v-model="callError" class="h-16 w-full text-red-500 bg-black text-xs mb-4 p-4 font-mono"></textarea>
           </div>
 
-          <button class="py-2 rounded-full bg-black hover:bg-purple text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
-          <span v-if="waitingCall" class="text-sm text-red">Calling Function...</span>
+          <button class="py-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="onCallDataAndFunction">Call Function</button>
+          <span v-if="waitingCall" class="text-sm text-red-500">Calling Function...</span>
         </div>
     </div>
   </div>
@@ -185,7 +214,7 @@ import 'codemirror/keymap/sublime'
 import 'codemirror/mode/haskell/haskell'
 import 'codemirror/addon/merge/merge'
 
-const compilerUrl = 'https://latest.compiler.aeternity.art'
+const compilerUrl = 'https://latest.compiler.aepps.com'
 
 export default {
   name: 'Home',
@@ -206,12 +235,12 @@ export default {
 contract Example =
   entrypoint example(x : int) = x`,
       contractCode: '',
-      keypair: null,
+      keypair: { publicKey: null, secretKey: null },
       balance: 0,
       balanceInterval: null,
       byteCode: '',
       client: false,
-      nodeUrl: 'https://testnet.aeternity.art',
+      nodeUrl: 'https://testnet.aeternity.io',
       deployedContractInstance: null,
       deployInfo: '',
       minedData: false,
@@ -229,14 +258,14 @@ contract Example =
         gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
-        gas: 1000000,
+        gas: null, // sdk will automatically select this
         callData: ''
       },
       callOpts: {
         gasPrice: 1000000000,
         amount: 0,
         fee: null, // sdk will automatically select this
-        gas: 1000000,
+        gas: null, // sdk will automatically select this
         callData: ''
       },
       clientError: false,
@@ -274,6 +303,8 @@ contract Example =
       console.log(`Deploying contract...`)
       try {
         const contractInstance = await this.client.getContractInstance(this.contractCode)
+        // eslint-disable-next-line no-unused-vars
+        options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null));
         this.deployedContractInstance = await contractInstance.deploy(initArgs, options)
         return contractInstance
       } catch (err) {
@@ -285,11 +316,19 @@ contract Example =
       console.log(`calling static func ${func} with args ${args}`)
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       const options = { callStatic: true, gas }
-      const res = await this.deployedContractInstance.call(func, args, options)
-      return { decoded: res.decodedResult, result: res.result }
+      try {
+        const res = await this.deployedContractInstance.call(func, args, options)
+        return { decoded: res.decodedResult, result: res.result }
+      } catch (err) {
+        console.log(err)
+        throw err
+      }
     },
     async callContract (func, args, options) {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
+      // eslint-disable-next-line no-unused-vars
+      options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null));
+
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
         return await this.deployedContractInstance.call(func, args, options)
@@ -340,7 +379,7 @@ contract Example =
           this.deployError = ''
         })
         .catch(err => {
-          this.deployError = `${err}`
+          this.deployError = err
         })
     },
     onCallStatic () {
@@ -373,7 +412,7 @@ contract Example =
             this.waitingCall = false
           })
           .catch(err => {
-            this.callError = `${JSON.stringify(err)}`
+            this.callError = err
             this.waitingCall = false
           })
       } else {
@@ -400,24 +439,23 @@ contract Example =
       return keypair
     },
     async fundAccount (publicKey) {
-      const fundingClient = await Universal({
-        compilerUrl: compilerUrl,
-        nodes: [
-          {
-            name: 'node',
-            instance: await Node({ url: this.nodeUrl })
-          }],
-        accounts: [
-          MemoryAccount({
-            keypair: {
-              publicKey: 'ak_2qb5NUA8Dt41moZU7X2Tc2462Vb2nwRBrdWTuT2nUyAvdk8dHU',
-              secretKey: '0f34e79602f94c9300509b71c1fed42a9f47eafeef1e25b6922e9044eb3d8e14f2051cda7937da54a4a568c60b60a69293469059bafd927a7a0d160a2ac208aa'
-            }
-          })
-        ]
-      })
-
-      await fundingClient.spend(100000000000000000, publicKey)
+      await fetch(`https://testnet.faucet.aepps.com/account/${publicKey}`, {
+        method: 'POST',
+        body: {},
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+      }).catch(console.error)
+    },
+    async createKeypair () {
+      this.keypair = Crypto.generateKeyPair()
+      window.localStorage.setItem('testnet-keypair', JSON.stringify(this.keypair))
+      await this.fundAccount(this.keypair.publicKey)
+      await this.getClient()
+      this.modifySettings = false
+    },
+    async saveSettings () {
+      window.localStorage.setItem('testnet-keypair', JSON.stringify(this.keypair))
+      await this.getClient()
+      this.modifySettings = false
     },
     saveContract () {
       window.localStorage.setItem('contract-code', this.contractCode)
@@ -443,7 +481,7 @@ contract Example =
           this.deployError = ''
         })
         .catch(err => {
-          this.deployError = `${err}`
+          this.deployError = err
         })
     },
     resetContract () {
@@ -472,13 +510,15 @@ contract Example =
   button:hover,
   button:focus,
   button:active {
-	  outline: none;
-	  outline: 0;
+    outline: none;
+    outline: 0;
   }
+
   .CodeMirror {
     height: auto;
     min-height: 300px;
   }
+
   .CodeMirror-scroll {
     min-height: 300px;
   }
