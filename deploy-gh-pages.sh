@@ -7,7 +7,7 @@ npm install && \
 NODE_ENV=prod npm run build && \
 cd dist/ && \
 git init && \
-git remote add origin git@github.com:thepiwo/aepp-contracts.git && \
+git remote add origin git@github.com:aeternity/aepp-contracts.git && \
 git checkout -b gh-pages && \
 git add * && \
 git commit -m "contracts aepp ${GIT_REV} deployment to gh-pages" && \
