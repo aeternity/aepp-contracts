@@ -297,7 +297,7 @@ contract Example =
       try {
         return await this.client.compileContractAPI(code)
       } catch (err) {
-        this.compileError = err.response.body.map(e => e.message).join('\n')
+        this.compileError = err.response && err.response.body ? err.response.body.map(e => e.message).join('\n') : err
       }
     },
     async deploy (initArgs, options = {}) {
@@ -382,7 +382,7 @@ contract Example =
           this.deployError = ''
         })
         .catch(err => {
-          this.deployError = err.response.body.map(e => e.message).join('\n')
+          this.deployError = err.response && err.response.body ? err.response.body.map(e => e.message).join('\n') : err
         })
     },
     onCallStatic () {
