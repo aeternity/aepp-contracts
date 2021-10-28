@@ -59,10 +59,11 @@
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
           </div>
 
-          <div v-if="compileError">
-            <label class="text-xs block mb-1 text-red">Errors</label>
-            <textarea v-model="compileError" class="h-16 w-full border border-solid border-black font-mono bg-black text-xs text-red-500"></textarea>
+          <div class="mt-2 mb-2" v-if="compileError">
+            <label class="text-xs block mb-1 text-red">Compile Errors:</label>
+            <textarea v-model="compileError" class="h-16 w-full text-red-500 bg-black text-xs mb-4 p-4 font-mono"></textarea>
           </div>
+
 
           <button v-if="this.client" class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" @click="onCompile">Compile</button>
           <input v-if="this.client" v-model="contractAddress" class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4" />
@@ -296,8 +297,7 @@ contract Example =
       try {
         return await this.client.compileContractAPI(code)
       } catch (err) {
-        this.compileError = err
-        console.log(err)
+        this.compileError = err.response.body.map(e => e.message).join('\n')
       }
     },
     async deploy (initArgs, options = {}) {
@@ -382,7 +382,7 @@ contract Example =
           this.deployError = ''
         })
         .catch(err => {
-          this.deployError = err
+          this.deployError = err.response.body.map(e => e.message).join('\n')
         })
     },
     onCallStatic () {
@@ -498,6 +498,7 @@ contract Example =
     resetContract () {
       this.contractCode = this.example
       this.saveContract()
+      this.resetData()
     }
   },
   async mounted () {
