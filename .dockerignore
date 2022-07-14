@@ -1,0 +1,9 @@
+*
+!public/
+!src/
+!package.json
+!package-lock.json
+!babel.config.js
+!postcss.config.js
+!tailwind.config.js
+!vue.config.js
