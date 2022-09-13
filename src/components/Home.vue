@@ -429,7 +429,6 @@ contract Example =
       this.minedData = false
       this.miningStatus = false
       this.byteCode = false
-      this.aci = ''
 
       this.modifySettings = false
       this.deployedContractInstance = ''
@@ -541,13 +540,11 @@ contract Example =
       window.localStorage.setItem('contract-code', this.contractCode)
       window.localStorage.setItem('aci', this.aci)
       window.localStorage.setItem('contract-address', this.contractAddress)
-      window.localStorage.setItem('byte-code', this.byteCode)
     },
     getContract () {
       this.contractCode = window.localStorage.getItem('contract-code') ? window.localStorage.getItem('contract-code') : this.example
       this.aci = window.localStorage.getItem('aci') ? window.localStorage.getItem('aci') : ''
       this.contractAddress = window.localStorage.getItem('contract-address') ? window.localStorage.getItem('contract-address') : ''
-      this.byteCode = window.localStorage.getItem('byte-code') ? window.localStorage.getItem('byte-code') : ''
     },
     atAddress () {
       this.saveContract()
