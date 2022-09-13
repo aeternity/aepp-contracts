@@ -291,7 +291,9 @@ import 'codemirror/addon/merge/merge'
 const compilerUrl = 'https://latest.compiler.aepps.com'
 
 BigInt.prototype.toJSON = function() { return this.toString() }
-Uint8Array.prototype.toJSON = function() { return Buffer.from(this).toString('hex') };
+Uint8Array.prototype.toString = function() { return Buffer.from(this).toString('hex') };
+Uint8Array.prototype.toJSON = function() { return this.toString() };
+Map.prototype.toJSON = function() { return Object.fromEntries(this) };
 
 export default {
   name: 'Home',
