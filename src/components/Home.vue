@@ -60,7 +60,7 @@
     <div class="mt-2 -mx-2" v-if="!clientError">
       <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
         <div class="flex">
-          <div class="relative w-6/12">
+          <div class="relative w-8/12">
             <h2 class="py-2 inline-block">
               Sophia Contract's Code:
             </h2>
@@ -68,7 +68,7 @@
               or
             </h2>
           </div>
-          <div class="relative w-6/12">
+          <div class="relative w-4/12">
             <h2 class="py-2 inline-block">
               ACI:
             </h2>
@@ -76,10 +76,10 @@
         </div>
 
         <div class="flex">
-          <div class="relative w-6/12 pr-1">
+          <div class="relative w-8/12 pr-1">
             <codemirror v-model="contractCode" :options="cmOption"></codemirror>
           </div>
-          <div class="relative w-6/12">
+          <div class="relative w-4/12">
             <codemirror v-model="aci" :options="cmOption"></codemirror>
           </div>
         </div>
@@ -93,7 +93,7 @@
 
 
         <div class="flex">
-          <div class="relative w-6/12">
+          <div class="relative w-8/12">
             <button v-if="this.client" class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
                     @click="onCompile">Compile
             </button>
@@ -101,7 +101,7 @@
                     @click="resetContract">Reset
             </button>
           </div>
-          <div class="relative w-6/12">
+          <div class="relative w-4/12">
             <input v-if="this.client" v-model="contractAddress"
                    class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"/>
             <button v-if="this.client" class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
