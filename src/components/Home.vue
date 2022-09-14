@@ -1,12 +1,22 @@
 <template>
   <div class="home container mx-auto">
 
-    <h6 class="mt-4 text-sm text-purple" v-if="!modifySettings && keypair && keypair.publicKey"
-        @click="modifySettings = true">
-      <span class="font-mono text-black">Account: </span> {{ keypair.publicKey }}
-    </h6>
+    <div class="flex">
+      <button class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4" v-if="isStatic" @click="initExtension">
+        Connect Wallet Extension
+      </button>
+      <button class="mt-2 mr-4 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+              @click="modifySettings = !modifySettings">
+        <span v-if="isStatic">Modify Local Account</span>
+        <span v-if="!isStatic">Use Local Account</span>
+      </button>
+      <h6 class="mt-4 text-sm text-purple" v-if="!modifySettings && account">
+        <span class="font-mono text-black">Account: </span> {{ account }}
+      </h6>
 
-    <div v-if="!keypair || !keypair.secretKey || !keypair.publicKey || !nodeUrl || this.modifySettings">
+    </div>
+
+    <div v-if="!keypair || !nodeUrl || this.modifySettings">
       <div class="flex mt-8 mb-8">
         <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
           <h2 class="py-2">
@@ -41,18 +51,18 @@
 
     <h1 class="py-2">
       Test contracts
-      <span v-if="!client && !clientError" class="text-sm text-red-500">
+      <span v-if="!isConnected && !clientError" class="text-sm text-red-500">
           (connecting to {{ nodeUrl }} ...)
         </span>
-      <span v-if="!client && clientError" class="text-sm text-red-500">
+      <span v-if="!isConnected && clientError" class="text-sm text-red-500">
           {{ clientError }}
         </span>
-      <span v-if="client && clientError" class="text-sm text-red-500">
+      <span v-if="isConnected && clientError" class="text-sm text-red-500">
            Error connecting to {{ nodeUrl }} <br/>
            {{ clientError }}
         </span>
 
-      <span v-if="client && !clientError" class="text-sm text-green-500">
+      <span v-if="isConnected && !clientError" class="text-sm text-green-500">
           ({{ nodeUrl }})
         </span>
     </h1>
@@ -94,17 +104,17 @@
 
         <div class="flex">
           <div class="relative w-8/12">
-            <button v-if="this.client" class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            <button v-if="isConnected" class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
                     @click="onCompile">Compile
             </button>
-            <button v-if="this.client" class="mt-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            <button v-if="isConnected" class="mt-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
                     @click="resetContract">Reset
             </button>
           </div>
           <div class="relative w-4/12">
-            <input v-if="this.client" v-model="contractAddress"
+            <input v-if="isConnected" v-model="contractAddress"
                    class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"/>
-            <button v-if="this.client" class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            <button v-if="isConnected" class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
                     @click="atAddress">at Address
             </button>
           </div>
@@ -281,19 +291,17 @@
 </template>
 
 <script>
-import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk/es'
 import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 
 import 'codemirror/keymap/sublime'
 import 'codemirror/mode/haskell/haskell'
 import 'codemirror/addon/merge/merge'
+import { address, initWallet, networkId, sdk } from '../wallet'
 
-const compilerUrl = 'https://latest.compiler.aepps.com'
-
-BigInt.prototype.toJSON = function() { return this.toString() }
-Uint8Array.prototype.toString = function() { return Buffer.from(this).toString('hex') };
-Uint8Array.prototype.toJSON = function() { return this.toString() };
-Map.prototype.toJSON = function() { return Object.fromEntries(this) };
+BigInt.prototype.toJSON = function () { return this.toString() }
+Uint8Array.prototype.toString = function () { return Buffer.from(this).toString('hex') }
+Uint8Array.prototype.toJSON = function () { return this.toString() }
+Map.prototype.toJSON = function () { return Object.fromEntries(this) }
 
 export default {
   name: 'Home',
@@ -319,7 +327,6 @@ contract Example =
       balance: 0,
       balanceInterval: null,
       byteCode: '',
-      client: false,
       nodeUrl: 'https://testnet.aeternity.io',
       deployedContractInstance: null,
       deployInfo: '',
@@ -355,7 +362,10 @@ contract Example =
       compileError: '',
       callStaticRes: '',
       callStaticError: '',
-      waitingCall: false
+      waitingCall: false,
+      account: null,
+      isConnected: false,
+      isStatic: true,
     }
   },
   props: {
@@ -371,10 +381,10 @@ contract Example =
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        return Promise.all([this.client.compilerApi.compileContract({
+        return Promise.all([sdk.compilerApi.compileContract({
           code,
           options: {}
-        }), this.client.compilerApi.generateACI({ code, options: {} })])
+        }), sdk.compilerApi.generateACI({ code, options: {} })])
       } catch (err) {
         this.compileError = err.response && err.response.body ? err.response.body.map(e => e.message).join('\n') : err
       }
@@ -384,9 +394,9 @@ contract Example =
 
       console.log(`Deploying contract...`)
       try {
-        const contractInstance = await this.client.getContractInstance({ source: this.contractCode })
+        const contractInstance = await sdk.getContractInstance({ source: this.contractCode })
         // eslint-disable-next-line no-unused-vars
-        options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null));
+        options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null))
         this.deployedContractInstance = await contractInstance.deploy(initArgs, options)
         return contractInstance
       } catch (err) {
@@ -408,7 +418,7 @@ contract Example =
     async callContract (func, args, options) {
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       // eslint-disable-next-line no-unused-vars
-      options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null));
+      options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null))
 
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
@@ -495,20 +505,14 @@ contract Example =
     async getClient () {
       this.clientError = null
       try {
-        this.client = new AeSdk({
-          compilerUrl: compilerUrl,
-          nodes: [
-            {
-              name: 'node',
-              instance: new Node(this.nodeUrl)
-            }],
-        })
-        await this.client.addAccount(new MemoryAccount({ keypair: this.keypair }), { select: true })
-        if ((await this.client.getBalance(this.keypair.publicKey)) < 10000000000000000) await this.fundAccount(this.keypair.publicKey)
-        await this.client.getBalance(this.keypair.publicKey)
+        await initWallet(this.keypair)
+        this.isConnected = true
+        this.account = address
+        this.nodeUrl = sdk.pool.get(networkId).url
+        this.isStatic = true
+        if (networkId === 'ae_uat' && (await sdk.getBalance(address, {})) < 10000000000000000) await this.fundAccount(address)
       } catch (err) {
         this.clientError = err.toString().includes('404') ? 'Account not found' : err
-        console.log(this.clientError)
       }
     },
     getKeypair () {
@@ -556,7 +560,7 @@ contract Example =
       this.miningStatus = true
 
       const opts = this.aci !== '' ? { aci: JSON.parse(this.aci) } : { source: this.contractCode }
-      this.client.getContractInstance({ ...opts, contractAddress: this.contractAddress })
+      sdk.getContractInstance({ ...opts, contractAddress: this.contractAddress })
           .then(data => {
             this.deployInfo = `Instantiated Contract at address: ${this.contractAddress}`
             this.miningStatus = false
@@ -574,6 +578,13 @@ contract Example =
       this.byteCode = ''
       this.saveContract()
       this.resetData()
+    },
+    async initExtension () {
+      await initWallet()
+      this.isConnected = true
+      this.account = address
+      this.nodeUrl = sdk.pool.get(networkId).url
+      this.isStatic = false
     }
   },
   async mounted () {
