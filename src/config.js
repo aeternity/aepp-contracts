@@ -4,7 +4,7 @@ import {
 
 export const defaultNetworkId = 'ae_uat'
 
-export const COMPILER_URL = 'https://compiler.aepps.com'
+export const COMPILER_URL = 'https://v7.compiler.stg.aepps.com'
 
 export const nodes = [{
   name: 'ae_uat',

@@ -291,12 +291,12 @@
 </template>
 
 <script>
-import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
+import { generateKeyPair } from '@aeternity/aepp-sdk'
 
 import 'codemirror/keymap/sublime'
 import 'codemirror/mode/haskell/haskell'
 import 'codemirror/addon/merge/merge'
-import { address, initWallet, networkId, sdk } from '../wallet'
+import { initWallet, networkId, sdk } from '../wallet'
 
 BigInt.prototype.toJSON = function () { return this.toString() }
 Uint8Array.prototype.toString = function () { return Buffer.from(this).toString('hex') }
@@ -381,10 +381,8 @@ contract Example =
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        return Promise.all([sdk.compilerApi.compileContract({
-          code,
-          options: {}
-        }), sdk.compilerApi.generateACI({ code, options: {} })])
+        const { bytecode, aci } = await sdk.compilerApi.compileBySourceCode(code)
+        return Promise.all([bytecode, aci])
       } catch (err) {
         this.compileError = err.response && err.response.body ? err.response.body.map(e => e.message).join('\n') : err
       }
@@ -394,10 +392,10 @@ contract Example =
 
       console.log(`Deploying contract...`)
       try {
-        const contractInstance = await sdk.getContractInstance({ source: this.contractCode })
+        const contractInstance = await sdk.initializeContract({ sourceCode: this.contractCode })
         // eslint-disable-next-line no-unused-vars
         options = Object.fromEntries(Object.entries(options).filter(([_, v]) => v != null))
-        this.deployedContractInstance = await contractInstance.deploy(initArgs, options)
+        this.deployedContractInstance = await contractInstance.$deploy(initArgs, options)
         return contractInstance
       } catch (err) {
         console.error(err)
@@ -409,7 +407,7 @@ contract Example =
       args = args ? args.split(',').map((arg) => { return arg.trim() }) : []
       const options = { callStatic: true, gas }
       try {
-        return await this.deployedContractInstance.call(func, args, options)
+        return await this.deployedContractInstance.$call(func, args, options)
       } catch (err) {
         console.error(err)
         throw err
@@ -422,7 +420,7 @@ contract Example =
 
       console.log(`calling a function on a deployed contract with func: ${func}, args: ${args} and options:`, options)
       try {
-        return await this.deployedContractInstance.call(func, args, options)
+        return await this.deployedContractInstance.$call(func, args, options)
       } catch (err) {
         console.error(err)
         throw err
@@ -447,10 +445,9 @@ contract Example =
       this.saveContract()
       this.resetData()
       this.compile(this.contractCode)
-          .then(([{ bytecode }, aci]) => {
+          .then(([bytecode, aci]) => {
             this.contractAddress = undefined
             this.byteCode = bytecode
-            delete aci.interface
             this.aci = JSON.stringify(aci, null, 2)
           })
     },
@@ -460,7 +457,7 @@ contract Example =
 
       this.deploy(this.deployArgs, this.deployOpts) // this waits until the TX is mined
           .then(data => {
-            this.contractAddress = this.deployedContractInstance.address
+            this.contractAddress = this.deployedContractInstance.$options.address
             this.saveContract()
             this.deployInfo = `Deployed, and mined at this address: ${this.contractAddress}`
             this.miningStatus = false
@@ -507,29 +504,33 @@ contract Example =
       try {
         await initWallet(this.keypair)
         this.isConnected = true
-        this.account = address
-        this.nodeUrl = sdk.pool.get(networkId).url
+        this.account = sdk.address
+        this.nodeUrl = sdk.api.$host
         this.isStatic = true
-        if (networkId === 'ae_uat' && (await sdk.getBalance(address, {})) < 10000000000000000) await this.fundAccount(address)
+        if (networkId === 'ae_uat' && (await sdk.getBalance(sdk.address)) < 10000000000000000) {
+          await this.fundAccount(sdk.address)
+        }
       } catch (err) {
-        this.clientError = err.toString().includes('404') ? 'Account not found' : err
+        console.log(err.statusCode);
+        console.log(err.message);
+        // throw err;
+        this.clientError = err
       }
     },
     getKeypair () {
       let keypairString = window.localStorage.getItem('testnet-keypair')
-      let keypair = keypairString ? JSON.parse(keypairString) : Crypto.generateKeyPair()
+      let keypair = keypairString ? JSON.parse(keypairString) : generateKeyPair()
       window.localStorage.setItem('testnet-keypair', JSON.stringify(keypair))
       return keypair
     },
     async fundAccount (publicKey) {
-      await fetch(`https://testnet.faucet.aepps.com/account/${publicKey}`, {
-        method: 'POST',
-        body: {},
-        headers: { 'content-type': 'application/x-www-form-urlencoded' }
-      }).catch(console.error)
+      await fetch(
+        `https://testnet.faucet.aepps.com/account/${publicKey}`,
+        { method: 'POST' },
+      ).catch(console.error)
     },
     async createKeypair () {
-      this.keypair = Crypto.generateKeyPair()
+      this.keypair = generateKeyPair()
       window.localStorage.setItem('testnet-keypair', JSON.stringify(this.keypair))
       await this.fundAccount(this.keypair.publicKey)
       await this.getClient()
@@ -559,8 +560,8 @@ contract Example =
       this.deployInfo = 'Instantiating Contract at address ...'
       this.miningStatus = true
 
-      const opts = this.aci !== '' ? { aci: JSON.parse(this.aci) } : { source: this.contractCode }
-      sdk.getContractInstance({ ...opts, contractAddress: this.contractAddress })
+      const opts = this.aci !== '' ? { aci: JSON.parse(this.aci) } : { sourceCode: this.contractCode }
+      sdk.initializeContract({ ...opts, address: this.contractAddress })
           .then(data => {
             this.deployInfo = `Instantiated Contract at address: ${this.contractAddress}`
             this.miningStatus = false
@@ -582,8 +583,8 @@ contract Example =
     async initExtension () {
       await initWallet()
       this.isConnected = true
-      this.account = address
-      this.nodeUrl = sdk.pool.get(networkId).url
+      this.account = sdk.address
+      this.nodeUrl = sdk.api.$host
       this.isStatic = false
     }
   },

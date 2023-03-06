@@ -2,6 +2,7 @@ import {
   AeSdkAepp,
   BrowserWindowMessageConnection,
   AeSdk,
+  CompilerHttp,
   walletDetector,
   MemoryAccount,
 } from '@aeternity/aepp-sdk'
@@ -12,7 +13,6 @@ export let sdk = null
 
 // eslint-disable-next-line no-unused-vars
 let activeWallet = null
-export let address = null
 // eslint-disable-next-line no-unused-vars
 let walletStatus = null
 export let networkId = null
@@ -23,15 +23,11 @@ export const initWallet = async (keypair = null) => {
   try {
     // connect to static Wallet
     if (keypair) {
-      const account = new MemoryAccount({ keypair })
-
-      const client = new AeSdk({
-        compilerUrl: COMPILER_URL,
+      sdk = new AeSdk({
+        onCompiler: new CompilerHttp(COMPILER_URL),
         nodes,
+        accounts: [new MemoryAccount(keypair.secretKey)],
       })
-
-      await client.addAccount(account, { select: true })
-      sdk = client
 
       await aeConnectToNode(defaultNetworkId)
 
@@ -42,7 +38,7 @@ export const initWallet = async (keypair = null) => {
       sdk = new AeSdkAepp({
         name: 'AEPP',
         nodes,
-        compilerUrl: COMPILER_URL,
+        onCompiler: new CompilerHttp(COMPILER_URL),
         onNetworkChange: async ({ networkId }) => {
           await aeConnectToNode(networkId)
         },
@@ -86,8 +82,7 @@ export const fetchWalletInfo = async () => {
   walletStatus = 'fetching_info'
 
   try {
-    networkId = await sdk.getNetworkId()
-    address = await sdk.address()
+    networkId = await sdk.api.getNetworkId()
 
     walletStatus = 'connected'
     return true
