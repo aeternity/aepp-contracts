@@ -1,16 +1,22 @@
 <template>
-  <div id="app">
-    <Home/>
-  </div>
+  <Editor />
 </template>
 
-<script>
-import Home from './components/Home.vue'
+<script setup lang="ts">
+import Editor from "./components/Editor.vue";
 
-export default {
-  name: 'app',
-  components: {
-    Home
-  }
-}
+import { useSdkStore } from "./stores/sdkStore";
+import { onMounted } from "vue";
+import { useContractStore } from "./stores/contractStore";
+
+const sdkStore = useSdkStore();
+const { initSdk } = sdkStore;
+
+const contractStore = useContractStore();
+const { initContractState } = contractStore;
+
+onMounted(async () => {
+  await initSdk();
+  await initContractState();
+});
 </script>
