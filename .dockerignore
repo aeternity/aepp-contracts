@@ -3,7 +3,9 @@
 !src/
 !package.json
 !package-lock.json
-!babel.config.js
-!postcss.config.js
-!tailwind.config.js
-!vue.config.js
+!index.html
+!postcss.config.cjs
+!tailwind.config.cjs
+!tsconfig.json
+!tsconfig.node.json
+!vite.config.ts

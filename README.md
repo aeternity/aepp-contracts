@@ -25,10 +25,10 @@ npm install
 ## Start the application
 
 ```
-npm run serve
+npm run dev
 ```
 
-The current form should be self explainatory.
+The current form should be self explanatory.
 
 ## Build Setup
 
