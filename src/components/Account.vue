@@ -1,8 +1,8 @@
 <template>
   <div class="flex">
     <button
-      class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       v-if="isStatic"
+      class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       @click="initSdk(false)"
     >
       Connect Wallet Extension
@@ -12,9 +12,9 @@
       @click="modifySettings = !modifySettings"
     >
       <span v-if="isStatic">Modify Local Account</span>
-      <span v-if="!isStatic">Use Local Account</span>
+      <span v-else>Use Local Account</span>
     </button>
-    <h6 class="mt-4 text-sm text-purple" v-if="!modifySettings && address">
+    <h6 v-if="!modifySettings && address" class="mt-4 text-sm text-purple">
       <span class="font-mono text-black">Account: </span> {{ address }}
     </h6>
   </div>
@@ -27,9 +27,9 @@
           <div class="mx-2 w-1/3">
             <label class="text-xs block mb-1" for="host">Host</label>
             <input
-              v-model="nodeUrl"
-              class="w-full p-2"
               id="host"
+              v-model="nodeUrlInput"
+              class="w-full p-2"
               type="text"
               placeholder="https://testnet.aeternity.io"
             />
@@ -39,9 +39,9 @@
               >Private Key</label
             >
             <input
+              id="accountPriv"
               v-model="secretKey"
               class="w-full p-2"
-              id="accountPriv"
               type="text"
               placeholder="Private Key"
             />
@@ -59,38 +59,42 @@
 
   <h1 class="py-2">
     Test contracts
-    <span v-if="!isConnected && !clientError" class="text-sm text-red-500">
-      (connecting to {{ nodeUrl }} ...)
+    <span v-if="status === Status.CONNECTED" class="text-sm text-green-500">
+      ({{ status }} {{ nodeUrl }})
     </span>
-    <span v-if="!isConnected && clientError" class="text-sm text-red-500">
-      {{ clientError }}
+    <span
+      v-if="status === Status.CONNECTION_ERROR"
+      class="text-sm text-red-500"
+    >
+      ({{ status }} {{ nodeUrl }})
     </span>
-    <span v-if="isConnected && clientError" class="text-sm text-red-500">
-      Error connecting to {{ nodeUrl }} <br />
-      {{ clientError }}
-    </span>
-
-    <span v-if="isConnected && !clientError" class="text-sm text-green-500">
-      ({{ nodeUrl }})
+    <span
+      v-if="status !== Status.CONNECTION_ERROR && status !== Status.CONNECTED"
+      class="text-sm text-yellow-500"
+    >
+      ({{ status }} {{ nodeUrl }})
     </span>
   </h1>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useSdkStore } from "../stores/sdkStore";
-import { ref } from "vue";
+import { Status, useSdkStore } from "../stores/sdkStore";
+import { ref, watch } from "vue";
 
 const sdkStore = useSdkStore();
-const { isStatic, address, nodeUrl, secretKey, isConnected } =
-  storeToRefs(sdkStore);
+const { isStatic, address, nodeUrl, secretKey, status } = storeToRefs(sdkStore);
 const { initSdk } = sdkStore;
 
 const modifySettings = ref(false);
-const clientError = ref(false);
+const nodeUrlInput = ref("");
+
+watch(nodeUrl, () => {
+  nodeUrlInput.value = nodeUrl.value;
+});
 
 async function useLocalAccount() {
   secretKey.value = undefined;
-  await initSdk(true);
+  await initSdk(true, nodeUrlInput.value);
   modifySettings.value = false;
 }
 </script>

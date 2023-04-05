@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="mt-2 mb-2" v-if="compileResult.error">
+    <div v-if="compileResult.error" class="mt-2 mb-2">
       <label class="text-xs block mb-1 text-red">Compile Errors:</label>
       <textarea
         v-model="compileResult.error"
@@ -44,14 +44,12 @@
     <div class="flex">
       <div class="relative w-8/12">
         <button
-          v-if="isConnected"
           class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
           @click="compileContractFromSource"
         >
           Compile
         </button>
         <button
-          v-if="isConnected"
           class="mt-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
           @click="resetContractState"
         >
@@ -60,12 +58,10 @@
       </div>
       <div class="relative w-4/12">
         <input
-          v-if="isConnected"
           v-model="contractAddress"
           class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
         />
         <button
-          v-if="isConnected"
           class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
           @click="initializeContractFromAci(contractAddress, aci)"
         >
@@ -81,7 +77,6 @@ import { oneDark } from "@codemirror/theme-one-dark";
 import { javascript } from "@codemirror/lang-javascript";
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
-import { useSdkStore } from "../stores/sdkStore";
 import { ref, watch } from "vue";
 
 const extensions = [javascript(), oneDark];
@@ -93,9 +88,6 @@ const {
   initializeContractFromAci,
   resetContractState,
 } = contractStore;
-
-const sdkStore = useSdkStore();
-const { isConnected } = storeToRefs(sdkStore);
 
 const contractAddress = ref("");
 const aci = ref("");
