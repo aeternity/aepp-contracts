@@ -35,11 +35,11 @@
             />
           </div>
           <div class="mx-2 w-1/3">
-            <label class="text-xs block mb-1" for="accountPriv"
+            <label class="text-xs block mb-1" for="accountPrivateKey"
               >Private Key</label
             >
             <input
-              id="accountPriv"
+              id="accountPrivateKey"
               v-model="secretKey"
               class="w-full p-2"
               type="text"

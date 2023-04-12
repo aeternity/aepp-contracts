@@ -22,7 +22,7 @@ export const defaultCallOptions = {
 export class Result<T> {
   error?: string;
   info?: string;
-  final: boolean = false;
+  final = false;
   data?: T;
 
   setError(error: string) {

@@ -11,6 +11,7 @@ import {
   Result,
 } from "../utils/utils";
 import "../utils/toJsonExtensions";
+import { Encoded } from "@aeternity/aepp-sdk/es/utils/encoder";
 
 export const useContractStore = defineStore("contract", () => {
   const compileData: Ref<{ contractCode: string }> = ref({
@@ -59,6 +60,7 @@ export const useContractStore = defineStore("contract", () => {
   });
   const callResult: Ref<Result<string>> = ref(new Result());
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let contractInstance: Contract<any> | undefined = undefined;
 
   const sdkStore = useSdkStore();
@@ -100,7 +102,7 @@ export const useContractStore = defineStore("contract", () => {
     await sdkStore.aeSdk
       ?.initializeContract({
         ...{ aci: JSON.parse(aci) },
-        address: `ct_${contractAddress.replace("ct_", "")}`,
+        address: contractAddress as Encoded.ContractAddress,
       })
       .then((instance) => {
         contractInstance = instance;
@@ -134,15 +136,15 @@ export const useContractStore = defineStore("contract", () => {
     });
 
     const options = Object.fromEntries(
-      Object.entries(deployData.value.options).filter(([_, v]) => v != null)
+      Object.entries(deployData.value.options).filter(([, v]) => v != null)
     );
 
     contractInstance
       ?.$deploy(args, options)
       .then((deployed) => {
         deployResult.value.setFinal(
-          `Deployed, and mined at this address: ${deployed?.result?.contractId}`,
-          deployed?.result?.contractId
+          `Deployed, and mined at this address: ${deployed.result?.contractId}`,
+          deployed.result?.contractId
         );
         persistContract(
           compileData.value.contractCode,
@@ -184,7 +186,7 @@ export const useContractStore = defineStore("contract", () => {
     callResult.value.setInfo("Calling Contract ...");
     const args = argsStringToArgs(callData.value.args);
     const options = Object.fromEntries(
-      Object.entries(callData.value.options).filter(([_, v]) => v != null)
+      Object.entries(callData.value.options).filter(([, v]) => v != null)
     );
 
     contractInstance
