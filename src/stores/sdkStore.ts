@@ -42,7 +42,7 @@ function getNodes(nodeUrl?: string) {
         nodes: [
           {
             name: "custom",
-            instance: new Node(nodeUrl!),
+            instance: new Node(nodeUrl),
           },
         ],
       }
@@ -65,7 +65,7 @@ export const useSdkStore = defineStore("sdk", () => {
   async function scanForWallets() {
     status.value = Status.WALLET_SCANNING;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (aeSdk instanceof AeSdkAepp) {
         const handleWallets: ({
           wallets,
@@ -76,24 +76,25 @@ export const useSdkStore = defineStore("sdk", () => {
         }) => Promise<void> = async ({ wallets, newWallet }) => {
           newWallet = newWallet || Object.values(wallets)[0];
           stopScan();
-          if (!aeSdk) return;
 
           try {
             (aeSdk as AeSdkAepp).disconnectWallet();
-          } catch (_) {}
+          } catch (_) {
+            // specifically ignore, to ensure we are disconnected before trying to connect, but disconnect will error if we are not connected
+          }
 
           const { networkId } = await (aeSdk as AeSdkAepp).connectToWallet(
             newWallet.getConnection()
           );
 
-          aeSdk.selectNode(networkId);
+          (aeSdk as AeSdkAepp).selectNode(networkId);
 
           await (aeSdk as AeSdkAepp).subscribeAddress(
             SUBSCRIPTION_TYPES.subscribe,
             "current"
           );
 
-          resolve("");
+          resolve();
         };
         const scannerConnection = new BrowserWindowMessageConnection();
         const stopScan = walletDetector(scannerConnection, handleWallets);
@@ -132,7 +133,7 @@ export const useSdkStore = defineStore("sdk", () => {
     });
   }
 
-  async function initSdk(initStatic: boolean = true, customNodeUrl?: string) {
+  async function initSdk(initStatic = true, customNodeUrl?: string) {
     status.value = Status.UNINITIALIZED;
     if (customNodeUrl) {
       nodeUrl.value = customNodeUrl;

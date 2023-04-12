@@ -1,7 +1,7 @@
 <template>
   <div
-    class="w-1/2 p-4 bg-gray-200 rounded-sm shadow"
     v-if="compileResult.final"
+    class="w-1/2 p-4 bg-gray-200 rounded-sm shadow"
   >
     <h2 class="py-2">
       Byte Code
@@ -12,7 +12,7 @@
       class="h-16 w-full font-mono bg-black text-white text-xs mb-4 p-4"
     ></textarea>
 
-    <div class="mt-2 mb-2" v-if="deployResult.error">
+    <div v-if="deployResult.error" class="mt-2 mb-2">
       <label class="text-xs block mb-1 text-red">Deploy Errors:</label>
       <textarea
         v-model="deployResult.error"
@@ -24,9 +24,9 @@
       <div class="mx-2 w-1/3">
         <label class="text-xs block mb-1" for="deployFunc">Function</label>
         <input
+          id="deployFunc"
           value="init"
           class="w-full p-2"
-          id="deployFunc"
           type="text"
           disabled
         />
@@ -34,9 +34,9 @@
       <div class="mx-2 w-2/3">
         <label class="text-xs block mb-1" for="deployArgs">Arguments</label>
         <input
+          id="deployArgs"
           v-model="deployData.args"
           class="w-full p-2"
-          id="deployArgs"
           type="text"
           placeholder="comma separated args"
         />
@@ -55,9 +55,9 @@
           ></label
         >
         <input
+          id="dGasPrice"
           v-model.number="deployData.options.gasPrice"
           class="w-full p-2"
-          id="dGasPrice"
           type="number"
           min="1000000000"
           placeholder="gas price"
@@ -75,9 +75,9 @@
           ></label
         >
         <input
+          id="dAmount"
           v-model.number="deployData.options.amount"
           class="w-full p-2"
-          id="dAmount"
           type="number"
           min="0"
           placeholder="amount"
@@ -95,9 +95,9 @@
           ></label
         >
         <input
+          id="dFee"
           v-model.number="deployData.options.fee"
           class="w-full p-2"
-          id="dFee"
           type="number"
           placeholder="auto"
         />
@@ -105,9 +105,9 @@
       <div class="mx-2 w-1/4">
         <label class="text-xs block mb-1" for="dGas">Gas Limit</label>
         <input
+          id="dGas"
           v-model.number="deployData.options.gas"
           class="w-full p-2"
-          id="dGas"
           type="number"
           min="0"
           placeholder="auto"
