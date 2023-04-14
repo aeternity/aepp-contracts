@@ -18,7 +18,7 @@
           :indent-with-tab="true"
           :tab-size="2"
           :extensions="extensions"
-          style="height: 300px"
+          style="height: 300px; resize: vertical;overflow: auto !important;"
         />
       </div>
       <div class="relative w-4/12">
@@ -28,7 +28,7 @@
           :indent-with-tab="true"
           :tab-size="2"
           :extensions="extensions"
-          style="height: 300px"
+          style="height: 300px; resize: vertical;overflow: auto !important;"
         />
       </div>
     </div>
