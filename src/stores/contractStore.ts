@@ -8,14 +8,14 @@ import {
   exampleContractCode,
   getContract,
   persistContract,
-  Result,
+  Result
 } from "../utils/utils";
 import "../utils/toJsonExtensions";
 import { Encoded } from "@aeternity/aepp-sdk/es/utils/encoder";
 
 export const useContractStore = defineStore("contract", () => {
   const compileData: Ref<{ contractCode: string }> = ref({
-    contractCode: structuredClone(exampleContractCode),
+    contractCode: structuredClone(exampleContractCode)
   });
   const compileResult: Ref<Result<{ aci: string; byteCode?: string }>> = ref(
     new Result()
@@ -32,14 +32,14 @@ export const useContractStore = defineStore("contract", () => {
     };
   }> = ref({
     args: "",
-    options: structuredClone(defaultCallOptions),
+    options: structuredClone(defaultCallOptions)
   });
   const deployResult: Ref<Result<string>> = ref(new Result());
 
   const callStaticData: Ref<{ args: string; func: string; gas: number }> = ref({
     func: "example",
     gas: 1000000,
-    args: "",
+    args: ""
   });
   const callStaticResult: Ref<Result<string>> = ref(new Result());
 
@@ -56,7 +56,7 @@ export const useContractStore = defineStore("contract", () => {
   }> = ref({
     func: "example",
     args: "",
-    options: structuredClone(defaultCallOptions),
+    options: structuredClone(defaultCallOptions)
   });
   const callResult: Ref<Result<string>> = ref(new Result());
 
@@ -74,7 +74,7 @@ export const useContractStore = defineStore("contract", () => {
       .then((result) => {
         compileResult.value.setFinal("Compiled from source", {
           aci: JSON.stringify(result?.aci, null, 2),
-          byteCode: result.bytecode,
+          byteCode: result.bytecode
         });
 
         persistContract(
@@ -102,13 +102,13 @@ export const useContractStore = defineStore("contract", () => {
     await sdkStore.aeSdk
       ?.initializeContract({
         ...{ aci: JSON.parse(aci) },
-        address: contractAddress as Encoded.ContractAddress,
+        address: contractAddress as Encoded.ContractAddress
       })
       .then((instance) => {
         contractInstance = instance;
         compileResult.value.setFinal(`Initialized from ACI`, {
           aci,
-          byteCode: "calling at address doesn't need bytecode",
+          byteCode: "calling at address doesn't need bytecode"
         });
         deployResult.value.setFinal(
           `Instantiated Contract at address: ${contractAddress}`,
@@ -127,12 +127,13 @@ export const useContractStore = defineStore("contract", () => {
   }
 
   async function deployContract() {
-    resetDeployAndCallData();
+    resetDeployAndCallData(false);
     deployResult.value.setInfo("Deploying Contract ...");
     const args = argsStringToArgs(deployData.value.args);
+    console.log(args, deployData.value.args);
 
     contractInstance = await sdkStore.aeSdk?.initializeContract({
-      sourceCode: compileData.value.contractCode,
+      sourceCode: compileData.value.contractCode
     });
 
     const options = Object.fromEntries(
@@ -217,24 +218,26 @@ export const useContractStore = defineStore("contract", () => {
       );
   }
 
-  function resetDeployAndCallData() {
-    deployData.value = {
-      args: "",
-      options: structuredClone(defaultCallOptions),
-    };
-    deployResult.value = new Result();
+  function resetDeployAndCallData(includeDeployData = true) {
+    if (includeDeployData) {
+      deployData.value = {
+        args: "",
+        options: structuredClone(defaultCallOptions)
+      };
+      deployResult.value = new Result();
+    }
 
     callStaticData.value = {
       func: "example",
       gas: 1000000,
-      args: "",
+      args: ""
     };
     callStaticResult.value = new Result();
 
     callData.value = {
       func: "example",
       args: "",
-      options: structuredClone(defaultCallOptions),
+      options: structuredClone(defaultCallOptions)
     };
     callResult.value = new Result();
   }
@@ -272,6 +275,6 @@ export const useContractStore = defineStore("contract", () => {
 
     callData,
     callResult,
-    callContract,
+    callContract
   };
 });
