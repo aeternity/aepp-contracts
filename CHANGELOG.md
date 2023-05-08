@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/aeternity/aepp-contracts/compare/v2.0.1...v2.1.0) (2023-05-08)
+
+
+### Features
+
+* add version and contribution note ([69af2e2](https://github.com/aeternity/aepp-contracts/commit/69af2e2cf70e7d86ca5c6c055f0bb5076675b776))
+
+
+### CI / CD
+
+* test build in actions ([e6b32f1](https://github.com/aeternity/aepp-contracts/commit/e6b32f1ddc0bf58cb22dd3a328a61ba30fafa8e3))
+
 ## [2.0.1](https://github.com/aeternity/aepp-contracts/compare/v2.0.0...v2.0.1) (2023-05-08)
 
 
