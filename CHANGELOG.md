@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.1](https://github.com/aeternity/aepp-contracts/compare/v2.0.0...v2.0.1) (2023-05-08)
+
+
+### Bug Fixes
+
+* incorrect deploydata reset ([8e547d6](https://github.com/aeternity/aepp-contracts/commit/8e547d6759ba3e11830c2f0c8bda9d3f0df11964))
+* sdk ref, custom node url and secret usage ([4fc710a](https://github.com/aeternity/aepp-contracts/commit/4fc710ac5335dd46460b2c72721303b8a8353e1c))
+
+
+### Miscellaneous
+
+* update dependencies ([46e74f4](https://github.com/aeternity/aepp-contracts/commit/46e74f4a3e9e0d0212ee3b5a00a0d1bad12a07bf))
+
 ## [2.0.0](https://github.com/aeternity/aepp-contracts/compare/1.1.2...v2.0.0) (2023-04-20)
 
 
