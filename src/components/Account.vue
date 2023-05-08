@@ -40,7 +40,7 @@
             >
             <input
               id="accountPrivateKey"
-              v-model="secretKey"
+              v-model="secretKeyInput"
               class="w-full p-2"
               type="text"
               placeholder="Private Key"
@@ -87,14 +87,19 @@ const { initSdk } = sdkStore;
 
 const modifySettings = ref(false);
 const nodeUrlInput = ref("");
+const secretKeyInput = ref("");
 
 watch(nodeUrl, () => {
   nodeUrlInput.value = nodeUrl.value;
 });
 
+watch(secretKey, () => {
+  secretKeyInput.value = secretKey.value || "";
+});
+
 async function useLocalAccount() {
   secretKey.value = undefined;
-  await initSdk(true, nodeUrlInput.value);
+  await initSdk(true, nodeUrlInput.value, secretKeyInput.value);
   modifySettings.value = false;
 }
 </script>

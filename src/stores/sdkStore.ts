@@ -11,7 +11,7 @@ import {
   walletDetector,
 } from "@aeternity/aepp-sdk";
 import { COMPILER_URL, nodes } from "../utils/config";
-import { computed, Ref, ref, UnwrapRef } from "vue";
+import { Ref, ref, ShallowRef, shallowRef, UnwrapRef } from "vue";
 import BigNumber from "bignumber.js";
 import { getSecretKey, persistSecretKey } from "../utils/utils";
 
@@ -50,23 +50,19 @@ function getNodes(nodeUrl?: string) {
 }
 
 export const useSdkStore = defineStore("sdk", () => {
-  let aeSdk: AeSdkAepp | AeSdk | undefined;
-
+  const aeSdk: ShallowRef<AeSdk | AeSdkAepp | undefined> = shallowRef();
   const secretKey: Ref<UnwrapRef<string | undefined>> = ref();
-
   const status = ref(Status.UNINITIALIZED);
   const address = ref();
   const networkId = ref();
   const nodeUrl = ref();
   const isStatic = ref(true);
 
-  const initializedSdk = computed(() => aeSdk);
-
   async function scanForWallets() {
     status.value = Status.WALLET_SCANNING;
 
     return new Promise<void>((resolve, reject) => {
-      if (aeSdk instanceof AeSdkAepp) {
+      if (aeSdk.value instanceof AeSdkAepp) {
         const handleWallets: ({
           wallets,
           newWallet,
@@ -78,18 +74,18 @@ export const useSdkStore = defineStore("sdk", () => {
           stopScan();
 
           try {
-            (aeSdk as AeSdkAepp).disconnectWallet();
+            (aeSdk.value as AeSdkAepp).disconnectWallet();
           } catch (_) {
             // specifically ignore, to ensure we are disconnected before trying to connect, but disconnect will error if we are not connected
           }
 
-          const { networkId } = await (aeSdk as AeSdkAepp).connectToWallet(
-            newWallet.getConnection()
-          );
+          const { networkId } = await (
+            aeSdk.value as AeSdkAepp
+          ).connectToWallet(newWallet.getConnection());
 
-          (aeSdk as AeSdkAepp).selectNode(networkId);
+          (aeSdk.value as AeSdkAepp).selectNode(networkId);
 
-          await (aeSdk as AeSdkAepp).subscribeAddress(
+          await (aeSdk.value as AeSdkAepp).subscribeAddress(
             SUBSCRIPTION_TYPES.subscribe,
             "current"
           );
@@ -104,16 +100,16 @@ export const useSdkStore = defineStore("sdk", () => {
 
   async function initAeSdkAepp(customNodeUrl?: string) {
     isStatic.value = false;
-    aeSdk = new AeSdkAepp({
+    aeSdk.value = new AeSdkAepp({
       name: "Contract Editor",
       ...getNodes(customNodeUrl),
       onCompiler: new CompilerHttp(COMPILER_URL, { ignoreVersion: true }),
       onNetworkChange: async ({ networkId }) => {
-        if (aeSdk) {
-          const [{ name }] = (await aeSdk.getNodesInPool()).filter(
+        if (aeSdk.value) {
+          const [{ name }] = (await aeSdk.value.getNodesInPool()).filter(
             (node) => node.nodeNetworkId === networkId
           );
-          aeSdk.selectNode(name);
+          aeSdk.value.selectNode(name);
           await updateConnectionInfo();
         }
       },
@@ -124,29 +120,29 @@ export const useSdkStore = defineStore("sdk", () => {
     await scanForWallets();
   }
 
-  function initAeSdk(secretKey: string, customNodeUrl?: string) {
+  function initAeSdk(customSecretKey: string, customNodeUrl?: string) {
+    secretKey.value = customSecretKey;
     isStatic.value = true;
-    aeSdk = new AeSdk({
+    aeSdk.value = new AeSdk({
       onCompiler: new CompilerHttp(COMPILER_URL, { ignoreVersion: true }),
-      accounts: [new MemoryAccount(secretKey)],
+      accounts: [new MemoryAccount(customSecretKey)],
       ...getNodes(customNodeUrl),
     });
   }
 
-  async function initSdk(initStatic = true, customNodeUrl?: string) {
+  async function initSdk(
+    initStatic = true,
+    customNodeUrl?: string,
+    customSecretKey?: string
+  ) {
     status.value = Status.UNINITIALIZED;
-    if (customNodeUrl) {
-      nodeUrl.value = customNodeUrl;
-    } else {
-      nodeUrl.value = nodes[0].instance.$host;
-    }
+    if (customNodeUrl) nodeUrl.value = customNodeUrl;
+    else nodeUrl.value = nodes[0].instance.$host;
 
     try {
-      if (initStatic) {
-        secretKey.value = getOrGenerateSecretKey();
-
-        if (secretKey.value) initAeSdk(secretKey.value, customNodeUrl);
-      } else await initAeSdkAepp(customNodeUrl);
+      if (initStatic)
+        initAeSdk(customSecretKey || getOrGenerateSecretKey(), customNodeUrl);
+      else await initAeSdkAepp(customNodeUrl);
 
       await updateConnectionInfo();
     } catch (e) {
@@ -156,10 +152,10 @@ export const useSdkStore = defineStore("sdk", () => {
 
   async function updateConnectionInfo() {
     status.value = Status.FETCHING_INFO;
-    networkId.value = await aeSdk?.api?.getNetworkId();
-    nodeUrl.value = aeSdk?.api.$host;
+    networkId.value = await aeSdk.value?.api?.getNetworkId();
+    nodeUrl.value = aeSdk.value?.api.$host;
 
-    address.value = aeSdk?.address;
+    address.value = aeSdk.value?.address;
     status.value = Status.CHECK_FUNDING;
 
     await fundAccountIfNeeded();
@@ -172,7 +168,7 @@ export const useSdkStore = defineStore("sdk", () => {
 
   async function fundAccountIfNeeded() {
     const balance = address.value
-      ? (await aeSdk?.getBalance(address.value)) || 0
+      ? (await aeSdk.value?.getBalance(address.value)) || 0
       : 0;
 
     if (
@@ -189,7 +185,7 @@ export const useSdkStore = defineStore("sdk", () => {
   }
 
   return {
-    aeSdk: initializedSdk,
+    aeSdk,
     initSdk,
     status,
     address,
