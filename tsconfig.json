@@ -5,6 +5,7 @@
     "module": "es6",
     "moduleResolution": "Node",
     "strict": true,
+    "strictFunctionTypes": false,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": false,
