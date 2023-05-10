@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Contract, toAe } from "@aeternity/aepp-sdk";
+import { Contract, toAe, Encoded, Tag } from "@aeternity/aepp-sdk";
 import { Ref, ref } from "vue";
 import { useSdkStore } from "./sdkStore";
 import {
@@ -11,7 +11,6 @@ import {
   Result,
 } from "../utils/utils";
 import "../utils/toJsonExtensions";
-import { Encoded } from "@aeternity/aepp-sdk/es/utils/encoder";
 
 export const useContractStore = defineStore("contract", () => {
   const compileData: Ref<{ contractCode: string }> = ref({
@@ -165,14 +164,11 @@ export const useContractStore = defineStore("contract", () => {
     contractInstance
       ?.$call(callStaticData.value.func, args, options)
       .then((result) => {
+        if (result.tx.tag !== Tag.ContractCallTx) throw new Error('Unexpected transaction');
         callStaticResult.value.setFinal(
           `Dry-Run Gas Estimate: ${
             result?.result?.gasUsed
-            // @ts-ignore
-          }, Fee Estimate: ${toAe(result?.tx?.fee)} ae (${
-            // @ts-ignore
-            result?.tx?.fee
-          } aetto)`,
+          }, Fee Estimate: ${toAe(result.tx.fee)} ae (${result.tx.fee} aetto)`,
           JSON.stringify(result?.decodedResult)
         );
       })
@@ -192,12 +188,12 @@ export const useContractStore = defineStore("contract", () => {
     contractInstance
       ?.$call(callData.value.func, args, options)
       .then((result) => {
+        if (
+          result.tx.tag !== Tag.SignedTx || result.tx.encodedTx.tag !== Tag.ContractCallTx
+        ) throw new Error('Unexpected transaction');
+        const { fee } = result.tx.encodedTx;
         callResult.value.setFinal(
-          `Gas Used: ${result?.result?.gasUsed}, Fee: ${toAe(
-            // @ts-ignore
-            result?.tx?.encodedTx?.fee
-            // @ts-ignore
-          )} ae (${result?.tx?.encodedTx?.fee} aetto)`,
+          `Gas Used: ${result?.result?.gasUsed}, Fee: ${toAe(fee)} ae (${fee} aetto)`,
           JSON.stringify(result?.decodedResult)
         );
       })
