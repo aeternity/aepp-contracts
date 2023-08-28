@@ -131,7 +131,8 @@ export const useContractStore = defineStore("contract", () => {
     const args = argsStringToArgs(deployData.value.args);
 
     contractInstance = await sdkStore.aeSdk?.initializeContract({
-      sourceCode: compileData.value.contractCode,
+      bytecode: compileResult.value.data!.byteCode as Encoded.ContractBytearray,
+      aci: JSON.parse(compileResult.value.data!.aci),
     });
 
     const options = Object.fromEntries(
