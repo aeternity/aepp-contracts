@@ -17,7 +17,7 @@ export const useContractStore = defineStore("contract", () => {
     contractCode: structuredClone(exampleContractCode),
   });
   const compileResult: Ref<Result<{ aci: string; byteCode?: string }>> = ref(
-    new Result()
+    new Result<{ aci: string; byteCode?: string }>(),
   );
 
   const deployData: Ref<{
@@ -33,14 +33,14 @@ export const useContractStore = defineStore("contract", () => {
     args: "",
     options: structuredClone(defaultCallOptions),
   });
-  const deployResult: Ref<Result<string>> = ref(new Result());
+  const deployResult: Ref<Result<string>> = ref(new Result<string>());
 
   const callStaticData: Ref<{ args: string; func: string; gas: number }> = ref({
     func: "example",
     gas: 1000000,
     args: "",
   });
-  const callStaticResult: Ref<Result<string>> = ref(new Result());
+  const callStaticResult: Ref<Result<string>> = ref(new Result<string>());
 
   const callData: Ref<{
     args: string;
@@ -57,7 +57,7 @@ export const useContractStore = defineStore("contract", () => {
     args: "",
     options: structuredClone(defaultCallOptions),
   });
-  const callResult: Ref<Result<string>> = ref(new Result());
+  const callResult: Ref<Result<string>> = ref(new Result<string>());
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let contractInstance: Contract<any> | undefined = undefined;
@@ -79,13 +79,13 @@ export const useContractStore = defineStore("contract", () => {
         persistContract(
           compileData.value.contractCode,
           compileResult.value.data?.aci || "",
-          deployResult.value.data
+          deployResult.value.data,
         );
       })
       .catch((error) => {
         if (error instanceof Error)
           compileResult.value.setError(
-            error.message.replaceAll("compile error:\n", "")
+            error.message.replaceAll("compile error:\n", ""),
           );
         return undefined;
       });
@@ -93,7 +93,7 @@ export const useContractStore = defineStore("contract", () => {
 
   async function initializeContractFromAci(
     contractAddress: string,
-    aci: string
+    aci: string,
   ) {
     resetDeployAndCallData();
     deployResult.value.setInfo("Instantiating Contract at address ...");
@@ -111,12 +111,12 @@ export const useContractStore = defineStore("contract", () => {
         });
         deployResult.value.setFinal(
           `Instantiated Contract at address: ${contractAddress}`,
-          contractAddress
+          contractAddress,
         );
         persistContract(
           compileData.value.contractCode,
           compileResult.value.data?.aci || "",
-          deployResult.value.data
+          deployResult.value.data,
         );
       })
       .catch((error) => {
@@ -136,7 +136,7 @@ export const useContractStore = defineStore("contract", () => {
     });
 
     const options = Object.fromEntries(
-      Object.entries(deployData.value.options).filter(([, v]) => v != null)
+      Object.entries(deployData.value.options).filter(([, v]) => v != null),
     );
 
     contractInstance
@@ -144,12 +144,12 @@ export const useContractStore = defineStore("contract", () => {
       .then((deployed) => {
         deployResult.value.setFinal(
           `Deployed, and mined at this address: ${deployed.result?.contractId}`,
-          deployed.result?.contractId
+          deployed.result?.contractId,
         );
         persistContract(
           compileData.value.contractCode,
           compileResult.value.data?.aci || "",
-          deployed?.result?.contractId
+          deployed?.result?.contractId,
         );
       })
       .catch((error) => {
@@ -165,12 +165,14 @@ export const useContractStore = defineStore("contract", () => {
     contractInstance
       ?.$call(callStaticData.value.func, args, options)
       .then((result) => {
-        if (result.tx.tag !== Tag.ContractCallTx) throw new Error('Unexpected transaction');
+        if (result.tx.tag !== Tag.ContractCallTx)
+          throw new Error("Unexpected transaction");
         callStaticResult.value.setFinal(
-          `Dry-Run Gas Estimate: ${
-            result?.result?.gasUsed
-          }, Fee Estimate: ${toAe(result.tx.fee)} ae (${result.tx.fee} aetto)`,
-          JSON.stringify(result?.decodedResult)
+          `Dry-Run Gas Estimate: ${result?.result
+            ?.gasUsed}, Fee Estimate: ${toAe(result.tx.fee)} ae (${
+            result.tx.fee
+          } aetto)`,
+          JSON.stringify(result?.decodedResult),
         );
       })
       .catch((error) => {
@@ -183,19 +185,23 @@ export const useContractStore = defineStore("contract", () => {
     callResult.value.setInfo("Calling Contract ...");
     const args = argsStringToArgs(callData.value.args);
     const options = Object.fromEntries(
-      Object.entries(callData.value.options).filter(([, v]) => v != null)
+      Object.entries(callData.value.options).filter(([, v]) => v != null),
     );
 
     contractInstance
       ?.$call(callData.value.func, args, options)
       .then((result) => {
         if (
-          result.tx.tag !== Tag.SignedTx || result.tx.encodedTx.tag !== Tag.ContractCallTx
-        ) throw new Error('Unexpected transaction');
+          result.tx.tag !== Tag.SignedTx ||
+          result.tx.encodedTx.tag !== Tag.ContractCallTx
+        )
+          throw new Error("Unexpected transaction");
         const { fee } = result.tx.encodedTx;
         callResult.value.setFinal(
-          `Gas Used: ${result?.result?.gasUsed}, Fee: ${toAe(fee)} ae (${fee} aetto)`,
-          JSON.stringify(result?.decodedResult)
+          `Gas Used: ${result?.result?.gasUsed}, Fee: ${toAe(
+            fee,
+          )} ae (${fee} aetto)`,
+          JSON.stringify(result?.decodedResult),
         );
       })
       .catch((error) => {
@@ -205,12 +211,14 @@ export const useContractStore = defineStore("contract", () => {
 
   async function initContractState() {
     const persistedContract = getContract();
+
     compileData.value.contractCode =
       persistedContract.contractCode || structuredClone(exampleContractCode);
+
     if (persistedContract.aci && persistedContract.contractAddress)
       await initializeContractFromAci(
         persistedContract.contractAddress,
-        persistedContract.aci
+        persistedContract.aci,
       );
   }
 
@@ -245,10 +253,10 @@ export const useContractStore = defineStore("contract", () => {
     deployResult.value = new Result();
 
     resetDeployAndCallData();
-    await persistContract(
+    persistContract(
       compileData.value.contractCode,
       compileResult.value.data?.aci || "",
-      deployResult.value.data
+      deployResult.value.data,
     );
   }
 
