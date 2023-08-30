@@ -56,18 +56,26 @@ export function getSecretKey() {
 export function persistContract(
   contractCode: string,
   aci: string,
-  contractAddress?: string
+  contractAddress?: string,
+  bytecode?: string,
 ) {
   window.localStorage.setItem("contract-code", contractCode);
   window.localStorage.setItem("aci", aci);
-  if (contractAddress)
-    window.localStorage.setItem("contract-address", contractAddress);
+
+  bytecode
+    ? window.localStorage.setItem("bytecode", bytecode)
+    : window.localStorage.removeItem("bytecode");
+
+  contractAddress
+    ? window.localStorage.setItem("contract-address", contractAddress)
+    : window.localStorage.removeItem("contract-address");
 }
 
 export function getContract() {
   const contractCode = window.localStorage.getItem("contract-code");
   const aci = window.localStorage.getItem("aci");
   const contractAddress = window.localStorage.getItem("contract-address");
+  const bytecode = window.localStorage.getItem("bytecode");
 
-  return { contractCode, aci, contractAddress };
+  return { contractCode, aci, bytecode, contractAddress };
 }

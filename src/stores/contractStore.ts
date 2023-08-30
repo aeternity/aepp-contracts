@@ -21,6 +21,8 @@ export const useContractStore = defineStore("contract", () => {
   );
 
   const deployData: Ref<{
+    bytecode: string;
+    aci: string;
     args: string;
     options: {
       amount: number;
@@ -30,6 +32,8 @@ export const useContractStore = defineStore("contract", () => {
       gasPrice: number;
     };
   }> = ref({
+    bytecode: "",
+    aci: "",
     args: "",
     options: structuredClone(defaultCallOptions),
   });
@@ -64,6 +68,15 @@ export const useContractStore = defineStore("contract", () => {
 
   const sdkStore = useSdkStore();
 
+  function persist() {
+    persistContract(
+      compileData.value.contractCode,
+      compileResult.value.data?.aci || deployData.value.aci,
+      deployResult.value.data,
+      compileResult.value.data?.byteCode,
+    );
+  }
+
   async function compileContractFromSource() {
     compileResult.value.setInfo("Compiling contract source");
     resetDeployAndCallData();
@@ -76,11 +89,9 @@ export const useContractStore = defineStore("contract", () => {
           byteCode: result.bytecode,
         });
 
-        persistContract(
-          compileData.value.contractCode,
-          compileResult.value.data?.aci || "",
-          deployResult.value.data,
-        );
+        deployData.value.bytecode = result.bytecode;
+
+        persist();
       })
       .catch((error) => {
         if (error instanceof Error)
@@ -91,33 +102,30 @@ export const useContractStore = defineStore("contract", () => {
       });
   }
 
-  async function initializeContractFromAci(
-    contractAddress: string,
-    aci: string,
-  ) {
-    resetDeployAndCallData();
+  async function initializeContractFromAci(contractAddress: string) {
+    resetDeployAndCallData(false);
     deployResult.value.setInfo("Instantiating Contract at address ...");
 
     await sdkStore.aeSdk
       ?.initializeContract({
-        ...{ aci: JSON.parse(aci) },
+        aci: JSON.parse(deployData.value.aci),
         address: contractAddress as Encoded.ContractAddress,
       })
       .then((instance) => {
         contractInstance = instance;
         compileResult.value.setFinal(`Initialized from ACI`, {
-          aci,
-          byteCode: "calling at address doesn't need bytecode",
+          aci: deployData.value.aci,
+          byteCode:
+            deployData.value.bytecode ||
+            "calling at address doesn't need bytecode",
         });
+
         deployResult.value.setFinal(
           `Instantiated Contract at address: ${contractAddress}`,
           contractAddress,
         );
-        persistContract(
-          compileData.value.contractCode,
-          compileResult.value.data?.aci || "",
-          deployResult.value.data,
-        );
+
+        persist();
       })
       .catch((error) => {
         if (error instanceof Error) deployResult.value.setError(error.message);
@@ -131,8 +139,8 @@ export const useContractStore = defineStore("contract", () => {
     const args = argsStringToArgs(deployData.value.args);
 
     contractInstance = await sdkStore.aeSdk?.initializeContract({
-      bytecode: compileResult.value.data!.byteCode as Encoded.ContractBytearray,
-      aci: JSON.parse(compileResult.value.data!.aci),
+      bytecode: deployData.value.bytecode as Encoded.ContractBytearray,
+      aci: JSON.parse(compileResult.value.data?.aci || deployData.value.aci),
     });
 
     const options = Object.fromEntries(
@@ -146,11 +154,8 @@ export const useContractStore = defineStore("contract", () => {
           `Deployed, and mined at this address: ${deployed.result?.contractId}`,
           deployed.result?.contractId,
         );
-        persistContract(
-          compileData.value.contractCode,
-          compileResult.value.data?.aci || "",
-          deployed?.result?.contractId,
-        );
+
+        persist();
       })
       .catch((error) => {
         if (error instanceof Error) deployResult.value.setError(error.message);
@@ -215,17 +220,19 @@ export const useContractStore = defineStore("contract", () => {
     compileData.value.contractCode =
       persistedContract.contractCode || structuredClone(exampleContractCode);
 
-    if (persistedContract.aci && persistedContract.contractAddress)
-      await initializeContractFromAci(
-        persistedContract.contractAddress,
-        persistedContract.aci,
-      );
+    deployData.value.aci = persistedContract.aci || "";
+    deployData.value.bytecode = persistedContract.bytecode || "";
+
+    if (persistedContract.contractAddress)
+      await initializeContractFromAci(persistedContract.contractAddress);
   }
 
   function resetDeployAndCallData(includeDeployData = true) {
     if (includeDeployData) {
       deployData.value = {
+        aci: "",
         args: "",
+        bytecode: "",
         options: structuredClone(defaultCallOptions),
       };
       deployResult.value = new Result();
@@ -244,6 +251,8 @@ export const useContractStore = defineStore("contract", () => {
       options: structuredClone(defaultCallOptions),
     };
     callResult.value = new Result();
+
+    persist();
   }
 
   async function resetContractState() {
@@ -253,11 +262,8 @@ export const useContractStore = defineStore("contract", () => {
     deployResult.value = new Result();
 
     resetDeployAndCallData();
-    persistContract(
-      compileData.value.contractCode,
-      compileResult.value.data?.aci || "",
-      deployResult.value.data,
-    );
+
+    persist();
   }
 
   return {

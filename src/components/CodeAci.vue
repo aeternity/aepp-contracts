@@ -18,17 +18,17 @@
           :indent-with-tab="true"
           :tab-size="2"
           :extensions="extensions"
-          style="height: 300px; resize: vertical;overflow: auto !important;"
+          style="height: 300px; resize: vertical; overflow: auto !important"
         />
       </div>
       <div class="relative w-4/12">
         <codemirror
-          v-model="aci"
+          v-model="deployData.aci"
           :autofocus="true"
           :indent-with-tab="true"
           :tab-size="2"
           :extensions="extensions"
-          style="height: 300px; resize: vertical;overflow: auto !important;"
+          style="height: 300px; resize: vertical; overflow: auto !important"
         />
       </div>
     </div>
@@ -63,7 +63,7 @@
         />
         <button
           class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-          @click="initializeContractFromAci(contractAddress, aci)"
+          @click="initializeContractFromAci(contractAddress)"
         >
           at Address
         </button>
@@ -82,7 +82,8 @@ import { ref, watch } from "vue";
 const extensions = [javascript(), oneDark];
 
 const contractStore = useContractStore();
-const { compileData, compileResult, deployResult } = storeToRefs(contractStore);
+const { deployData, compileData, compileResult, deployResult } =
+  storeToRefs(contractStore);
 const {
   compileContractFromSource,
   initializeContractFromAci,
@@ -90,7 +91,6 @@ const {
 } = contractStore;
 
 const contractAddress = ref("");
-const aci = ref("");
 
 // want those watch here to only react to changes from store but still have local models
 watch(
@@ -98,14 +98,15 @@ watch(
   () => {
     contractAddress.value = deployResult.value.data || "";
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
   compileResult,
   () => {
-    aci.value = compileResult.value.data?.aci || "";
+    deployData.value.aci =
+      compileResult.value.data?.aci || deployData.value.aci;
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
