@@ -1,14 +1,11 @@
 <template>
-  <div
-    v-if="compileResult.final"
-    class="w-1/2 p-4 bg-gray-200 rounded-sm shadow"
-  >
+  <div class="w-1/2 p-4 bg-gray-200 rounded-sm shadow">
     <h2 class="py-2">
       Byte Code
       <span class="block w-full text-xs">{{ deployResult.info }}</span>
     </h2>
     <textarea
-      v-model="compileResult.data!.byteCode"
+      v-model="deployData.bytecode"
       class="h-16 w-full font-mono bg-black text-white text-xs mb-4 p-4"
     ></textarea>
 
@@ -123,17 +120,33 @@
 
     <button
       class="py-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+      :disabled="!canDeploy"
       @click="deployContract"
     >
       Deploy
     </button>
+    <span v-if="!canDeploy"> Bytecode and ACI is needed to deploy </span>
   </div>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
+import { computed, watch } from "vue";
 
 const contractStore = useContractStore();
-const { compileResult, deployData, deployResult } = storeToRefs(contractStore);
+const { deployData, deployResult, compileResult } = storeToRefs(contractStore);
 const { deployContract } = contractStore;
+
+const canDeploy = computed(
+  () => deployData.value.aci !== "" && !!deployData.value.bytecode,
+);
+
+watch(
+  compileResult,
+  () => {
+    deployData.value.bytecode =
+      compileResult.value.data?.byteCode || deployData.value.bytecode;
+  },
+  { deep: true },
+);
 </script>
