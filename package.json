@@ -21,6 +21,7 @@
     "vue-codemirror": "^6.1.1"
   },
   "devDependencies": {
+    "@types/phoenix": "^1.6.1",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "@vitejs/plugin-vue": "^4.3.3",
