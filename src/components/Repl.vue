@@ -2,53 +2,63 @@
   <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
     <div class="flex">
       <div class="relative w-8/12">
-        <h2 class="py-2 inline-block">REPL:</h2>
+        <button
+          class="my-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+          @click="show = !show"
+        >
+          {{ show ? "Close" : "Open" }}
+        </button>
+        <h2 class="py-2 inline-block">REPL Interactive Sophia Shell</h2>
       </div>
     </div>
 
-    <div class="flex">
-      <div class="relative w-full">
-        <div
-          id="repl_output"
-          class="p-2 whitespace-pre-wrap text-white bg-black font-mono leading-none h-96 resize-y overflow-auto"
-          v-html="repl_output"
-        />
+    <div :class="show ? '' : 'hidden'">
+      <div class="flex">
+        <div class="relative w-full">
+          <!-- eslint-disable vue/no-v-html -->
+          <div
+            id="repl_output"
+            class="p-2 whitespace-pre-wrap text-white bg-black font-mono leading-none h-96 resize-y overflow-auto"
+            v-html="repl_output"
+          />
+          <!-- eslint-enable -->
+        </div>
       </div>
-    </div>
 
-    <div class="flex">
-      <div class="relative w-8/12">
-        <button
-          class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-        >
-          {{ repl_prompt }}
-        </button>
-        <input
-          v-model="repl_query"
-          class="mt-2 bg-black hover:bg-purple-500 text-white p-2 px-4 w-8/12"
-          @keyup.enter="repl_submitQuery()"
-          @keyup.up="repl_historyUp()"
-          @keyup.down="repl_historyDown()"
-        />
-        <button
-          class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-          @click="repl_submitQuery()"
-        >
-          Query
-        </button>
-      </div>
-      <div class="relative w-4/12">
-        <input
-          v-model="repl_contractName"
-          class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-          @keyup.enter="repl_loadFiles()"
-        />
-        <button
-          class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-          @click="repl_loadFiles()"
-        >
-          Load Contract
-        </button>
+      <div class="flex">
+        <div class="relative w-8/12">
+          <button
+            class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+          >
+            {{ repl_prompt }}
+          </button>
+          <input
+            v-model="repl_query"
+            class="mt-2 bg-black hover:bg-purple-500 text-white p-2 px-4 w-8/12"
+            @keyup.enter="repl_submitQuery()"
+            @keyup.up="repl_historyUp()"
+            @keyup.down="repl_historyDown()"
+          />
+          <button
+            class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            @click="repl_submitQuery()"
+          >
+            Query
+          </button>
+        </div>
+        <div class="relative w-4/12">
+          <input
+            v-model="repl_contractName"
+            class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            @keyup.enter="repl_loadFiles()"
+          />
+          <button
+            class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+            @click="repl_loadFiles()"
+          >
+            Load Contract
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -60,11 +70,13 @@ import { ref, watch } from "vue";
 
 import { Socket } from "phoenix";
 import { AnsiUp } from "ansi_up";
+
 const ansi_up = new AnsiUp();
 
 const contractStore = useContractStore();
 const { compileData, compileResult } = storeToRefs(contractStore);
 
+const show = ref(false);
 const repl_output = ref("");
 const repl_query = ref("");
 const repl_contractName = ref("");
