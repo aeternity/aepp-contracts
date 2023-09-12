@@ -19,7 +19,7 @@
           <div
             id="repl_output"
             class="p-2 whitespace-pre-wrap text-white bg-black font-mono leading-none h-96 resize-y overflow-auto"
-            v-html="repl_output"
+            v-html="replOutput"
           />
           <!-- eslint-enable -->
         </div>
@@ -30,10 +30,10 @@
           <button
             class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
           >
-            {{ repl_prompt }}
+            {{ replPrompt }}
           </button>
           <input
-            v-model="repl_query"
+            v-model="replQuery"
             class="mt-2 bg-black hover:bg-purple-500 text-white p-2 px-4 w-8/12"
             @keyup.enter="repl_submitQuery()"
             @keyup.up="repl_historyUp()"
@@ -48,7 +48,7 @@
         </div>
         <div class="relative w-4/12">
           <input
-            v-model="repl_contractName"
+            v-model="replContractName"
             class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
             @keyup.enter="repl_loadFiles()"
           />
@@ -71,21 +71,21 @@ import { ref, watch } from "vue";
 import { Socket } from "phoenix";
 import { AnsiUp } from "ansi_up";
 
-const ansi_up = new AnsiUp();
+const ansiUp = new AnsiUp();
 
 const contractStore = useContractStore();
 const { compileData, compileResult } = storeToRefs(contractStore);
 
 const show = ref(false);
-const repl_output = ref("");
-const repl_query = ref("");
-const repl_contractName = ref("");
-const repl_prompt = ref("");
+const replOutput = ref("");
+const replQuery = ref("");
+const replContractName = ref("");
+const replPrompt = ref("");
 
 watch(
   compileResult,
   () => {
-    repl_contractName.value = compileResult.value.data?.aci
+    replContractName.value = compileResult.value.data?.aci
       ? JSON.parse(compileResult.value.data?.aci)[0]?.contract.name + ".aes"
       : "";
   },
@@ -100,70 +100,70 @@ socket.connect();
 const channel = socket.channel("repl_session:lobby", {});
 
 let session: string | null = null;
-let last_prompt = "";
-let last_input = "";
+let lastPrompt = "";
+let lastInput = "";
 let history: string[] = [];
-let history_ptr = 0;
+let historyIndex = 0;
 
-repl_query.value = "";
+replQuery.value = "";
 
 function repl_historyUp() {
-  if (history_ptr == history.length) {
-    last_input = repl_query.value;
+  if (historyIndex == history.length) {
+    lastInput = replQuery.value;
   }
-  history_ptr -= 1;
+  historyIndex -= 1;
   history_retrieve();
 }
 
 function repl_historyDown() {
-  history_ptr += 1;
+  historyIndex += 1;
   history_retrieve();
 }
 
 function history_get() {
-  history_ptr = Math.min(history.length, Math.max(0, history_ptr));
-  if (history_ptr == history.length) {
-    return last_input;
+  historyIndex = Math.min(history.length, Math.max(0, historyIndex));
+  if (historyIndex == history.length) {
+    return lastInput;
   } else {
-    return history[history_ptr];
+    return history[historyIndex];
   }
 }
 
 function history_retrieve() {
-  repl_query.value = history_get();
+  replQuery.value = history_get();
 }
 
 function repl_loadFiles() {
   const contract = compileData.value.contractCode;
   channel.push("load", {
-    files: [{ filename: repl_contractName.value, content: contract }],
+    files: [{ filename: replContractName.value, content: contract }],
     user_session: session,
   });
 }
 
 function repl_submitQuery() {
-  const query = repl_query.value.trim();
+  const query = replQuery.value.trim();
   channel.push("query", { input: query, user_session: session });
 
-  last_input = query;
-  history_ptr = history.length;
-  if (history[history_ptr - 1] != query) {
+  lastInput = query;
+  historyIndex = history.length;
+  if (history[historyIndex - 1] != query) {
     history = history.concat(query);
-    history_ptr += 1;
+    historyIndex += 1;
   }
-  repl_query.value = "";
+  replQuery.value = "";
 }
 
 function log_response(msg: string) {
-  const txt = ansi_up.ansi_to_html(msg);
-  const prompt = last_prompt ? last_prompt + "> " : "";
-  repl_output.value += "\n" + prompt + last_input + "\n" + txt + "\n";
+  const txt = ansiUp.ansi_to_html(msg);
+  const prompt = lastPrompt ? lastPrompt + "> " : "";
+  replOutput.value += "\n" + prompt + lastInput + "\n" + txt + "\n";
   setTimeout(() => updateScroll(), 10);
 }
 
 function update_prompt(prompt: string) {
-  last_prompt = prompt;
-  repl_prompt.value = prompt + "> ";
+  lastPrompt = prompt;
+  replPrompt.value = prompt + "> ";
 }
 
 function updateScroll() {
