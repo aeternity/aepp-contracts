@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.2.0](https://github.com/aeternity/aepp-contracts/compare/v2.1.0...v2.2.0) (2023-09-12)
+
+
+### Features
+
+* add show/hide repl ([0c4c621](https://github.com/aeternity/aepp-contracts/commit/0c4c621ca6ddd3e07b83976556f2cf4fef8a7a74))
+* initial repl implementation ([2f2cf80](https://github.com/aeternity/aepp-contracts/commit/2f2cf80f6ec980b1cd6d157985556387d187a664))
+
+
+### Bug Fixes
+
+* improve code style, typedefs ([3bbd8c9](https://github.com/aeternity/aepp-contracts/commit/3bbd8c9e1fc170e68898829a35cbb0d1a8773c51))
+
+
+### Refactorings
+
+* check transaction type in result of contract call ([51bda26](https://github.com/aeternity/aepp-contracts/commit/51bda260a78753c2ac74cb4bfb7fc54bd85b9f2d))
+* deploy bytecode ([bb37701](https://github.com/aeternity/aepp-contracts/commit/bb37701d2331f32c829ff98f9f49cc730a032f05))
+* only establish channel on open, fix code style ([15ff4ad](https://github.com/aeternity/aepp-contracts/commit/15ff4ad76b2811d2aae120714a8f65f790a163b3))
+* persist bytecode, allow input without compile ([5c2ce76](https://github.com/aeternity/aepp-contracts/commit/5c2ce7626801075acef38e49d4289e1a6be539ac))
+* variable naming ([eef3aa0](https://github.com/aeternity/aepp-contracts/commit/eef3aa081da7a47808290f64067546f7fdac651c))
+
+
+### Miscellaneous
+
+* add lint to actions ([c1ccb20](https://github.com/aeternity/aepp-contracts/commit/c1ccb20ded47079844beaae3efbdf3ca83e9d38b))
+* fix codestyle ([5dd8bf5](https://github.com/aeternity/aepp-contracts/commit/5dd8bf546c9288acd969d6433e8c8a11b31699eb))
+* update dependencies ([fe0740d](https://github.com/aeternity/aepp-contracts/commit/fe0740d0088b96573eafa7076edfd044142b9118))
+
 ## [2.1.0](https://github.com/aeternity/aepp-contracts/compare/v2.0.1...v2.1.0) (2023-05-08)
 
 
