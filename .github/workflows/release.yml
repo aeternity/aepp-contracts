@@ -7,7 +7,6 @@ on:
 jobs:
   publish:
     uses: aeternity/github-actions/.github/workflows/_publish-docker.yml@v1.2.0
-    needs: [ validate ]
     secrets: inherit
   deploy:
     uses: aeternity/github-actions/.github/workflows/_deploy-gitops.yml@v1.2.0
