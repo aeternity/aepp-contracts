@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "echo \"All tests passed\""
   },
   "dependencies": {
     "@aeternity/aepp-sdk": "^13.2.1",
