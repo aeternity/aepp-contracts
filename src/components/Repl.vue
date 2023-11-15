@@ -86,7 +86,10 @@ watch(
   compileResult,
   () => {
     contractName.value = compileResult.value.data?.aci
-      ? JSON.parse(compileResult.value.data?.aci)[0]?.contract.name + ".aes"
+      ? JSON.parse(compileResult.value.data?.aci).find(
+          (aci: { contract: { kind: string } | undefined }) =>
+            aci.contract?.kind === "contract_main",
+        )?.contract.name + ".aes"
       : "";
   },
   { deep: true },
