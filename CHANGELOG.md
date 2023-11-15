@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/aeternity/aepp-contracts/compare/v2.2.1...v2.2.2) (2023-11-15)
+
+
+### CI / CD
+
+* use bot token for release please workflow ([#126](https://github.com/aeternity/aepp-contracts/issues/126)) ([19df8d8](https://github.com/aeternity/aepp-contracts/commit/19df8d82f0c3ddc4846c644ca9176afb45f0988d))
+
 ## [2.2.1](https://github.com/aeternity/aepp-contracts/compare/v2.2.0...v2.2.1) (2023-11-14)
 
 

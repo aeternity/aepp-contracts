@@ -1,6 +1,6 @@
 {
   "name": "aepp-contracts",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Contracts Aepp - Test Aeternity Smart Contracts",
   "scripts": {
     "dev": "vite",
