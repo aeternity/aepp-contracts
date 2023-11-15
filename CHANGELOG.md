@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.3](https://github.com/aeternity/aepp-contracts/compare/v2.2.2...v2.2.3) (2023-11-15)
+
+
+### Bug Fixes
+
+* repl contract name parsing ([cd36e0e](https://github.com/aeternity/aepp-contracts/commit/cd36e0e6a9b398ae713a9301432940e70617d527))
+
 ## [2.2.2](https://github.com/aeternity/aepp-contracts/compare/v2.2.1...v2.2.2) (2023-11-15)
 
 
