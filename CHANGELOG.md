@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.4](https://github.com/aeternity/aepp-contracts/compare/v2.2.3...v2.2.4) (2024-04-25)
+
+
+### Miscellaneous
+
+* update dependencies ([c50712d](https://github.com/aeternity/aepp-contracts/commit/c50712d44037a9a497fb926ab4899bdc649b2edb))
+
 ## [2.2.3](https://github.com/aeternity/aepp-contracts/compare/v2.2.2...v2.2.3) (2023-11-15)
 
 
