@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.5](https://github.com/aeternity/aepp-contracts/compare/v2.2.4...v2.2.5) (2024-04-26)
+
+
+### Miscellaneous
+
+* log connection error ([afa793f](https://github.com/aeternity/aepp-contracts/commit/afa793fcdd3996f626d0cc311cf04b802fcb95df))
+
 ## [2.2.4](https://github.com/aeternity/aepp-contracts/compare/v2.2.3...v2.2.4) (2024-04-25)
 
 
