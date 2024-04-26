@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.6](https://github.com/aeternity/aepp-contracts/compare/v2.2.5...v2.2.6) (2024-04-26)
+
+
+### Miscellaneous
+
+* regenerate package-lock to fix dead code elimination in rollup ([#135](https://github.com/aeternity/aepp-contracts/issues/135)) ([0eee5a7](https://github.com/aeternity/aepp-contracts/commit/0eee5a714532ccfaccb1ee2862092762add03a28))
+
 ## [2.2.5](https://github.com/aeternity/aepp-contracts/compare/v2.2.4...v2.2.5) (2024-04-26)
 
 
