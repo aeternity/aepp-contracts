@@ -87,7 +87,7 @@ export const useSdkStore = defineStore("sdk", () => {
 
           await (aeSdk.value as AeSdkAepp).subscribeAddress(
             SUBSCRIPTION_TYPES.subscribe,
-            "current"
+            "current",
           );
 
           resolve();
@@ -107,7 +107,7 @@ export const useSdkStore = defineStore("sdk", () => {
       onNetworkChange: async ({ networkId }) => {
         if (aeSdk.value) {
           const [{ name }] = (await aeSdk.value.getNodesInPool()).filter(
-            (node) => node.nodeNetworkId === networkId
+            (node) => node.nodeNetworkId === networkId,
           );
           aeSdk.value.selectNode(name);
           await updateConnectionInfo();
@@ -133,7 +133,7 @@ export const useSdkStore = defineStore("sdk", () => {
   async function initSdk(
     initStatic = true,
     customNodeUrl?: string,
-    customSecretKey?: string
+    customSecretKey?: string,
   ) {
     status.value = Status.UNINITIALIZED;
     if (customNodeUrl) nodeUrl.value = customNodeUrl;
@@ -146,6 +146,7 @@ export const useSdkStore = defineStore("sdk", () => {
 
       await updateConnectionInfo();
     } catch (e) {
+      console.error(e);
       status.value = Status.CONNECTION_ERROR;
     }
   }
