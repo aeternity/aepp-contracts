@@ -1,6 +1,6 @@
 import { Node } from "@aeternity/aepp-sdk";
 
-export const COMPILER_URL = "https://v7.compiler.aepps.com";
+export const COMPILER_URL = "https://v8.compiler.aepps.com";
 
 export const nodes: { instance: Node; name: string }[] = [
   {
