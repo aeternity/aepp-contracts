@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/aeternity/aepp-contracts/compare/v2.2.6...v2.3.0) (2024-05-23)
+
+
+### Features
+
+* use v8 compiler ([38920ed](https://github.com/aeternity/aepp-contracts/commit/38920ed38fc0541f794878c6a86fda9dc3bae877))
+
 ## [2.2.6](https://github.com/aeternity/aepp-contracts/compare/v2.2.5...v2.2.6) (2024-04-26)
 
 
