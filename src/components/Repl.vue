@@ -118,6 +118,11 @@ function toggleRepl() {
 
     channel = socket.channel("repl_session:lobby", {});
 
+    if(!channel) {
+      console.error("AEREPL: Could not create the channel");
+      return;
+    }
+
     session = null;
     lastPrompt = "";
     lastInput = "";
@@ -128,14 +133,20 @@ function toggleRepl() {
 
     channel
       .join()
-      .receive("ok", (resp) => {
+      .receive("ok", (resp: { prompt: string; user_session: string }) => {
         session = resp.user_session;
+
+        if(!channel) {
+          console.error("AEREPL: Channel died after successful opening");
+          return;
+        }
 
         console.log("AEREPL: Joined lobby. Session ID =", session);
         repl_disabled = false;
 
         channel.push("banner", {user_session: session})
-          .receive("ok", handle_response);
+          .receive("ok", handle_response)
+          .receive("error", handle_error("Could not make the initial call"));
       })
       .receive("error", handle_error("Could not establish the connection"));
   } else {
@@ -143,8 +154,8 @@ function toggleRepl() {
   }
 }
 
-function handle_error(msg) {
-  return (e) => {
+function handle_error(msg: string) {
+  return (e: any) => {
     updatePrompt("(CHANNEL ERROR)");
     repl_disabled = true;
 
@@ -166,7 +177,7 @@ function handle_response(payload: { prompt: string; user_session: string; msg: s
   }
 }
 
-function handle_file_load(filename) {
+function handle_file_load(filename: string) {
   return (payload: { prompt: string; user_session: string; msg: string }) => {
     const prompt = payload.prompt;
     session = payload.user_session || session;
