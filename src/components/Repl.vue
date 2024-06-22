@@ -35,6 +35,7 @@
           <input
             v-model="query"
             class="mt-2 bg-black hover:bg-purple-500 text-white p-2 px-4 w-8/12"
+            :disabled="repl_disabled"
             @keyup.enter="submitQuery()"
             @keyup.up="historyUp()"
             @keyup.down="historyDown()"
@@ -48,11 +49,13 @@
         </div>
         <div class="relative w-4/12">
           <input
+            :disabled="repl_disabled"
             v-model="contractName"
             class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
             @keyup.enter="loadFiles()"
           />
           <button
+            :disabled="repl_disabled"
             class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
             @click="loadFiles()"
           >
@@ -103,6 +106,8 @@ let lastPrompt = "";
 let lastInput = "";
 let history: string[] = [];
 let historyIndex = 0;
+let repl_disabled = true;
+let repl_console_log = false;
 
 function toggleRepl() {
   show.value = !show.value;
@@ -121,36 +126,57 @@ function toggleRepl() {
 
     query.value = "";
 
-    channel.on(
-      "response",
-      (payload: { prompt: string; user_session: string; msg: string }) => {
-        const prompt = payload.prompt;
-        session = payload.user_session || session;
-        const msg = payload.msg.replace(/^\n|\n$/g, "");
-        if (msg) {
-          logResponse(msg);
-        }
-        if (prompt) {
-          updatePrompt(prompt);
-        }
-      },
-    );
-
-    channel.onError(() => alert("Channel error."));
-
     channel
       .join()
-      .receive("ok", () => {
-        console.log("Joined aerepl lobby.");
+      .receive("ok", (resp) => {
+        session = resp.user_session;
+
+        console.log("AEREPL: Joined lobby. Session ID =", session);
+        repl_disabled = false;
+
+        channel.push("banner", {user_session: session})
+          .receive("ok", handle_response);
       })
-      .receive("error", (e) => {
-        console.error(e);
-        updatePrompt("(CHANNEL ERROR)");
-        alert("Could not establish the connection.");
-      });
+      .receive("error", handle_error("Could not establish the connection"));
   } else {
     channel?.leave();
   }
+}
+
+function handle_error(msg) {
+  return (e) => {
+    updatePrompt("(CHANNEL ERROR)");
+    repl_disabled = true;
+
+    console.error("AEREPL: ", msg);
+    console.error("AEREPL: ", e);
+  }
+}
+
+function handle_response(payload: { prompt: string; user_session: string; msg: string }) {
+  const prompt = payload.prompt;
+  session = payload.user_session || session;
+  const msg = payload.msg.replace(/^\n|\n$/g, "");
+
+  if (msg) {
+    logResponse(msg);
+  }
+  if (prompt) {
+    updatePrompt(prompt);
+  }
+}
+
+function handle_file_load(filename) {
+  return (payload: { prompt: string; user_session: string; msg: string }) => {
+    const prompt = payload.prompt;
+    session = payload.user_session || session;
+
+    logResponse("[loaded " + filename + "]");
+
+    if (prompt) {
+      updatePrompt(prompt);
+    }
+  };
 }
 
 function historyUp() {
@@ -180,16 +206,33 @@ function historyRetrieve() {
 }
 
 function loadFiles() {
+  if(repl_disabled) return;
+
   const contract = compileData.value.contractCode;
-  channel?.push("load", {
-    files: [{ filename: contractName.value, content: contract }],
+  let name = contractName.value.trim();
+  if (!name) name = "Contract.aes"
+
+  // Update file cache in REPL
+  channel?.push("update_files", {
+    files: [{ filename: name, content: contract }],
     user_session: session,
-  });
+  })
+    .receive("ok", handle_response)
+    .receive("error", handle_error("Could not upload files"));
+
+  // Order REPL to load the file into the context
+  channel?.push("load", {
+    files: [name],
+    user_session: session,
+  })
+    .receive("ok", handle_file_load(name))
+    .receive("error", handle_error("Could not load files"));
 }
 
 function submitQuery() {
+  if(repl_disabled) return;
+
   const trimmedQuery = query.value.trim();
-  channel?.push("query", { input: trimmedQuery, user_session: session });
 
   lastInput = trimmedQuery;
   historyIndex = history.length;
@@ -198,12 +241,21 @@ function submitQuery() {
     historyIndex += 1;
   }
   query.value = "";
+
+  channel?.push("query", { input: trimmedQuery, render: true, user_session: session })
+    .receive("ok", handle_response)
+    .receive("error", handle_error("Could not submit query"));
 }
 
 function logResponse(msg: string) {
   const txt = ansiUp.ansi_to_html(msg);
   const prompt = lastPrompt ? lastPrompt + "> " : "";
   output.value += "\n" + prompt + lastInput + "\n" + txt + "\n";
+
+  if(repl_console_log) {
+    console.log("AEREPL: ", txt);
+  }
+
   setTimeout(() => updateScroll(), 10);
 }
 
