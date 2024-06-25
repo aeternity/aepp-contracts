@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/aeternity/aepp-contracts/compare/v2.3.0...v2.4.0) (2024-06-25)
+
+
+### Features
+
+* Update aerepl-web interface ([cd8618d](https://github.com/aeternity/aepp-contracts/commit/cd8618d582cddd04e2070ca2aaa27667e930a868))
+
 ## [2.3.0](https://github.com/aeternity/aepp-contracts/compare/v2.2.6...v2.3.0) (2024-05-23)
 
 
