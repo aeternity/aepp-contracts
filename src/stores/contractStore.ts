@@ -173,10 +173,9 @@ export const useContractStore = defineStore("contract", () => {
         if (result.tx.tag !== Tag.ContractCallTx)
           throw new Error("Unexpected transaction");
         callStaticResult.value.setFinal(
-          `Dry-Run Gas Estimate: ${result?.result
-            ?.gasUsed}, Fee Estimate: ${toAe(result.tx.fee)} ae (${
-            result.tx.fee
-          } aetto)`,
+          `Dry-Run Gas Estimate: ${
+            result?.result?.gasUsed
+          }, Fee Estimate: ${toAe(result.tx.fee)} ae (${result.tx.fee} aetto)`,
           JSON.stringify(result?.decodedResult),
         );
       })
