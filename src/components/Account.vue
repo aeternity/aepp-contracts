@@ -11,8 +11,7 @@
       class="mt-2 mr-4 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       @click="modifySettings = !modifySettings"
     >
-      <span v-if="isStatic">Modify Local Account</span>
-      <span v-else>Use Local Account</span>
+      {{ isStatic ? "Modify" : "Use" }} Local Account
     </button>
     <h6 v-if="!modifySettings && address" class="mt-4 text-sm text-purple">
       <span class="font-mono text-black">Account: </span> {{ address }}
@@ -35,9 +34,9 @@
             />
           </div>
           <div class="mx-2 w-1/3">
-            <label class="text-xs block mb-1" for="accountPrivateKey"
-              >Private Key</label
-            >
+            <label class="text-xs block mb-1" for="accountPrivateKey">
+              Private Key
+            </label>
             <input
               id="accountPrivateKey"
               v-model="secretKeyInput"
@@ -59,18 +58,13 @@
 
   <h1 class="py-2">
     Test contracts
-    <span v-if="status === Status.CONNECTED" class="text-sm text-green-500">
-      ({{ status }} {{ nodeUrl }})
-    </span>
     <span
-      v-if="status === Status.CONNECTION_ERROR"
-      class="text-sm text-red-500"
-    >
-      ({{ status }} {{ nodeUrl }})
-    </span>
-    <span
-      v-if="status !== Status.CONNECTION_ERROR && status !== Status.CONNECTED"
-      class="text-sm text-yellow-500"
+      class="text-sm"
+      :class="
+        (status === Status.CONNECTED && 'text-green-500') ||
+        (status === Status.CONNECTION_ERROR && 'text-red-500') ||
+        'text-yellow-500'
+      "
     >
       ({{ status }} {{ nodeUrl }})
     </span>
