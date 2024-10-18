@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <button
-      v-if="isStatic"
+      v-if="isLocalAccount"
       class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       @click="initSdk(false)"
     >
@@ -11,7 +11,7 @@
       class="mt-2 mr-4 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       @click="modifySettings = !modifySettings"
     >
-      {{ isStatic ? "Modify" : "Use" }} Local Account
+      {{ isLocalAccount ? "Modify" : "Use" }} Local Account
     </button>
     <h6 v-if="!modifySettings && address" class="mt-4 text-sm text-purple">
       <span class="font-mono text-black">Account: </span> {{ address }}
@@ -76,7 +76,8 @@ import { Status, useSdkStore } from "../stores/sdkStore";
 import { ref, watch } from "vue";
 
 const sdkStore = useSdkStore();
-const { isStatic, address, nodeUrl, secretKey, status } = storeToRefs(sdkStore);
+const { isLocalAccount, address, nodeUrl, secretKey, status } =
+  storeToRefs(sdkStore);
 const { initSdk } = sdkStore;
 
 const modifySettings = ref(false);

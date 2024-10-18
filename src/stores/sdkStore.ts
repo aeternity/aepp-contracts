@@ -56,7 +56,7 @@ export const useSdkStore = defineStore("sdk", () => {
   const address = ref();
   const networkId = ref();
   const nodeUrl = ref();
-  const isStatic = ref(true);
+  const isLocalAccount = ref(true);
 
   async function scanForWallets() {
     status.value = Status.WALLET_SCANNING;
@@ -99,7 +99,7 @@ export const useSdkStore = defineStore("sdk", () => {
   }
 
   async function initAeSdkAepp(customNodeUrl?: string) {
-    isStatic.value = false;
+    isLocalAccount.value = false;
     aeSdk.value = new AeSdkAepp({
       name: "Contract Editor",
       ...getNodes(customNodeUrl),
@@ -122,7 +122,7 @@ export const useSdkStore = defineStore("sdk", () => {
 
   function initAeSdk(customSecretKey: string, customNodeUrl?: string) {
     secretKey.value = customSecretKey;
-    isStatic.value = true;
+    isLocalAccount.value = true;
     aeSdk.value = new AeSdk({
       onCompiler: new CompilerHttp(COMPILER_URL, { ignoreVersion: true }),
       accounts: [new MemoryAccount(customSecretKey)],
@@ -181,7 +181,8 @@ export const useSdkStore = defineStore("sdk", () => {
         method: "POST",
       }).catch(console.error);
 
-      if (isStatic.value && secretKey.value) persistSecretKey(secretKey.value);
+      if (isLocalAccount.value && secretKey.value)
+        persistSecretKey(secretKey.value);
     }
   }
 
@@ -193,6 +194,6 @@ export const useSdkStore = defineStore("sdk", () => {
     networkId,
     secretKey,
     nodeUrl,
-    isStatic,
+    isLocalAccount,
   };
 });
