@@ -81,7 +81,7 @@ export const useContractStore = defineStore("contract", () => {
     compileResult.value.setInfo("Compiling contract source");
     resetDeployAndCallData();
 
-    await sdkStore.aeSdk?.compilerApi
+    await sdkStore.aeSdk.compilerApi
       .compileBySourceCode(compileData.value.contractCode)
       .then((result) => {
         compileResult.value.setFinal("Compiled from source", {
@@ -102,35 +102,36 @@ export const useContractStore = defineStore("contract", () => {
       });
   }
 
-  async function initializeContractFromAci(contractAddress: string) {
+  async function initializeContractFromAci(
+    contractAddress: Encoded.ContractAddress,
+  ) {
     resetDeployAndCallData(false);
     deployResult.value.setInfo("Instantiating Contract at address ...");
 
-    await sdkStore.aeSdk
-      ?.initializeContract({
+    try {
+      contractInstance = await Contract.initialize({
+        ...sdkStore.aeSdk.getContext(),
         aci: JSON.parse(deployData.value.aci),
-        address: contractAddress as Encoded.ContractAddress,
-      })
-      .then((instance) => {
-        contractInstance = instance;
-        compileResult.value.setFinal(`Initialized from ACI`, {
-          aci: deployData.value.aci,
-          byteCode:
-            deployData.value.bytecode ||
-            "calling at address doesn't need bytecode",
-        });
-
-        deployResult.value.setFinal(
-          `Instantiated Contract at address: ${contractAddress}`,
-          contractAddress,
-        );
-
-        persist();
-      })
-      .catch((error) => {
-        if (error instanceof Error) deployResult.value.setError(error.message);
-        return undefined;
+        address: contractAddress,
       });
+
+      compileResult.value.setFinal(`Initialized from ACI`, {
+        aci: deployData.value.aci,
+        byteCode:
+          deployData.value.bytecode ||
+          "calling at address doesn't need bytecode",
+      });
+
+      deployResult.value.setFinal(
+        `Instantiated Contract at address: ${contractAddress}`,
+        contractAddress,
+      );
+
+      persist();
+    } catch (error) {
+      if (error instanceof Error) deployResult.value.setError(error.message);
+      return undefined;
+    }
   }
 
   async function deployContract() {
@@ -138,7 +139,8 @@ export const useContractStore = defineStore("contract", () => {
     deployResult.value.setInfo("Deploying Contract ...");
     const args = argsStringToArgs(deployData.value.args);
 
-    contractInstance = await sdkStore.aeSdk?.initializeContract({
+    contractInstance = await Contract.initialize({
+      ...sdkStore.aeSdk.getContext(),
       bytecode: deployData.value.bytecode as Encoded.ContractBytearray,
       aci: JSON.parse(compileResult.value.data?.aci || deployData.value.aci),
     });
@@ -148,7 +150,7 @@ export const useContractStore = defineStore("contract", () => {
     );
 
     contractInstance
-      ?.$deploy(args, options)
+      .$deploy(args, options)
       .then((deployed) => {
         deployResult.value.setFinal(
           `Deployed, and mined at this address: ${deployed.result?.contractId}`,

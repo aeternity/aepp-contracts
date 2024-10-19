@@ -3,7 +3,7 @@
     <button
       v-if="isLocalAccount"
       class="mt-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-      @click="initSdk(false)"
+      @click="connectWallet"
     >
       Connect Wallet Extension
     </button>
@@ -18,7 +18,7 @@
     </h6>
   </div>
 
-  <div v-if="!secretKey || !address || !nodeUrl || modifySettings">
+  <div v-if="modifySettings">
     <div class="flex mt-8 mb-8">
       <div class="w-full p-4 bg-gray-200 rounded-sm shadow">
         <h2 class="py-2">Settings</h2>
@@ -74,27 +74,28 @@
 import { storeToRefs } from "pinia";
 import { Status, useSdkStore } from "../stores/sdkStore";
 import { ref, watch } from "vue";
+import { Encoding, isAddressValid } from "@aeternity/aepp-sdk";
 
 const sdkStore = useSdkStore();
 const { isLocalAccount, address, nodeUrl, secretKey, status } =
   storeToRefs(sdkStore);
-const { initSdk } = sdkStore;
+const { connectWallet, setAccountAndNode } = sdkStore;
 
 const modifySettings = ref(false);
 const nodeUrlInput = ref("");
 const secretKeyInput = ref("");
 
-watch(nodeUrl, () => {
+watch(modifySettings, () => {
   nodeUrlInput.value = nodeUrl.value;
-});
-
-watch(secretKey, () => {
-  secretKeyInput.value = secretKey.value || "";
+  secretKeyInput.value = secretKey.value;
 });
 
 async function useLocalAccount() {
-  secretKey.value = undefined;
-  await initSdk(true, nodeUrlInput.value, secretKeyInput.value);
+  if (!isAddressValid(secretKeyInput.value, Encoding.AccountSecretKey)) {
+    alert("Invalid secret key, it should be encoded as sk_");
+    return;
+  }
+  await setAccountAndNode(secretKeyInput.value, nodeUrlInput.value);
   modifySettings.value = false;
 }
 </script>
