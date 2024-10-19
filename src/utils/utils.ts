@@ -9,7 +9,8 @@ export function argsStringToArgs(argsString: string) {
 export const exampleContractCode = `@compiler >= 4
 
 contract Example =
-  entrypoint example(x : int) = x`;
+  entrypoint example(x : int) = x
+`;
 
 export const defaultCallOptions = {
   gasPrice: 1000000000,

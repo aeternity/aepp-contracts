@@ -12,7 +12,6 @@ import {
 } from "@aeternity/aepp-sdk";
 import { COMPILER_URL, nodes } from "../utils/config";
 import { Ref, ref, ShallowRef, shallowRef, UnwrapRef } from "vue";
-import BigNumber from "bignumber.js";
 import { getSecretKey, persistSecretKey } from "../utils/utils";
 
 interface Wallet {
@@ -175,7 +174,7 @@ export const useSdkStore = defineStore("sdk", () => {
     if (
       networkId.value === "ae_uat" &&
       address.value &&
-      new BigNumber(10000000000000000).gt(balance)
+      +balance < 10000000000000000
     ) {
       await fetch(`https://faucet.aepps.com/account/${address.value}`, {
         method: "POST",
