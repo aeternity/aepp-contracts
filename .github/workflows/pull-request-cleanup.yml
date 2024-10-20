@@ -2,8 +2,8 @@ name: pull-request-cleanup
 
 on:
   pull_request:
-    branches: [ master ]
-    types: [ closed ]
+    branches: [master]
+    types: [closed]
 
 jobs:
   rollback:
@@ -21,5 +21,5 @@ jobs:
       TAG: "pr-${{ github.event.number }}"
   cleanup:
     uses: aeternity/github-actions/.github/workflows/_cleanup-ecr.yml@v2.3.1
-    needs: [ delete-tag ]
+    needs: [delete-tag]
     secrets: inherit

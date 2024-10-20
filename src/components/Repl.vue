@@ -118,7 +118,7 @@ function toggleRepl() {
 
     channel = socket.channel("repl_session:lobby", {});
 
-    if(!channel) {
+    if (!channel) {
       console.error("AEREPL: Could not create the channel");
       return;
     }
@@ -136,7 +136,7 @@ function toggleRepl() {
       .receive("ok", (resp: { prompt: string; user_session: string }) => {
         session = resp.user_session;
 
-        if(!channel) {
+        if (!channel) {
           console.error("AEREPL: Channel died after successful opening");
           return;
         }
@@ -144,7 +144,8 @@ function toggleRepl() {
         console.log("AEREPL: Joined lobby. Session ID =", session);
         repl_disabled = false;
 
-        channel.push("banner", {user_session: session})
+        channel
+          .push("banner", { user_session: session })
           .receive("ok", handle_response)
           .receive("error", handle_error("Could not make the initial call"));
       })
@@ -161,10 +162,14 @@ function handle_error(msg: string) {
 
     console.error("AEREPL: ", msg);
     console.error("AEREPL: ", e);
-  }
+  };
 }
 
-function handle_response(payload: { prompt: string; user_session: string; msg: string }) {
+function handle_response(payload: {
+  prompt: string;
+  user_session: string;
+  msg: string;
+}) {
   const prompt = payload.prompt;
   session = payload.user_session || session;
   const msg = payload.msg.replace(/^\n|\n$/g, "");
@@ -217,31 +222,33 @@ function historyRetrieve() {
 }
 
 function loadFiles() {
-  if(repl_disabled) return;
+  if (repl_disabled) return;
 
   const contract = compileData.value.contractCode;
   let name = contractName.value.trim();
-  if (!name) name = "Contract.aes"
+  if (!name) name = "Contract.aes";
 
   // Update file cache in REPL
-  channel?.push("update_files", {
-    files: [{ filename: name, content: contract }],
-    user_session: session,
-  })
+  channel
+    ?.push("update_files", {
+      files: [{ filename: name, content: contract }],
+      user_session: session,
+    })
     .receive("ok", handle_response)
     .receive("error", handle_error("Could not upload files"));
 
   // Order REPL to load the file into the context
-  channel?.push("load", {
-    files: [name],
-    user_session: session,
-  })
+  channel
+    ?.push("load", {
+      files: [name],
+      user_session: session,
+    })
     .receive("ok", handle_file_load(name))
     .receive("error", handle_error("Could not load files"));
 }
 
 function submitQuery() {
-  if(repl_disabled) return;
+  if (repl_disabled) return;
 
   const trimmedQuery = query.value.trim();
 
@@ -253,7 +260,12 @@ function submitQuery() {
   }
   query.value = "";
 
-  channel?.push("query", { input: trimmedQuery, render: true, user_session: session })
+  channel
+    ?.push("query", {
+      input: trimmedQuery,
+      render: true,
+      user_session: session,
+    })
     .receive("ok", handle_response)
     .receive("error", handle_error("Could not submit query"));
 }
@@ -263,7 +275,7 @@ function logResponse(msg: string) {
   const prompt = lastPrompt ? lastPrompt + "> " : "";
   output.value += "\n" + prompt + lastInput + "\n" + txt + "\n";
 
-  if(repl_console_log) {
+  if (repl_console_log) {
     console.log("AEREPL: ", txt);
   }
 

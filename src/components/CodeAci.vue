@@ -63,7 +63,7 @@
         />
         <button
           class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"
-          @click="initializeContractFromAci(contractAddress)"
+          @click="initializeContractFromAciWithCheck"
         >
           at Address
         </button>
@@ -78,6 +78,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
 import { ref, watch } from "vue";
+import { Encoding, isAddressValid } from "@aeternity/aepp-sdk";
 
 const extensions = [javascript(), oneDark];
 
@@ -89,6 +90,14 @@ const {
   initializeContractFromAci,
   resetContractState,
 } = contractStore;
+
+async function initializeContractFromAciWithCheck() {
+  if (!isAddressValid(contractAddress.value, Encoding.ContractAddress)) {
+    alert("Invalid contract address, it should be encoded as ct_");
+    return;
+  }
+  await initializeContractFromAci(contractAddress.value);
+}
 
 const contractAddress = ref("");
 

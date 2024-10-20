@@ -16,6 +16,7 @@ This is a simple Web Application that demonstrates Aeternity Contracts.
 ## Installation
 
 1. Clone this repo and install required dependencies
+
 ```bash
 git clone https://github.com/aeternity/aepp-contracts/
 cd aepp-contracts
@@ -32,7 +33,7 @@ The current form should be self explanatory.
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
 
