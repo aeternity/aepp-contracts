@@ -65,7 +65,7 @@ export const useSdkStore = defineStore("sdk", () => {
   const nodeUrl = ref(aeSdk.api.$host);
   const isLocalAccount = ref(true);
 
-  async function disconnectWallet() {
+  function disconnectWallet() {
     if (walletConnector == null) return;
     walletConnector.disconnect();
     walletConnector.removeAllListeners();
