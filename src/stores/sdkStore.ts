@@ -157,7 +157,7 @@ export const useSdkStore = defineStore("sdk", () => {
     }
   }
 
-  updateConnectionInfo();
+  void updateConnectionInfo();
 
   return {
     aeSdk: shallowRef(aeSdk),
