@@ -1,3 +1,5 @@
+import { Encoded } from "@aeternity/aepp-sdk";
+
 export function argsStringToArgs(argsString: string) {
   return argsString.trim() === ""
     ? []
@@ -9,7 +11,8 @@ export function argsStringToArgs(argsString: string) {
 export const exampleContractCode = `@compiler >= 4
 
 contract Example =
-  entrypoint example(x : int) = x`;
+  entrypoint example(x : int) = x
+`;
 
 export const defaultCallOptions = {
   gasPrice: 1000000000,
@@ -74,7 +77,9 @@ export function persistContract(
 export function getContract() {
   const contractCode = window.localStorage.getItem("contract-code");
   const aci = window.localStorage.getItem("aci");
-  const contractAddress = window.localStorage.getItem("contract-address");
+  const contractAddress = window.localStorage.getItem(
+    "contract-address",
+  ) as Encoded.ContractAddress | null;
   const bytecode = window.localStorage.getItem("bytecode");
 
   return { contractCode, aci, bytecode, contractAddress };

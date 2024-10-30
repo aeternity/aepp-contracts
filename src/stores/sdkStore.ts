@@ -1,31 +1,25 @@
 import { defineStore } from "pinia";
+import { Buffer } from 'buffer';
 import {
+  AccountBase,
   AeSdk,
-  AeSdkAepp,
   BrowserWindowMessageConnection,
   CompilerHttp,
-  generateKeyPair,
+  encode,
+  Encoded,
+  Encoding,
+  isAddressValid,
   MemoryAccount,
   Node,
   SUBSCRIPTION_TYPES,
+  WalletConnectorFrame,
   walletDetector,
 } from "@aeternity/aepp-sdk";
 import { COMPILER_URL, nodes } from "../utils/config";
-import { Ref, ref, ShallowRef, shallowRef, UnwrapRef } from "vue";
-import BigNumber from "bignumber.js";
+import { computed, ref, shallowRef } from "vue";
 import { getSecretKey, persistSecretKey } from "../utils/utils";
 
-interface Wallet {
-  info: {
-    id: string;
-    type: string;
-    origin: string;
-  };
-  getConnection: () => BrowserWindowMessageConnection;
-}
-interface Wallets {
-  [key: string]: Wallet;
-}
+type Wallet = Parameters<Parameters<typeof walletDetector>[1]>[0]["newWallet"];
 
 export enum Status {
   UNINITIALIZED = "Uninitialized",
@@ -36,163 +30,143 @@ export enum Status {
   CONNECTION_ERROR = "Connection Error",
 }
 
-function getNodes(nodeUrl?: string) {
-  return nodeUrl
-    ? {
-        nodes: [
-          {
-            name: "custom",
-            instance: new Node(nodeUrl),
-          },
-        ],
-      }
-    : { nodes };
-}
-
 export const useSdkStore = defineStore("sdk", () => {
-  const aeSdk: ShallowRef<AeSdk | AeSdkAepp | undefined> = shallowRef();
-  const secretKey: Ref<UnwrapRef<string | undefined>> = ref();
+  const secretKey = computed({
+    get(): Encoded.AccountSecretKey {
+      const key = getSecretKey();
+      if (key == null) {
+        const sk = MemoryAccount.generate().secretKey;
+        persistSecretKey(sk);
+        return sk;
+      }
+      if (!isAddressValid(key, Encoding.AccountSecretKey)) {
+        const buffer = Buffer.from(key, "hex");
+        const sk = encode(buffer.subarray(0, 32), Encoding.AccountSecretKey);
+        persistSecretKey(sk);
+        return sk;
+      }
+      return key;
+    },
+
+    set(sk: Encoded.AccountSecretKey) {
+      persistSecretKey(sk);
+    },
+  });
+
+  const aeSdk = new AeSdk({
+    onCompiler: new CompilerHttp(COMPILER_URL),
+    accounts: [new MemoryAccount(secretKey.value)],
+    nodes,
+  });
+  let walletConnector: WalletConnectorFrame | undefined;
+
   const status = ref(Status.UNINITIALIZED);
-  const address = ref();
-  const networkId = ref();
-  const nodeUrl = ref();
-  const isStatic = ref(true);
+  const address = ref(aeSdk.address);
+  const nodeUrl = ref(aeSdk.api.$host);
+  const isLocalAccount = ref(true);
 
-  async function scanForWallets() {
+  function disconnectWallet() {
+    if (walletConnector == null) return;
+    walletConnector.disconnect();
+    walletConnector.removeAllListeners();
+    walletConnector = undefined;
+  }
+
+  async function setupWalletConnector() {
     status.value = Status.WALLET_SCANNING;
+    disconnectWallet();
 
-    return new Promise<void>((resolve, reject) => {
-      if (aeSdk.value instanceof AeSdkAepp) {
-        const handleWallets: ({
-          wallets,
-          newWallet,
-        }: {
-          wallets: Wallets;
-          newWallet?: Wallet | undefined;
-        }) => Promise<void> = async ({ wallets, newWallet }) => {
-          newWallet = newWallet || Object.values(wallets)[0];
-          stopScan();
-
-          try {
-            (aeSdk.value as AeSdkAepp).disconnectWallet();
-          } catch (_) {
-            // specifically ignore, to ensure we are disconnected before trying to connect, but disconnect will error if we are not connected
-          }
-
-          const { networkId } = await (
-            aeSdk.value as AeSdkAepp
-          ).connectToWallet(newWallet.getConnection());
-
-          (aeSdk.value as AeSdkAepp).selectNode(networkId);
-
-          await (aeSdk.value as AeSdkAepp).subscribeAddress(
-            SUBSCRIPTION_TYPES.subscribe,
-            "current",
-          );
-
-          resolve();
-        };
-        const scannerConnection = new BrowserWindowMessageConnection();
-        const stopScan = walletDetector(scannerConnection, handleWallets);
-      } else reject("AeSdk instance needed for wallet connection");
-    });
-  }
-
-  async function initAeSdkAepp(customNodeUrl?: string) {
-    isStatic.value = false;
-    aeSdk.value = new AeSdkAepp({
-      name: "Contract Editor",
-      ...getNodes(customNodeUrl),
-      onCompiler: new CompilerHttp(COMPILER_URL, { ignoreVersion: true }),
-      onNetworkChange: async ({ networkId }) => {
-        if (aeSdk.value) {
-          const [{ name }] = (await aeSdk.value.getNodesInPool()).filter(
-            (node) => node.nodeNetworkId === networkId,
-          );
-          aeSdk.value.selectNode(name);
-          await updateConnectionInfo();
-        }
-      },
-      onAddressChange: () => updateConnectionInfo(),
-      onDisconnect: () => alert("Aepp is disconnected"),
+    const wallet = await new Promise<Wallet>((resolve) => {
+      const scannerConnection = new BrowserWindowMessageConnection();
+      const stopScan = walletDetector(scannerConnection, ({ newWallet }) => {
+        resolve(newWallet);
+        stopScan();
+      });
     });
 
-    await scanForWallets();
-  }
-
-  function initAeSdk(customSecretKey: string, customNodeUrl?: string) {
-    secretKey.value = customSecretKey;
-    isStatic.value = true;
-    aeSdk.value = new AeSdk({
-      onCompiler: new CompilerHttp(COMPILER_URL, { ignoreVersion: true }),
-      accounts: [new MemoryAccount(customSecretKey)],
-      ...getNodes(customNodeUrl),
+    const connector = await WalletConnectorFrame.connect(
+      "Contract Editor",
+      wallet.getConnection(),
+    );
+    connector.addListener("accountsChange", async (accounts: AccountBase[]) => {
+      aeSdk.removeAccount(aeSdk.address);
+      aeSdk.addAccount(accounts[0], { select: true });
+      address.value = aeSdk.address;
+      await updateConnectionInfo();
     });
+    connector.addListener("networkIdChange", async (networkId: string) => {
+      aeSdk.selectNode(networkId);
+      nodeUrl.value = aeSdk.api.$host;
+      await updateConnectionInfo();
+    });
+    connector.addListener("disconnect", () => alert("Aepp is disconnected"));
+    await connector.subscribeAccounts(SUBSCRIPTION_TYPES.subscribe, "current");
   }
 
-  async function initSdk(
-    initStatic = true,
-    customNodeUrl?: string,
-    customSecretKey?: string,
+  async function setAccountAndNode(
+    customSecretKey: Encoded.AccountSecretKey,
+    customNodeUrl: string,
   ) {
     status.value = Status.UNINITIALIZED;
-    if (customNodeUrl) nodeUrl.value = customNodeUrl;
-    else nodeUrl.value = nodes[0].instance.$host;
+    disconnectWallet();
+    isLocalAccount.value = true;
 
+    aeSdk.removeAccount(aeSdk.address);
+    aeSdk.addAccount(new MemoryAccount(customSecretKey), { select: true });
+    address.value = aeSdk.address;
+    secretKey.value = customSecretKey;
+
+    aeSdk.pool.delete("custom");
+    aeSdk.addNode("custom", new Node(customNodeUrl), true);
+    nodeUrl.value = aeSdk.api.$host;
+    await updateConnectionInfo();
+  }
+
+  async function connectWallet() {
+    status.value = Status.UNINITIALIZED;
+    isLocalAccount.value = false;
     try {
-      if (initStatic)
-        initAeSdk(customSecretKey || getOrGenerateSecretKey(), customNodeUrl);
-      else await initAeSdkAepp(customNodeUrl);
+      await setupWalletConnector();
+    } catch (e) {
+      console.error(e);
+      status.value = Status.CONNECTION_ERROR;
+      isLocalAccount.value = true;
+    }
+    await updateConnectionInfo();
+  }
 
-      await updateConnectionInfo();
+  async function updateConnectionInfo() {
+    try {
+      status.value = Status.FETCHING_INFO;
+      const { address } = aeSdk;
+      const networkId = await aeSdk.api.getNetworkId();
+      status.value = Status.CHECK_FUNDING;
+      const balance = +(await aeSdk.getBalance(address));
+      if (networkId === "ae_uat" && +balance < 1e16) {
+        const response = await fetch(
+          `https://faucet.aepps.com/account/${address}`,
+          { method: "POST" },
+        );
+        if (response.status !== 200)
+          throw new Error(`Faucet response code: ${response.status}`);
+      }
+      status.value = Status.CONNECTED;
     } catch (e) {
       console.error(e);
       status.value = Status.CONNECTION_ERROR;
     }
   }
 
-  async function updateConnectionInfo() {
-    status.value = Status.FETCHING_INFO;
-    networkId.value = await aeSdk.value?.api?.getNetworkId();
-    nodeUrl.value = aeSdk.value?.api.$host;
-
-    address.value = aeSdk.value?.address;
-    status.value = Status.CHECK_FUNDING;
-
-    await fundAccountIfNeeded();
-    status.value = Status.CONNECTED;
-  }
-
-  function getOrGenerateSecretKey() {
-    return getSecretKey() || generateKeyPair().secretKey;
-  }
-
-  async function fundAccountIfNeeded() {
-    const balance = address.value
-      ? (await aeSdk.value?.getBalance(address.value)) || 0
-      : 0;
-
-    if (
-      networkId.value === "ae_uat" &&
-      address.value &&
-      new BigNumber(10000000000000000).gt(balance)
-    ) {
-      await fetch(`https://faucet.aepps.com/account/${address.value}`, {
-        method: "POST",
-      }).catch(console.error);
-
-      if (isStatic.value && secretKey.value) persistSecretKey(secretKey.value);
-    }
-  }
+  void updateConnectionInfo();
 
   return {
-    aeSdk,
-    initSdk,
+    aeSdk: shallowRef(aeSdk),
+    connectWallet,
+    setAccountAndNode,
     status,
     address,
-    networkId,
     secretKey,
     nodeUrl,
-    isStatic,
+    isLocalAccount,
   };
 });
