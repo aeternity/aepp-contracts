@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.4.1](https://github.com/aeternity/aepp-contracts/compare/v2.4.0...v2.4.1) (2024-10-30)
+
+
+### CI / CD
+
+* switch to node@20 ([d4106a8](https://github.com/aeternity/aepp-contracts/commit/d4106a84f08e5379d999539fb01cf5ff3929e87b))
+
+
+### Refactorings
+
+* drop bignumber.js ([c503e9d](https://github.com/aeternity/aepp-contracts/commit/c503e9daab8cf47a9076fdad35e7971948bbefd9))
+* extract common status markup in Account.vue ([0c5437a](https://github.com/aeternity/aepp-contracts/commit/0c5437af7c2ece5fb9d30fb6dac694115dbe5629))
+* rename `isStatic` to `isLocalAccount` ([531ded4](https://github.com/aeternity/aepp-contracts/commit/531ded4d562cd6883c8cbd9d151ce6eb1bd38b69))
+
+
+### Miscellaneous
+
+* **deps:** update ([31f72e3](https://github.com/aeternity/aepp-contracts/commit/31f72e310e5f29b5a00df3223d9895f70cf3acee))
+* explicitly ignore promise returned by `updateConnectionInfo` ([e8589e9](https://github.com/aeternity/aepp-contracts/commit/e8589e92f33f004f31a551adeb974d072fbfa29e))
+* make disconnectWallet sync ([7a1f42f](https://github.com/aeternity/aepp-contracts/commit/7a1f42f9a269f7d0e89e44beee84a5ec2708e998))
+* update sdk to 14, improve types ([97ada22](https://github.com/aeternity/aepp-contracts/commit/97ada2281f5bfcbd62cafa36710e61029e015ecd))
+
 ## [2.4.0](https://github.com/aeternity/aepp-contracts/compare/v2.3.0...v2.4.0) (2024-06-25)
 
 
