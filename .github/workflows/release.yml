@@ -5,8 +5,11 @@ on:
     tags: [v*]
 
 jobs:
-  publish:
+  publish-dockerhub:
     uses: aeternity/github-actions/.github/workflows/_publish-docker.yml@v2.3.1
+    secrets: inherit
+  publish:
+    uses: aeternity/github-actions/.github/workflows/_publish-ecr.yml@v2.3.1
     secrets: inherit
   deploy:
     uses: aeternity/github-actions/.github/workflows/_deploy-gitops.yml@v2.3.1
