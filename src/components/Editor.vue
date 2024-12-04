@@ -1,7 +1,7 @@
 <template>
   <div class="home container mx-auto">
     <Account />
-    <div v-if="status === Status.CONNECTED">
+    <div v-if="sdkStatus === Status.CONNECTED">
       <CodeAci />
       <Repl />
       <div class="flex mt-8 mb-8">
@@ -23,5 +23,5 @@ import { Status, useSdkStore } from "../stores/sdkStore";
 import { storeToRefs } from "pinia";
 
 const sdkStore = useSdkStore();
-const { status } = storeToRefs(sdkStore);
+const { sdkStatus } = storeToRefs(sdkStore);
 </script>

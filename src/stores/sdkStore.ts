@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer";
 import {
   AccountBase,
   AeSdk,
@@ -60,7 +60,7 @@ export const useSdkStore = defineStore("sdk", () => {
   });
   let walletConnector: WalletConnectorFrame | undefined;
 
-  const status = ref(Status.UNINITIALIZED);
+  const sdkStatus = ref(Status.UNINITIALIZED);
   const address = ref(aeSdk.address);
   const nodeUrl = ref(aeSdk.api.$host);
   const isLocalAccount = ref(true);
@@ -73,7 +73,7 @@ export const useSdkStore = defineStore("sdk", () => {
   }
 
   async function setupWalletConnector() {
-    status.value = Status.WALLET_SCANNING;
+    sdkStatus.value = Status.WALLET_SCANNING;
     disconnectWallet();
 
     const wallet = await new Promise<Wallet>((resolve) => {
@@ -107,7 +107,7 @@ export const useSdkStore = defineStore("sdk", () => {
     customSecretKey: Encoded.AccountSecretKey,
     customNodeUrl: string,
   ) {
-    status.value = Status.UNINITIALIZED;
+    sdkStatus.value = Status.UNINITIALIZED;
     disconnectWallet();
     isLocalAccount.value = true;
 
@@ -123,13 +123,13 @@ export const useSdkStore = defineStore("sdk", () => {
   }
 
   async function connectWallet() {
-    status.value = Status.UNINITIALIZED;
+    sdkStatus.value = Status.UNINITIALIZED;
     isLocalAccount.value = false;
     try {
       await setupWalletConnector();
     } catch (e) {
       console.error(e);
-      status.value = Status.CONNECTION_ERROR;
+      sdkStatus.value = Status.CONNECTION_ERROR;
       isLocalAccount.value = true;
     }
     await updateConnectionInfo();
@@ -137,10 +137,10 @@ export const useSdkStore = defineStore("sdk", () => {
 
   async function updateConnectionInfo() {
     try {
-      status.value = Status.FETCHING_INFO;
+      sdkStatus.value = Status.FETCHING_INFO;
       const { address } = aeSdk;
       const networkId = await aeSdk.api.getNetworkId();
-      status.value = Status.CHECK_FUNDING;
+      sdkStatus.value = Status.CHECK_FUNDING;
       const balance = +(await aeSdk.getBalance(address));
       if (networkId === "ae_uat" && +balance < 1e16) {
         const response = await fetch(
@@ -150,10 +150,10 @@ export const useSdkStore = defineStore("sdk", () => {
         if (response.status !== 200)
           throw new Error(`Faucet response code: ${response.status}`);
       }
-      status.value = Status.CONNECTED;
+      sdkStatus.value = Status.CONNECTED;
     } catch (e) {
       console.error(e);
-      status.value = Status.CONNECTION_ERROR;
+      sdkStatus.value = Status.CONNECTION_ERROR;
     }
   }
 
@@ -163,7 +163,7 @@ export const useSdkStore = defineStore("sdk", () => {
     aeSdk: shallowRef(aeSdk),
     connectWallet,
     setAccountAndNode,
-    status,
+    sdkStatus,
     address,
     secretKey,
     nodeUrl,

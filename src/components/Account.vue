@@ -61,12 +61,12 @@
     <span
       class="text-sm"
       :class="
-        (status === Status.CONNECTED && 'text-green-500') ||
-        (status === Status.CONNECTION_ERROR && 'text-red-500') ||
+        (sdkStatus === Status.CONNECTED && 'text-green-500') ||
+        (sdkStatus === Status.CONNECTION_ERROR && 'text-red-500') ||
         'text-yellow-500'
       "
     >
-      ({{ status }} {{ nodeUrl }})
+      ({{ sdkStatus }} {{ nodeUrl }})
     </span>
   </h1>
 </template>
@@ -77,7 +77,7 @@ import { ref, watch } from "vue";
 import { Encoding, isAddressValid } from "@aeternity/aepp-sdk";
 
 const sdkStore = useSdkStore();
-const { isLocalAccount, address, nodeUrl, secretKey, status } =
+const { isLocalAccount, address, nodeUrl, secretKey, sdkStatus } =
   storeToRefs(sdkStore);
 const { connectWallet, setAccountAndNode } = sdkStore;
 

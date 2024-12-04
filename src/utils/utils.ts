@@ -65,13 +65,17 @@ export function persistContract(
   window.localStorage.setItem("contract-code", contractCode);
   window.localStorage.setItem("aci", aci);
 
-  bytecode
-    ? window.localStorage.setItem("bytecode", bytecode)
-    : window.localStorage.removeItem("bytecode");
+  if (bytecode) {
+    window.localStorage.setItem("bytecode", bytecode);
+  } else {
+    window.localStorage.removeItem("bytecode");
+  }
 
-  contractAddress
-    ? window.localStorage.setItem("contract-address", contractAddress)
-    : window.localStorage.removeItem("contract-address");
+  if (contractAddress) {
+    window.localStorage.setItem("contract-address", contractAddress);
+  } else {
+    window.localStorage.removeItem("contract-address");
+  }
 }
 
 export function getContract() {

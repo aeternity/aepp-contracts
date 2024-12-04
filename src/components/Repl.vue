@@ -30,7 +30,7 @@
           <button
             class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
           >
-            {{ prompt }}
+            {{ cmdPrompt }}
           </button>
           <input
             v-model="query"
@@ -49,8 +49,8 @@
         </div>
         <div class="relative w-4/12">
           <input
-            :disabled="repl_disabled"
             v-model="contractName"
+            :disabled="repl_disabled"
             class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
             @keyup.enter="loadFiles()"
           />
@@ -83,7 +83,7 @@ const show = ref(false);
 const output = ref("");
 const query = ref("");
 const contractName = ref("");
-const prompt = ref("");
+const cmdPrompt = ref("");
 
 watch(
   compileResult,
@@ -104,8 +104,8 @@ let channel: Channel | null = null;
 let session: string | null = null;
 let lastPrompt = "";
 let lastInput = "";
-let history: string[] = [];
-let historyIndex = 0;
+let cmdHistory: string[] = [];
+let cmdHistoryIndex = 0;
 let repl_disabled = true;
 let repl_console_log = false;
 
@@ -126,8 +126,8 @@ function toggleRepl() {
     session = null;
     lastPrompt = "";
     lastInput = "";
-    history = [];
-    historyIndex = 0;
+    cmdHistory = [];
+    cmdHistoryIndex = 0;
 
     query.value = "";
 
@@ -156,7 +156,7 @@ function toggleRepl() {
 }
 
 function handle_error(msg: string) {
-  return (e: any) => {
+  return (e: unknown) => {
     updatePrompt("(CHANNEL ERROR)");
     repl_disabled = true;
 
@@ -196,24 +196,24 @@ function handle_file_load(filename: string) {
 }
 
 function historyUp() {
-  if (historyIndex == history.length) {
+  if (cmdHistoryIndex == cmdHistory.length) {
     lastInput = query.value;
   }
-  historyIndex -= 1;
+  cmdHistoryIndex -= 1;
   historyRetrieve();
 }
 
 function historyDown() {
-  historyIndex += 1;
+  cmdHistoryIndex += 1;
   historyRetrieve();
 }
 
 function historyGet() {
-  historyIndex = Math.min(history.length, Math.max(0, historyIndex));
-  if (historyIndex == history.length) {
+  cmdHistoryIndex = Math.min(cmdHistory.length, Math.max(0, cmdHistoryIndex));
+  if (cmdHistoryIndex == cmdHistory.length) {
     return lastInput;
   } else {
-    return history[historyIndex];
+    return cmdHistory[cmdHistoryIndex];
   }
 }
 
@@ -253,10 +253,10 @@ function submitQuery() {
   const trimmedQuery = query.value.trim();
 
   lastInput = trimmedQuery;
-  historyIndex = history.length;
-  if (history[historyIndex - 1] != trimmedQuery) {
-    history = history.concat(trimmedQuery);
-    historyIndex += 1;
+  cmdHistoryIndex = cmdHistory.length;
+  if (cmdHistory[cmdHistoryIndex - 1] != trimmedQuery) {
+    cmdHistory = cmdHistory.concat(trimmedQuery);
+    cmdHistoryIndex += 1;
   }
   query.value = "";
 
@@ -284,7 +284,7 @@ function logResponse(msg: string) {
 
 function updatePrompt(updatePrompt: string) {
   lastPrompt = updatePrompt;
-  prompt.value = updatePrompt + "> ";
+  cmdPrompt.value = updatePrompt + "> ";
 }
 
 function updateScroll() {
