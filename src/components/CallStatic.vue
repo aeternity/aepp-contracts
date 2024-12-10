@@ -13,6 +13,7 @@
           class="w-full p-2"
           type="text"
           placeholder="function"
+          @keydown.enter="callContractStatic"
         />
       </div>
       <div class="mx-2 w-1/3">
@@ -36,6 +37,7 @@
           class="w-full p-2"
           type="text"
           placeholder="comma separated args"
+          @keydown.enter="callContractStatic"
         />
       </div>
     </div>

@@ -36,6 +36,7 @@
           class="w-full p-2"
           type="text"
           placeholder="comma separated args"
+          @keydown.enter="deployContract"
         />
       </div>
     </div>

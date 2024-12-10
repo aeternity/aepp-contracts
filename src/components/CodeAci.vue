@@ -60,6 +60,7 @@
         <input
           v-model="contractAddress"
           class="mt-2 rounded-l-full bg-black hover:bg-purple-500 text-white p-2 px-4"
+          @keydown.enter="initializeContractFromAciWithCheck"
         />
         <button
           class="mt-2 mr-2 rounded-r-full bg-black hover:bg-purple-500 text-white p-2 px-4"

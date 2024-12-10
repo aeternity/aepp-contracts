@@ -91,6 +91,7 @@
           class="w-full p-2"
           type="text"
           placeholder="function"
+          @keydown.enter="callContract"
         />
       </div>
       <div class="mx-2 w-2/3">
@@ -101,6 +102,7 @@
           class="w-full p-2"
           type="text"
           placeholder="comma separated args"
+          @keydown.enter="callContract"
         />
       </div>
     </div>
