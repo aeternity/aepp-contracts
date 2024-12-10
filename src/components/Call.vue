@@ -96,14 +96,20 @@
       </div>
       <div class="mx-2 w-2/3">
         <label class="text-xs block mb-1" for="args">Arguments</label>
-        <input
-          id="args"
-          v-model="callData.args"
-          class="w-full p-2"
-          type="text"
-          placeholder="comma separated args"
-          @keydown.enter="callContract"
-        />
+        <div class="flex flex-row">
+          <input
+            id="args"
+            v-model="callData.args"
+            class="w-full p-2"
+            type="text"
+            placeholder="comma separated args (using eval as array)"
+            @keydown.enter="callContract"
+          />
+          <div class="ml-2 flex flex-col">
+            <label class="text-xs block mb-1" for="staticEval">Eval</label>
+            <input id="staticEval" v-model="callData.eval" type="checkbox" />
+          </div>
+        </div>
       </div>
     </div>
 

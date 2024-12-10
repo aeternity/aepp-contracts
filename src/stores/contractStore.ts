@@ -24,6 +24,7 @@ export const useContractStore = defineStore("contract", () => {
     bytecode: string;
     aci: string;
     args: string;
+    eval: boolean;
     options: {
       amount: number;
       callData: string;
@@ -35,19 +36,27 @@ export const useContractStore = defineStore("contract", () => {
     bytecode: "",
     aci: "",
     args: "",
+    eval: false,
     options: structuredClone(defaultCallOptions),
   });
   const deployResult: Ref<Result<string>> = ref(new Result<string>());
 
-  const callStaticData: Ref<{ args: string; func: string; gas: number }> = ref({
+  const callStaticData: Ref<{
+    args: string;
+    func: string;
+    gas: number;
+    eval: boolean;
+  }> = ref({
     func: "example",
     gas: 1000000,
     args: "",
+    eval: false,
   });
   const callStaticResult: Ref<Result<string>> = ref(new Result<string>());
 
   const callData: Ref<{
     args: string;
+    eval: boolean;
     func: string;
     options: {
       amount: number;
@@ -59,6 +68,7 @@ export const useContractStore = defineStore("contract", () => {
   }> = ref({
     func: "example",
     args: "",
+    eval: false,
     options: structuredClone(defaultCallOptions),
   });
   const callResult: Ref<Result<string>> = ref(new Result<string>());
@@ -137,7 +147,9 @@ export const useContractStore = defineStore("contract", () => {
   async function deployContract() {
     resetDeployAndCallData(false);
     deployResult.value.setInfo("Deploying Contract ...");
-    const args = argsStringToArgs(deployData.value.args);
+    const args = deployData.value.eval
+      ? eval(deployData.value.args)
+      : argsStringToArgs(deployData.value.args);
 
     contractInstance = await Contract.initialize({
       ...sdkStore.aeSdk.getContext(),
@@ -167,7 +179,9 @@ export const useContractStore = defineStore("contract", () => {
 
   async function callContractStatic() {
     callStaticResult.value.setInfo("Dry-Running ...");
-    const args = argsStringToArgs(callStaticData.value.args);
+    const args = callStaticData.value.eval
+      ? eval(callStaticData.value.args)
+      : argsStringToArgs(callStaticData.value.args);
     const options = { callStatic: true, gas: callStaticData.value.gas };
 
     contractInstance
@@ -191,7 +205,10 @@ export const useContractStore = defineStore("contract", () => {
 
   async function callContract() {
     callResult.value.setInfo("Calling Contract ...");
-    const args = argsStringToArgs(callData.value.args);
+
+    const args = callData.value.eval
+      ? eval(callData.value.args)
+      : argsStringToArgs(callData.value.args);
     const options = Object.fromEntries(
       Object.entries(callData.value.options).filter(([, v]) => v != null),
     );
@@ -236,6 +253,7 @@ export const useContractStore = defineStore("contract", () => {
       deployData.value = {
         aci: "",
         args: "",
+        eval: false,
         bytecode: "",
         options: structuredClone(defaultCallOptions),
       };
@@ -246,12 +264,14 @@ export const useContractStore = defineStore("contract", () => {
       func: "example",
       gas: 1000000,
       args: "",
+      eval: false,
     };
     callStaticResult.value = new Result();
 
     callData.value = {
       func: "example",
       args: "",
+      eval: false,
       options: structuredClone(defaultCallOptions),
     };
     callResult.value = new Result();

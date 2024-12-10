@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="text-xs block mb-1 font-bold" v-if="result?.events?.length">
+    <span v-if="result?.events?.length" class="text-xs block mb-1 font-bold">
       Events:
     </span>
     <span

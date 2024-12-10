@@ -31,14 +31,24 @@
     <div class="flex -mx-2 mt-4 mb-4">
       <div class="mx-2 w-full">
         <label class="text-xs block mb-1" for="staticArgs">Arguments</label>
-        <input
-          id="staticArgs"
-          v-model="callStaticData.args"
-          class="w-full p-2"
-          type="text"
-          placeholder="comma separated args"
-          @keydown.enter="callContractStatic"
-        />
+        <div class="flex flex-row">
+          <input
+            id="staticArgs"
+            v-model="callStaticData.args"
+            class="w-full p-2"
+            type="text"
+            placeholder="comma separated args (using eval as array)"
+            @keydown.enter="callContractStatic"
+          />
+          <div class="ml-2 flex flex-col">
+            <label class="text-xs block mb-1" for="staticEval">Eval</label>
+            <input
+              id="staticEval"
+              v-model="callStaticData.eval"
+              type="checkbox"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
