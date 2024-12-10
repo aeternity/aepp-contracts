@@ -146,7 +146,17 @@ function toggleRepl() {
 
         channel
           .push("banner", { user_session: session })
-          .receive("ok", handle_response)
+          .receive("ok", (msg: string) => handle_response({ msg }))
+          .receive("error", handle_error("Could not make the initial call"));
+
+        channel
+          .push("app_version", { user_session: session })
+          .receive("ok", (msg: string) => console.log(`App version: ${msg}`))
+          .receive("error", handle_error("Could not make the initial call"));
+
+        channel
+          .push("prompt", { user_session: session })
+          .receive("ok", (msg: string) => handle_response({ prompt: msg }))
           .receive("error", handle_error("Could not make the initial call"));
       })
       .receive("error", handle_error("Could not establish the connection"));
@@ -166,15 +176,15 @@ function handle_error(msg: string) {
 }
 
 function handle_response(payload: {
-  prompt: string;
-  user_session: string;
-  msg: string;
+  prompt?: string;
+  user_session?: string;
+  msg?: string;
 }) {
   const prompt = payload.prompt;
   session = payload.user_session || session;
-  const msg = payload.msg.replace(/^\n|\n$/g, "");
+  const msg = payload.msg?.replace(/^\n|\n$/g, "");
 
-  if (msg) {
+  if (msg !== undefined) {
     logResponse(msg);
   }
   if (prompt) {
@@ -230,7 +240,7 @@ function loadFiles() {
 
   // Update file cache in REPL
   channel
-    ?.push("update_files", {
+    ?.push("update_filesystem_cache", {
       files: [{ filename: name, content: contract }],
       user_session: session,
     })
@@ -261,9 +271,8 @@ function submitQuery() {
   query.value = "";
 
   channel
-    ?.push("query", {
+    ?.push("call_str", {
       input: trimmedQuery,
-      render: true,
       user_session: session,
     })
     .receive("ok", handle_response)
