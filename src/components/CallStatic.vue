@@ -57,6 +57,8 @@
       ></textarea>
     </div>
 
+    <decoded-events :result="callStaticResult" />
+
     <button
       class="py-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       @click="callContractStatic"
@@ -68,6 +70,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
+import DecodedEvents from "./DecodedEvents.vue";
 
 const contractStore = useContractStore();
 const { deployResult, callStaticData, callStaticResult } =

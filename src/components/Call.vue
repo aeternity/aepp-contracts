@@ -121,6 +121,7 @@
         class="h-16 w-full text-red-500 bg-black text-xs mb-4 p-4 font-mono"
       ></textarea>
     </div>
+    <decoded-events :result="callResult" />
 
     <button
       class="py-2 mr-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
@@ -133,6 +134,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
+import DecodedEvents from "./DecodedEvents.vue";
 
 const contractStore = useContractStore();
 const { deployResult, callData, callResult } = storeToRefs(contractStore);

@@ -155,6 +155,7 @@ export const useContractStore = defineStore("contract", () => {
         deployResult.value.setFinal(
           `Deployed, and mined at this address: ${deployed.result?.contractId}`,
           deployed.result?.contractId,
+          deployed.decodedEvents,
         );
 
         persist();
@@ -179,6 +180,7 @@ export const useContractStore = defineStore("contract", () => {
             result?.result?.gasUsed
           }, Fee Estimate: ${toAe(result.tx.fee)} ae (${result.tx.fee} aetto)`,
           JSON.stringify(result?.decodedResult),
+          result.decodedEvents,
         );
       })
       .catch((error) => {
@@ -208,6 +210,7 @@ export const useContractStore = defineStore("contract", () => {
             fee,
           )} ae (${fee} aetto)`,
           JSON.stringify(result?.decodedResult),
+          result.decodedEvents,
         );
       })
       .catch((error) => {

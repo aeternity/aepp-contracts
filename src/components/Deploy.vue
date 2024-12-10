@@ -117,7 +117,7 @@
         type="hidden"
       />
     </div>
-
+    <decoded-events :result="deployResult" class="mt-2" />
     <button
       class="py-2 rounded-full bg-black hover:bg-purple-500 text-white p-2 px-4"
       :disabled="!canDeploy"
@@ -132,6 +132,7 @@
 import { storeToRefs } from "pinia";
 import { useContractStore } from "../stores/contractStore";
 import { computed, watch } from "vue";
+import DecodedEvents from "./DecodedEvents.vue";
 
 const contractStore = useContractStore();
 const { deployData, deployResult, compileResult } = storeToRefs(contractStore);

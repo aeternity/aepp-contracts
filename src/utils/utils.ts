@@ -1,5 +1,14 @@
 import { Encoded } from "@aeternity/aepp-sdk";
 
+export interface DecodedEvent {
+  name: string;
+  args: unknown[];
+  contract: {
+    name: string;
+    address: Encoded.ContractAddress;
+  };
+} // copied from Contract.d.ts as not exported by sdk
+
 export function argsStringToArgs(argsString: string) {
   return argsString.trim() === ""
     ? []
@@ -27,6 +36,7 @@ export class Result<T> {
   info?: string;
   final = false;
   data?: T;
+  events?: DecodedEvent[];
 
   setError(error: string) {
     this.error = error;
@@ -41,11 +51,12 @@ export class Result<T> {
     this.data = undefined;
   }
 
-  setFinal(info: string, data?: T) {
+  setFinal(info: string, data?: T, events?: DecodedEvent[]) {
     this.info = info;
     this.error = undefined;
     this.final = true;
     this.data = data;
+    this.events = events;
   }
 }
 
