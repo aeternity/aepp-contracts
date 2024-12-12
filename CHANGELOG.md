@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.5.0](https://github.com/aeternity/aepp-contracts/compare/v2.4.2...v2.5.0) (2024-12-12)
+
+
+### Features
+
+* allow to evaluate args ([45320bc](https://github.com/aeternity/aepp-contracts/commit/45320bc79d8ddff806032a83a9242a3f85f4a2ac))
+* show call logs ([b5e5c88](https://github.com/aeternity/aepp-contracts/commit/b5e5c8891d020909e4cf23bb2e6bffcbccfbafc2))
+* trigger action on enter ([5cd2591](https://github.com/aeternity/aepp-contracts/commit/5cd2591b707548e5266eb82b38050419714b3ebd))
+
+
+### Bug Fixes
+
+* repl ([1541a44](https://github.com/aeternity/aepp-contracts/commit/1541a44ff7df18db7e41df0a03b8b4c52ffc26a1))
+
+
+### Miscellaneous
+
+* update dependencies, fix eslint ([ef7077e](https://github.com/aeternity/aepp-contracts/commit/ef7077ed3d9761a2cbb466c7114d1a8cec9be3be))
+
 ## [2.4.2](https://github.com/aeternity/aepp-contracts/compare/v2.4.1...v2.4.2) (2024-11-07)
 
 
