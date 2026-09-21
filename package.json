@@ -10,7 +10,7 @@
     "test": "echo \"All tests passed\""
   },
   "dependencies": {
-    "@aeternity/aepp-sdk": "^14.0.0",
+    "@aeternity/aepp-sdk": "^15.0.0",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/theme-one-dark": "^6.1.2",
     "ansi_up": "^6.0.2",
