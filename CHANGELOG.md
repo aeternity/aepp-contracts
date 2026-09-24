@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.5.1](https://github.com/aeternity/aepp-contracts/compare/v2.5.0...v2.5.1) (2026-09-23)
+
+
+### CI / CD
+
+* bump github-actions reusable workflows to v2.4.0 ([4742cbd](https://github.com/aeternity/aepp-contracts/commit/4742cbd9dd18c32607f81cd2f17f54e8089089c3))
+
+
+### Miscellaneous
+
+* bump @aeternity/aepp-sdk to 15.0.0 ([eeae177](https://github.com/aeternity/aepp-contracts/commit/eeae17757a05a5c7c1042d624157043cbccbf6e8))
+
 ## [2.5.0](https://github.com/aeternity/aepp-contracts/compare/v2.4.2...v2.5.0) (2024-12-12)
 
 
