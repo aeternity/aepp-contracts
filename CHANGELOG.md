@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.2](https://github.com/aeternity/aepp-contracts/compare/v2.5.1...v2.5.2) (2026-09-24)
+
+
+### CI / CD
+
+* bump stale _publish-docker.yml reference to v2.4.0 ([9f55892](https://github.com/aeternity/aepp-contracts/commit/9f55892758910d54664f303bf8b978b26147382a))
+
 ## [2.5.1](https://github.com/aeternity/aepp-contracts/compare/v2.5.0...v2.5.1) (2026-09-23)
 
 
