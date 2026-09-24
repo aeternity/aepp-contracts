@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish-dockerhub:
-    uses: aeternity/github-actions/.github/workflows/_publish-docker.yml@v2.3.1
+    uses: aeternity/github-actions/.github/workflows/_publish-docker.yml@v2.4.0
     secrets: inherit
   publish:
     uses: aeternity/github-actions/.github/workflows/_publish-ecr.yml@v2.4.0
