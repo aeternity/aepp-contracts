@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.3](https://github.com/aeternity/aepp-contracts/compare/v2.5.2...v2.5.3) (2026-10-05)
+
+
+### CI / CD
+
+* bump stale pull-request-cleanup.yml refs to v2.4.0 ([d90aa82](https://github.com/aeternity/aepp-contracts/commit/d90aa82719c3ca137db757a63f00728186c451d9))
+
 ## [2.5.2](https://github.com/aeternity/aepp-contracts/compare/v2.5.1...v2.5.2) (2026-09-24)
 
 
